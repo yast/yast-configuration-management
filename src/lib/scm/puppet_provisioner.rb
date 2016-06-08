@@ -4,9 +4,8 @@ require "scm/cfa/puppet"
 
 module Yast
   module SCM
+    # Puppet integration handler
     class PuppetProvisioner < Provisioner
-      include Yast::Logger
-
       # List of packages to install
       #
       # Only puppet is needed.
@@ -18,11 +17,11 @@ module Yast
 
     private
 
-      # Update the puppet's configuration file
+      # Update puppet's configuration
       #
-      # At this time, only the master server is handled
-      # according to #master.
+      # At this time, only the master server is handled.
       #
+      # @see Yast::SCM::Provisioner#update_configuration
       # @see #master
       def update_configuration
         return unless master.is_a?(::String)
@@ -33,7 +32,9 @@ module Yast
         config.save
       end
 
-      # Apply configuration
+      # Try to apply system configuration
+      #
+      # @see Yast::SCM::Provisioner#try_to_apply
       def try_to_apply
         Yast::Execute.locally("puppet", "agent", "--onetime",
           "--no-daemonize", "--waitforcert", auth_timeout.to_s)

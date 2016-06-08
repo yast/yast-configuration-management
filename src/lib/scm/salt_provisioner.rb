@@ -5,6 +5,7 @@ require "scm/provisioner"
 
 module Yast
   module SCM
+    # Salt integration handler
     class SaltProvisioner < Provisioner
       # List of packages to install
       #
@@ -19,9 +20,9 @@ module Yast
 
       # Update the minion's configuration file
       #
-      # At this time, only the master server is handled
-      # according to #master.
+      # At this time, only the master server is handled.
       #
+      # @see Yast::SCM::Provisioner#update_configuration
       # @see #master
       def update_configuration
         return unless master.is_a?(::String)
@@ -32,7 +33,9 @@ module Yast
         config.save
       end
 
-      # Apply configuration
+      # Try to apply system configuration
+      #
+      # @see Yast::SCM::Provisioner#try_to_apply
       def try_to_apply
         Yast::Execute.locally("salt-call", "state.highstate")
         true

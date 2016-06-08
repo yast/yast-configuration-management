@@ -6,13 +6,14 @@ module Yast
   module SCM
     module CFA
       # Represents a Salt Minion configuration file.
-      #
-      # FIXME: At this time, we're using Augeas' cobblersettings lense,
-      # as long as YAML is not supported. We should use another parser.
       class Minion < ::CFA::BaseModel
         attributes(master: "master")
 
+        # Configuration parser
+        # FIXME: At this time, we're using Augeas' cobblersettings lense,
+        # as long as YAML is not supported. We should use another parser.
         PARSER = ::CFA::AugeasParser.new("cobblersettings.lns")
+        # Path to configuration file
         PATH = "/etc/salt/minion".freeze
 
         # Constructor

@@ -7,7 +7,9 @@ module Yast
     module CFA
       # Represents a Puppet configuration file.
       class Puppet < ::CFA::BaseModel
+        # Configuration parser
         PARSER = ::CFA::AugeasParser.new("puppet.lns")
+        # Path to configuration file
         PATH = "/etc/puppet/puppet.conf".freeze
 
         # Constructor
@@ -19,9 +21,10 @@ module Yast
 
         # Set server name
         #
-        # @param value [String] Puppet master server's name
-        def server=(value)
-          data["main"]["server"] = value
+        # @param name [String] Puppet master server's name
+        # @return [String] Puppet master server's name
+        def server=(name)
+          data["main"]["server"] = name
         end
 
         # Return server name
