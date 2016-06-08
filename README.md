@@ -1,9 +1,8 @@
 # YaST SCM
 
 This module allows AutoYaST2 to delegate part of the configuration to a
-[Configuration Management System](https://en.wikipedia.org/wiki/Software_configuration_management)
-(SCM). At this time, only Salt is supported, but it should be pretty
-easy to extend it to support Chef or Puppet.
+[Software Configuration Management](https://en.wikipedia.org/wiki/Software_configuration_management)
+system. Salt and Puppet are supported.
 
 At this time, the module is only a simple proof of concept and is not
 ready for prime time.
@@ -21,7 +20,7 @@ The module will take care of:
 
 ```xml
 <scm>
-  <type>salt</type>
+  <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
   <auth_retries config:type="integer">5</auth_retries>
   <auth_timeout config:type="integer">10</auth_timeout>
@@ -39,3 +38,14 @@ updated. Finally, `salt-call` will be used to apply the configuration.
 To set up other options in `/etc/salt/minion`, the
 [AutoYaST file element](https://www.suse.com/documentation/sles-12/singlehtml/book_autoyast/book_autoyast.html#createprofile.completeconf)
 should be used.
+
+### Puppet
+
+In this case, `puppet` package will be installed. If a `master`
+is set in the AutoYaST profile, `/etc/puppet/puppet.conf` will be
+updated. Finally, `puppet agent` will be used to apply the configuration.
+
+## Advanced options
+
+To set up advanced options you can use the
+[AutoYaST file element](https://www.suse.com/documentation/sles-12/singlehtml/book_autoyast/book_autoyast.html#createprofile.completeconf).
