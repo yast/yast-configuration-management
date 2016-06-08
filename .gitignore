@@ -1,0 +1,5 @@
+/doc/autodocs
+/.yardoc
+/coverage
+*.bz2
+*.pot

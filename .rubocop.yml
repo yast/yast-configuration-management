@@ -1,0 +1,68 @@
+# use the shared Yast defaults
+inherit_from:
+  /usr/share/YaST2/data/devtools/data/rubocop_yast_style.yml
+
+Metrics/AbcSize:
+  Max: 446
+
+Metrics/BlockNesting:
+  Max: 5
+
+Metrics/ClassLength:
+  Max: 2711
+
+Metrics/CyclomaticComplexity:
+  Max: 59
+
+Metrics/LineLength:
+  Max: 274
+
+Metrics/MethodLength:
+  Max: 931
+
+Metrics/ParameterLists:
+  Max: 11
+
+Metrics/PerceivedComplexity:
+  Max: 65
+
+Style/AccessorMethodName:
+  # keep backward compatibility, but do not allow new code to be non-ruby style
+  Exclude:
+    - library/systemd/src/modules/systemd_target.rb
+
+# UI_ID module is not camel case
+Style/ClassAndModuleCamelCase:
+  Enabled: false
+
+Style/ClassVars:
+  # We really need the class variables in SuSEFirewall modules
+  Exclude:
+    - "library/network/src/modules/SuSEFirewall.rb"
+
+# ensure new code is properly documented
+Style/Documentation:
+  Include:
+    - "library/*/src/lib/**/*.rb"
+
+Style/FileName:
+  Include:
+    - "library/*/src/lib/**/*.rb"
+
+Style/MethodName:
+  Include:
+    - "library/*/src/lib/**/*.rb"
+
+# keep it as it is part of API for old code
+Style/PredicateName:
+  Include:
+    - "library/*/src/lib/**/*.rb"
+
+# for old code keep it as often methods names are wrong and part of API
+Style/TrivialAccessors:
+  Include:
+    - "library/*/src/lib/**/*.rb"
+
+Style/VariableName:
+  Include:
+    - "library/*/src/lib/**/*.rb"
