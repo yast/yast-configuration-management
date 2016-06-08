@@ -21,7 +21,7 @@ module Yast
           cfg[key] = val unless key == :type
         end
 
-        Provisioner.current = Provisioner.new(data["type"].downcase, data)
+        Provisioner.current = Provisioner.provisioner_for(data["type"].downcase, config)
         true
       end
 

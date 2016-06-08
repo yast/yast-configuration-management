@@ -5,11 +5,13 @@ require "cheetah"
 
 describe Yast::SCM::SaltProvisioner do
   subject(:provisioner) { Yast::SCM::SaltProvisioner.new(config) }
-  let(:config) { { "auth_retries" => 3 } }
+
+  let(:config) { { auth_retries: 3, auth_timeout: 10 } }
 
   before do
     allow(provisioner).to receive(:sleep)
   end
+
   describe "#packages" do
     it "returns a list containing only 'salt-minion' package" do
       expect(provisioner.packages).to eq("install" => ["salt-minion"])
@@ -22,20 +24,20 @@ describe Yast::SCM::SaltProvisioner do
     it "runs salt-call" do
       expect(Yast::Execute).to receive(:locally)
         .with("salt-call", "state.highstate")
-      expect(provisioner.run)
+      expect(provisioner.run).to eq(true)
     end
 
     context "when salt-call fails" do
-      it "retries up to 'auth_times' times" do
+      it "retries up to 'auth_retries' times" do
         expect(Yast::Execute).to receive(:locally)
           .with("salt-call", "state.highstate").and_raise(Cheetah::ExecutionFailed)
-          .exactly(config["auth_retries"]).times
-        expect(provisioner.run)
+          .exactly(config[:auth_retries]).times
+        expect(provisioner.run).to eq(false)
       end
     end
 
     context "when a master server is specified through the configuration" do
-      let(:config) { { "master" => "myserver" } }
+      let(:config) { { master: "myserver" } }
 
       it "updates the configuration file" do
         allow(Yast::SCM::CFA::Minion).to receive(:new).and_return(minion_config)
