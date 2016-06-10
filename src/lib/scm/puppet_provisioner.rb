@@ -1,6 +1,7 @@
 require "yast"
 require "yast2/execute"
 require "scm/cfa/puppet"
+require "scm/provisioner"
 
 module Yast
   module SCM
@@ -32,12 +33,22 @@ module Yast
         config.save
       end
 
-      # Try to apply system configuration
+      # Try to apply system configuration in client mode
       #
-      # @see Yast::SCM::Provisioner#try_to_apply
-      def try_to_apply
+      # @see Yast::SCM::Provisioner#apply_client_mode
+      def apply_client_mode
         Yast::Execute.locally("puppet", "agent", "--onetime",
           "--no-daemonize", "--waitforcert", auth_timeout.to_s)
+        true
+      rescue
+        false
+      end
+
+      # Try to apply system configuration in masterless mode
+      #
+      # @see Yast::SCM::Provisioner#apply_masterless_mode
+      def apply_masterless_mode
+        Yast::Execute.locally("puppet", "apply", config_tmpdir.join("manifests", "site.pp").to_s)
         true
       rescue
         false

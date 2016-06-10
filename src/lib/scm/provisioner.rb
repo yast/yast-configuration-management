@@ -1,17 +1,33 @@
 require "yast"
+require "uri"
+require "transfer/file_from_url"
+require "pathname"
+require "yast2/execute"
+require "tmpdir"
 
 module Yast
   module SCM
     # This class handles the general bit of configuring/running SCM systems.
     class Provisioner
       include Yast::Logger
+      include Yast::Transfer::FileFromUrl
 
-      # @return [String] Master server hostname
+      MODES = [:masterless, :client]
+
+      # @return [String,nil] Master server hostname
       attr_reader :master
+      # @return [URI,nil] Config URL
+      attr_reader :config_url
       # @return [Integer] Number of authentication retries
       attr_reader :auth_retries
       # @return [Integer] Authentication timeout for each retry
       attr_reader :auth_timeout
+
+      # Mode could not be determined because master and config_url are
+      # both nil.
+      class CouldNotDetermineMode < StandardError; end
+      # Configuration (specified via config_url) could not be fetched
+      class ConfigurationNotFetched < StandardError; end
 
       class << self
         # Current provisioner
@@ -65,6 +81,7 @@ module Yast
         @master       = config[:master]
         @auth_retries = config[:auth_retries] || 3
         @auth_timeout = config[:auth_timeout] || 10
+        @config_url   = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
       end
 
       # Return the list of packages to install
@@ -80,27 +97,118 @@ module Yast
         {}
       end
 
-      # Apply the configuration
+      # Run the provisioner applying the configuration to the system
+      #
+      # Work is delegated to methods called after the mode: #run_masterless_mode
+      # and #run_client_mode.
+      #
+      # @see run_masterless_mode
+      # @see run_client_mode
+      def run
+        send("run_#{mode}_mode")
+      end
+      # Provisioner operation mode
+      #
+      # The mode is decided depending on 'master' and 'config_url'
+      # values.
+      #
+      # * If 'master' is specified -> :client
+      # * If 'config_url' is -> :masterless
+      # * Otherwise -> :client
+      #
+      # @param proposed [String] Proposed mode
+      # @return [Symbol] Mode. Possible values are listed in MODE constant.
+      #
+      # @see MODE
+      def mode
+        @mode =
+          if master || (master.nil? && config_url.nil?)
+            :client
+          else
+            :masterless
+          end
+      end
+
+      # Determines whether the provisioner is operating in the given module
+      #
+      # @return [Boolean] true if it's operating in the given mode; false otherwise.
+      def mode?(value)
+        mode == value
+      end
+
+      # Command to uncompress configuration
+      UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<config_tmpdir>s"
+      # Local file name of fetched configuration
+      CONFIG_LOCAL_FILENAME = "config.tgz"
+
+      # Fetchs configuration from config_url
+      #
+      # FIXME: this code should be in another class. We want to extend this
+      # mechanism to support, for example, git repositories.
+      #
+      # @return [Boolean] true if configuration was fetched; false otherwise.
+      def fetch_config
+        config_file = config_tmpdir.join(CONFIG_LOCAL_FILENAME)
+        return false unless get_file(config_url, config_file)
+        cmd = format(UNCOMPRESS_CONFIG, config_file: config_file, config_tmpdir: config_tmpdir)
+        Yast::Execute.locally(cmd)
+      rescue
+        false
+      end
+
+      # Run the provisioner in masterless mode
+      #
+      # * Fetch the configuration from the given #config_url
+      # * Apply the configuration using masterless mode
+      #
+      # @return [Boolean] true if configuration suceeded; false otherwise.
+      #
+      # @see fetch_config
+      # @see apply_masterless_mode
+      def run_masterless_mode
+        fetch_config && apply_masterless_mode
+      end
+
+      # Run the provisioner in client mode
+      #
+      # * Update configuration file writing the master name
+      # * Run the provisioner
+      #
+      # @return [Boolean] true if configuration suceeded; false otherwise.
       #
       # @see update_config_file
       # @see apply
-      def run
-        update_configuration
-        apply
+      def run_client_mode
+        update_configuration && with_retries(auth_retries) { apply_client_mode }
       end
+
 
     private
 
       # Apply the configuration using the SCM system
       #
-      # It performs 'auth_retries' attempts. Descending classes should
-      # implement #try_to_apply.
+      # To be redefined by inheriting classes.
       #
       # @return [Boolean] true if the configuration was applied; false otherwise.
-      def apply
-        auth_retries.times do |i|
+      def apply_client_mode
+        raise NotImplementedError
+      end
+
+      # Apply the configuration using the SCM system
+      #
+      # Configuration is available at #config_tmpdir
+      #
+      # @return [Boolean] true if the configuration was applied; false otherwise.
+      #
+      # @see config_tmpdir
+      def apply_masterless_mode
+        raise NotImplementedError
+      end
+
+      def with_retries(attempts = 1)
+        attempts.times do |i|
           log.info "Applying configuration (try #{i + 1}/#{auth_retries})"
-          return true if try_to_apply
+          return true if yield
         end
         false
       end
@@ -117,6 +225,25 @@ module Yast
       # To be defined by descending classes.
       def try_to_apply
         raise NotImplementedError
+      end
+
+      # Return a path to a temporal directory to extract configuration
+      #
+      # @return [Pathname] Path name to the temporal directory
+      def config_tmpdir
+        @config_tmpdir ||= Pathname.new(Dir.mktmpdir)
+      end
+
+      # Helper method to simplify invocation to get_file_from_url
+      #
+      # @return [Boolean] true if the file was fetched; false otherwise.
+      #
+      # @see Yast::Transfer::FileFromUrl
+      def get_file(source, target)
+        get_file_from_url(
+          scheme: source.scheme, host: source.host,
+          urlpath: source.path.to_s, urltok: {}, destdir: target.dirname.to_s,
+          localfile: target.basename.to_s)
       end
     end
   end
