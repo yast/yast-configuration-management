@@ -30,10 +30,10 @@ describe Yast::SCM::PuppetProvisioner do
 
       before do
         allow(Yast::SCM::CFA::Puppet).to receive(:new).and_return(puppet_config)
+        allow(puppet_config).to receive(:server=)
       end
 
       it "runs puppet agent" do
-        allow(puppet_config).to receive(:server=)
         expect(Yast::Execute).to receive(:locally)
           .with("puppet", "agent", "--onetime", "--no-daemonize",
           "--waitforcert", config[:auth_timeout].to_s)
@@ -42,7 +42,6 @@ describe Yast::SCM::PuppetProvisioner do
 
       context "when puppet agent fails" do
         it "retries up to 'auth_retries' times" do
-          allow(puppet_config).to receive(:server=)
           expect(Yast::Execute).to receive(:locally)
             .with("puppet", *any_args).and_raise(Cheetah::ExecutionFailed)
             .exactly(config[:auth_retries]).times

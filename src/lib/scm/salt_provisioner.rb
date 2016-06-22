@@ -36,13 +36,25 @@ module Yast
       # Try to apply system configuration
       #
       # @see Yast::SCM::Provisioner#try_to_apply
-      def try_to_apply
+      def apply_client_mode
         Yast::Execute.locally("salt-call", "state.highstate")
         true
       rescue
         sleep auth_timeout
         false
       end
+
+      # Try to apply system configuration in masterless mode
+      #
+      # @see Yast::SCM::Provisioner#apply_masterless_mode
+      def apply_masterless_mode
+        Yast::Execute.locally("salt-call", "--local",
+          "--file-root=#{config_tmpdir}", "state.highstate")
+        true
+      rescue
+        false
+      end
+
     end
   end
 end

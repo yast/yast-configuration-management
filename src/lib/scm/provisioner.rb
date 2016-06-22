@@ -122,6 +122,7 @@ module Yast
       #
       # @see MODE
       def mode
+        return @mode unless @mode.nil?
         @mode =
           if master || (master.nil? && config_url.nil?)
             :client
