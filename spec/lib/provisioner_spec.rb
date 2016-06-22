@@ -161,12 +161,13 @@ describe Yast::SCM::Provisioner do
       end
 
       it "downloads and uncompress the configuration to a temporal directory" do
-
         expect(provisioner).to receive(:get_file_from_url).with(
           scheme: "https", host: "yast.example.net", urlpath: "/myconfig.tgz",
-          urltok: {}, destdir: tmpdir,
-          localfile: described_class.const_get(:CONFIG_LOCAL_FILENAME)).and_return(true)
-        expect(Yast::Execute).to receive(:locally).with(%r{tar xf}).and_return(true)
+          urltok: {}, destdir: "/",
+          localfile: File.join(tmpdir, described_class.const_get(:CONFIG_LOCAL_FILENAME)))
+          .and_return(true)
+        expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
+          .and_return(true)
 
         provisioner.fetch_config
       end
@@ -174,7 +175,7 @@ describe Yast::SCM::Provisioner do
       context "when the file is downloaded and uncompressed" do
         before do
           allow(provisioner).to receive(:get_file_from_url).and_return(true)
-          allow(Yast::Execute).to receive(:locally).with(/tar/).and_return(true)
+          allow(Yast::Execute).to receive(:locally).with("tar", *any_args).and_return(true)
         end
 
         it "returns true" do
@@ -195,7 +196,7 @@ describe Yast::SCM::Provisioner do
       context "when uncompressing fails" do
         before do
           allow(provisioner).to receive(:get_file_from_url).and_return(true)
-          allow(Yast::Execute).to receive(:locally).with(/tar/).and_raise(Cheetah::ExecutionFailed)
+          allow(Yast::Execute).to receive(:locally).with("tar", *any_args).and_raise(Cheetah::ExecutionFailed)
         end
 
         it "returns false" do

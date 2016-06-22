@@ -10,6 +10,7 @@ module Yast
     # This class handles the general bit of configuring/running SCM systems.
     class Provisioner
       include Yast::Logger
+      include Yast::I18n
       include Yast::Transfer::FileFromUrl
 
       MODES = [:masterless, :client]
@@ -150,8 +151,8 @@ module Yast
       def fetch_config
         config_file = config_tmpdir.join(CONFIG_LOCAL_FILENAME)
         return false unless get_file(config_url, config_file)
-        cmd = format(UNCOMPRESS_CONFIG, config_file: config_file, config_tmpdir: config_tmpdir)
-        Yast::Execute.locally(cmd)
+        Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", config_tmpdir.to_s)
+        true
       rescue
         false
       end
@@ -242,8 +243,8 @@ module Yast
       def get_file(source, target)
         get_file_from_url(
           scheme: source.scheme, host: source.host,
-          urlpath: source.path.to_s, urltok: {}, destdir: target.dirname.to_s,
-          localfile: target.basename.to_s)
+          urlpath: source.path.to_s, urltok: {}, destdir: "/",
+          localfile: target.to_s)
       end
     end
   end
