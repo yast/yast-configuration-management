@@ -18,12 +18,24 @@ The module will take care of:
 
 ## Example
 
+### Client/master
+
 ```xml
 <scm>
   <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
   <auth_retries config:type="integer">5</auth_retries>
   <auth_timeout config:type="integer">10</auth_timeout>
+</scm>
+```
+
+### Masterless mode
+
+```xml
+<scm>
+  <type>salt</type> <!-- you can use "puppet" -->
+  <config_url>http://myserver.example.net/states.tgz</config_url>
+  <auth_retries config:type="integer">3</auth_retries>
 </scm>
 ```
 
@@ -34,10 +46,6 @@ The module will take care of:
 In this case, `salt-minion` package will be installed. If a `master`
 is set in the AutoYaST profile, `/etc/salt/minion` will be
 updated. Finally, `salt-call` will be used to apply the configuration.
-
-To set up other options in `/etc/salt/minion`, the
-[AutoYaST file element](https://www.suse.com/documentation/sles-12/singlehtml/book_autoyast/book_autoyast.html#createprofile.completeconf)
-should be used.
 
 ### Puppet
 
