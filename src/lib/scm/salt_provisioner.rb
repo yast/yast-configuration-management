@@ -40,7 +40,7 @@ module Yast
         Yast::Execute.locally("salt-call", "state.highstate")
         true
       rescue
-        sleep auth_timeout
+        sleep timeout
         false
       end
 

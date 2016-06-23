@@ -11,7 +11,7 @@ describe Yast::SCM::PuppetProvisioner do
   let(:tmpdir) { Pathname.new("tmp") }
 
   let(:config) do
-    { auth_retries: 3, auth_timeout: 10, master: master, config_url: config_url }
+    { attempts: 3, timeout: 10, master: master, config_url: config_url }
   end
 
   describe "#packages" do
@@ -36,15 +36,15 @@ describe Yast::SCM::PuppetProvisioner do
       it "runs puppet agent" do
         expect(Yast::Execute).to receive(:locally)
           .with("puppet", "agent", "--onetime", "--no-daemonize",
-          "--waitforcert", config[:auth_timeout].to_s)
+          "--waitforcert", config[:timeout].to_s)
         expect(provisioner.run).to eq(true)
       end
 
       context "when puppet agent fails" do
-        it "retries up to 'auth_retries' times" do
+        it "retries up to 'attempts' times" do
           expect(Yast::Execute).to receive(:locally)
             .with("puppet", *any_args).and_raise(Cheetah::ExecutionFailed)
-            .exactly(config[:auth_retries]).times
+            .exactly(config[:attempts]).times
           expect(provisioner.run).to eq(false)
         end
       end

@@ -11,7 +11,7 @@ describe Yast::SCM::SaltProvisioner do
   let(:tmpdir) { Pathname.new("/tmp") }
 
   let(:config) do
-    { auth_retries: 3, auth_timeout: 10, master: master, config_url: config_url }
+    { attempts: 3, timeout: 10, master: master, config_url: config_url }
   end
 
   before do
@@ -44,10 +44,10 @@ describe Yast::SCM::SaltProvisioner do
       end
 
       context "when salt-call fails" do
-        it "retries up to 'auth_retries' times" do
+        it "retries up to 'attempts' times" do
           expect(Yast::Execute).to receive(:locally)
             .with("salt-call", *any_args).and_raise(Cheetah::ExecutionFailed)
-            .exactly(config[:auth_retries]).times
+            .exactly(config[:attempts]).times
           expect(provisioner.run).to eq(false)
         end
       end

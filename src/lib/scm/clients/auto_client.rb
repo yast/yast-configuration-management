@@ -23,10 +23,10 @@ module Yast
       # to the provisioner's constructor.
       #
       # @return profile [Hash] configuration from AutoYaST profile
-      # @option profile [String] "type"         Provisioner to use ("salt", "puppet", etc.)
-      # @option profile [String] "master"       Master server name
-      # @option profile [String] "auth_timeout" Authentication timeout
-      # @option profile [String] "auth_retries" Authentication retries
+      # @option profile [String] "type"     Provisioner to use ("salt", "puppet", etc.)
+      # @option profile [String] "master"   Master server name
+      # @option profile [String] "timeout"  Authentication timeout
+      # @option profile [String] "attempts" Authentication retries
       def import(profile = {})
         config = {}
         profile.each_with_object(config) do |option, cfg|

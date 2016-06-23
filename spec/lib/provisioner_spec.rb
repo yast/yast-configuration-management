@@ -9,7 +9,7 @@ describe Yast::SCM::Provisioner do
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
 
   let(:config) do
-    { auth_retries: 3, auth_timeout: 10, master: master, config_url: config_url }
+    { attempts: 3, timeout: 10, master: master, config_url: config_url }
   end
 
   describe "#master" do
@@ -18,15 +18,15 @@ describe Yast::SCM::Provisioner do
     end
   end
 
-  describe "#auth_retries" do
+  describe "#attempts" do
     it "returns the master option" do
-      expect(provisioner.auth_retries).to eq(config[:auth_retries])
+      expect(provisioner.attempts).to eq(config[:attempts])
     end
   end
 
-  describe "#auth_timeout" do
-    it "returns the auth_timeout option" do
-      expect(provisioner.auth_timeout).to eq(config[:auth_timeout])
+  describe "#timeout" do
+    it "returns the timeout option" do
+      expect(provisioner.timeout).to eq(config[:timeout])
     end
   end
 

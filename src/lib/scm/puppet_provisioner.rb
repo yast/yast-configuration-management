@@ -38,7 +38,7 @@ module Yast
       # @see Yast::SCM::Provisioner#apply_client_mode
       def apply_client_mode
         Yast::Execute.locally("puppet", "agent", "--onetime",
-          "--no-daemonize", "--waitforcert", auth_timeout.to_s)
+          "--no-daemonize", "--waitforcert", timeout.to_s)
         true
       rescue
         false

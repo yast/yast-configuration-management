@@ -20,9 +20,9 @@ module Yast
       # @return [URI,nil] Config URL
       attr_reader :config_url
       # @return [Integer] Number of authentication retries
-      attr_reader :auth_retries
+      attr_reader :attempts
       # @return [Integer] Authentication timeout for each retry
-      attr_reader :auth_timeout
+      attr_reader :timeout
 
       # Mode could not be determined because master and config_url are
       # both nil.
@@ -74,15 +74,15 @@ module Yast
       # Constructor
       #
       # @param config [Hash] options
-      # @option config [Integer] :master       Master server's name
-      # @option config [Integer] :auth_retries Number of authentication retries
-      # @option config [Integer] :auth_timeout Authentication timeout for each retry
+      # @option config [Integer] :master   Master server's name
+      # @option config [Integer] :attempts Number of authentication retries
+      # @option config [Integer] :timeout Authentication timeout for each retry
       def initialize(config = {})
         log.info "Initializing provisioner #{self.class.name} with #{config}"
-        @master       = config[:master]
-        @auth_retries = config[:auth_retries] || 3
-        @auth_timeout = config[:auth_timeout] || 10
-        @config_url   = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
+        @master     = config[:master]
+        @attempts   = config[:attempts] || 3
+        @timeout    = config[:timeout] || 10
+        @config_url = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
       end
 
       # Return the list of packages to install
@@ -181,7 +181,7 @@ module Yast
       # @see update_config_file
       # @see apply
       def run_client_mode
-        update_configuration && with_retries(auth_retries) { apply_client_mode }
+        update_configuration && with_retries(attempts) { apply_client_mode }
       end
 
 
@@ -209,7 +209,7 @@ module Yast
 
       def with_retries(attempts = 1)
         attempts.times do |i|
-          log.info "Applying configuration (try #{i + 1}/#{auth_retries})"
+          log.info "Applying configuration (try #{i + 1}/#{attempts})"
           return true if yield
         end
         false

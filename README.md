@@ -24,8 +24,8 @@ The module will take care of:
 <scm>
   <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
-  <auth_retries config:type="integer">5</auth_retries>
-  <auth_timeout config:type="integer">10</auth_timeout>
+  <attempts config:type="integer">5</attempts>
+  <timeout config:type="integer">10</timeout>
 </scm>
 ```
 
@@ -35,7 +35,7 @@ The module will take care of:
 <scm>
   <type>salt</type> <!-- you can use "puppet" -->
   <config_url>http://myserver.example.net/states.tgz</config_url>
-  <auth_retries config:type="integer">3</auth_retries>
+  <attempts config:type="integer">3</attempts>
 </scm>
 ```
 
