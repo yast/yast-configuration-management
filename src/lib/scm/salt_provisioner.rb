@@ -35,7 +35,7 @@ module Yast
 
       # Try to apply system configuration
       #
-      # @see Yast::SCM::Provisioner#try_to_apply
+      # @see Yast::SCM::Provisioner#apply_client_mode
       def apply_client_mode
         Yast::Execute.locally("salt-call", "state.highstate")
         true

@@ -108,6 +108,7 @@ module Yast
       def run
         send("run_#{mode}_mode")
       end
+
       # Provisioner operation mode
       #
       # The mode is decided depending on 'master' and 'config_url'
@@ -178,12 +179,11 @@ module Yast
       #
       # @return [Boolean] true if configuration suceeded; false otherwise.
       #
-      # @see update_config_file
+      # @see update_configuration
       # @see apply
       def run_client_mode
         update_configuration && with_retries(attempts) { apply_client_mode }
       end
-
 
     private
 
@@ -219,13 +219,6 @@ module Yast
       #
       # To be defined by descending classes.
       def update_configuration
-        raise NotImplementedError
-      end
-
-      # Try to apply system configuration
-      #
-      # To be defined by descending classes.
-      def try_to_apply
         raise NotImplementedError
       end
 
