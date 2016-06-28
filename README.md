@@ -1,4 +1,4 @@
-# YaST SCM
+# YaST CM
 
 This module allows AutoYaST2 to delegate part of the configuration to a
 [Software Configuration Management](https://en.wikipedia.org/wiki/Software_configuration_management)
@@ -23,23 +23,23 @@ The module will take care of:
 ### Client/master
 
 ```xml
-<scm>
+<cm>
   <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
   <attempts config:type="integer">5</attempts>
   <timeout config:type="integer">10</timeout>
   <keys_url>usb:/</keys_url> <!-- you can use HTTP, FTP... -->
-</scm>
+</cm>
 ```
 
 ### Masterless mode
 
 ```xml
-<scm>
+<cm>
   <type>salt</type> <!-- you can use "puppet" -->
   <config_url>http://myserver.example.net/states.tgz</config_url>
   <attempts config:type="integer">3</attempts>
-</scm>
+</cm>
 ```
 
 ## Supported systems

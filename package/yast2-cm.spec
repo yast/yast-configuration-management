@@ -16,7 +16,7 @@
 #
 
 
-Name:           yast2-scm
+Name:           yast2-cm
 Version:        0.0.1
 Release:        0
 
@@ -38,10 +38,10 @@ Requires:       yast2-installation
 
 BuildArch: noarch
 
-Summary:	YaST2 - YaST SCM
+Summary:	YaST2 - YaST CM
 
 %description
-This package contains the YaST2 component for SCM provisioning.
+This package contains the YaST2 component for CM provisioning.
 
 %prep
 %setup -n %{name}-%{version}
@@ -57,7 +57,7 @@ rake install DESTDIR="%{buildroot}"
 %files
 %defattr(-,root,root)
 %{yast_clientdir}/*.rb
-%{yast_libdir}/scm
+%{yast_libdir}/cm
 %{yast_desktopdir}/*.desktop
 
 %dir %{yast_docdir}

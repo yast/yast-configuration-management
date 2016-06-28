@@ -1,10 +1,10 @@
 require_relative "../spec_helper"
-require "scm/salt_provisioner"
+require "cm/salt_provisioner"
 require "yast2/execute"
 require "cheetah"
 
-describe Yast::SCM::SaltProvisioner do
-  subject(:provisioner) { Yast::SCM::SaltProvisioner.new(config) }
+describe Yast::CM::SaltProvisioner do
+  subject(:provisioner) { Yast::CM::SaltProvisioner.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
@@ -35,9 +35,9 @@ describe Yast::SCM::SaltProvisioner do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::SCM::CFA::Minion).to receive(:new).and_return(minion_config)
+        allow(Yast::CM::CFA::Minion).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:master=)
-        allow(Yast::SCM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
       end
 
       it "runs salt-call" do
@@ -90,7 +90,7 @@ describe Yast::SCM::SaltProvisioner do
       it "updates the configuration file" do
         allow(Yast::Execute).to receive(:locally)
           .with("salt-call", *any_args)
-        expect(Yast::SCM::CFA::Minion).to_not receive(:new)
+        expect(Yast::CM::CFA::Minion).to_not receive(:new)
         provisioner.run
       end
     end

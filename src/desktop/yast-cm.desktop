@@ -5,9 +5,9 @@ Categories=Settings;System;Qt;X-SuSE-YaST;
 X-SuSE-YaST-AutoInst=all
 X-SuSE-YaST-AutoInstClonable=false
 X-SuSE-YaST-AutoInstRequires=lan
-X-SuSE-YaST-AutoInstSchema=scm.rnc
-X-SuSE-YaST-AutoInstResource=scm
-X-SuSE-YaST-AutoInstClient=scm_auto
-X-SuSE-YaST-Keywords=salt,privisioning,scm
+X-SuSE-YaST-AutoInstSchema=cm.rnc
+X-SuSE-YaST-AutoInstResource=cm
+X-SuSE-YaST-AutoInstClient=cm_auto
+X-SuSE-YaST-Keywords=salt,privisioning,cm
 
-Name=YaST2 SCM
+Name=YaST2 CM

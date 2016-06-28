@@ -1,14 +1,14 @@
 require "yast"
 require "installation/auto_client"
-require "scm/provisioner"
+require "cm/provisioner"
 
 module Yast
-  module SCM
+  module CM
     # AutoClient implementation
     #
     # The real work is delegated to Provisioners.
     #
-    # @see Yast::SCM::Provisioner
+    # @see Yast::CM::Provisioner
     class AutoClient < ::Installation::AutoClient
       include Yast::I18n
 

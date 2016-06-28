@@ -1,11 +1,11 @@
 require "yast"
 require "yast2/execute"
-require "scm/cfa/puppet"
-require "scm/provisioner"
+require "cm/cfa/puppet"
+require "cm/provisioner"
 require "pathname"
 
 module Yast
-  module SCM
+  module CM
     # Puppet integration handler
     class PuppetProvisioner < Provisioner
       PRIVATE_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/private_keys").freeze
@@ -26,7 +26,7 @@ module Yast
       #
       # At this time, only the master server is handled.
       #
-      # @see Yast::SCM::Provisioner#update_configuration
+      # @see Yast::CM::Provisioner#update_configuration
       # @see #master
       def update_configuration
         return unless master.is_a?(::String)
@@ -39,7 +39,7 @@ module Yast
 
       # Try to apply system configuration in client mode
       #
-      # @see Yast::SCM::Provisioner#apply_client_mode
+      # @see Yast::CM::Provisioner#apply_client_mode
       def apply_client_mode
         Yast::Execute.locally("puppet", "agent", "--onetime",
           "--no-daemonize", "--waitforcert", timeout.to_s)
@@ -50,7 +50,7 @@ module Yast
 
       # Try to apply system configuration in masterless mode
       #
-      # @see Yast::SCM::Provisioner#apply_masterless_mode
+      # @see Yast::CM::Provisioner#apply_masterless_mode
       def apply_masterless_mode
         Yast::Execute.locally("puppet", "apply", config_tmpdir.join("manifests", "site.pp").to_s)
         true

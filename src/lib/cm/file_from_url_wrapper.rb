@@ -2,7 +2,7 @@ require "yast"
 require "transfer/file_from_url"
 
 module Yast
-  module SCM
+  module CM
     # Wrapper around Transfer::FileFromUrl
     module FileFromUrlWrapper
       extend Yast::I18n

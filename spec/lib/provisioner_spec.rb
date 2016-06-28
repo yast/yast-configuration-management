@@ -1,15 +1,15 @@
 require_relative "../spec_helper"
-require "scm/provisioner"
-require "scm/key_finder"
+require "cm/provisioner"
+require "cm/key_finder"
 require "yast2/execute"
 
-describe Yast::SCM::Provisioner do
-  subject(:provisioner) { Yast::SCM::Provisioner.new(config) }
+describe Yast::CM::Provisioner do
+  subject(:provisioner) { Yast::CM::Provisioner.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { nil }
-  let(:file_from_url_wrapper) { Yast::SCM::FileFromUrlWrapper }
+  let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
 
   let(:config) do
     { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
@@ -169,7 +169,7 @@ describe Yast::SCM::Provisioner do
       end
 
       it "copy keys" do
-        expect(Yast::SCM::KeyFinder).to receive(:new)
+        expect(Yast::CM::KeyFinder).to receive(:new)
           .with(keys_url: URI(keys_url)).and_return(key_finder)
         expect(key_finder).to receive(:fetch_to)
           .with(private_key_path, public_key_path)
@@ -186,7 +186,7 @@ describe Yast::SCM::Provisioner do
 
       it "downloads and uncompress the configuration to a temporal directory" do
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(URI(config_url), tmpdir.join(Yast::SCM::Provisioner::CONFIG_LOCAL_FILENAME))
+          .with(URI(config_url), tmpdir.join(Yast::CM::Provisioner::CONFIG_LOCAL_FILENAME))
           .and_return(true)
         expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
           .and_return(true)

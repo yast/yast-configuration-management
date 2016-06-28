@@ -3,7 +3,7 @@ require "cfa/augeas_parser"
 require "cfa/matcher"
 
 module Yast
-  module SCM
+  module CM
     module CFA
       # Represents a Puppet configuration file.
       class Puppet < ::CFA::BaseModel

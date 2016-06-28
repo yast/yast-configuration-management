@@ -1,11 +1,11 @@
 require "yast"
 require "yast2/execute"
-require "scm/cfa/minion"
-require "scm/provisioner"
+require "cm/cfa/minion"
+require "cm/provisioner"
 require "pathname"
 
 module Yast
-  module SCM
+  module CM
     # Salt integration handler
     class SaltProvisioner < Provisioner
       PRIVATE_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pem").freeze
@@ -26,7 +26,7 @@ module Yast
       #
       # At this time, only the master server is handled.
       #
-      # @see Yast::SCM::Provisioner#update_configuration
+      # @see Yast::CM::Provisioner#update_configuration
       # @see #master
       def update_configuration
         return unless master.is_a?(::String)
@@ -39,7 +39,7 @@ module Yast
 
       # Try to apply system configuration
       #
-      # @see Yast::SCM::Provisioner#apply_client_mode
+      # @see Yast::CM::Provisioner#apply_client_mode
       def apply_client_mode
         Yast::Execute.locally("salt-call", "state.highstate")
         true
@@ -50,7 +50,7 @@ module Yast
 
       # Try to apply system configuration in masterless mode
       #
-      # @see Yast::SCM::Provisioner#apply_masterless_mode
+      # @see Yast::CM::Provisioner#apply_masterless_mode
       def apply_masterless_mode
         Yast::Execute.locally("salt-call", "--local",
           "--file-root=#{config_tmpdir}", "state.highstate")

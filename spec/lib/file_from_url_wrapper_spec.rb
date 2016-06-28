@@ -1,11 +1,11 @@
 require_relative "../spec_helper"
-require "scm/file_from_url_wrapper"
+require "cm/file_from_url_wrapper"
 require "uri"
 require "pathname"
 
-describe Yast::SCM::FileFromUrlWrapper do
+describe Yast::CM::FileFromUrlWrapper do
   describe "#get_file" do
-    described_class { Yast::SCM::FileFromUrlWrapper }
+    described_class { Yast::CM::FileFromUrlWrapper }
     subject(:wrapper) { described_class }
 
     let(:uri) { URI("http://yast.example.net/some-file.txt") }
@@ -21,9 +21,9 @@ describe Yast::SCM::FileFromUrlWrapper do
     end
 
     it "returns value from get_file_from_url" do
-      allow(Yast::SCM::FileFromUrlWrapper).to receive(:get_file_from_url)
+      allow(Yast::CM::FileFromUrlWrapper).to receive(:get_file_from_url)
         .and_return("some-value")
-      expect(Yast::SCM::FileFromUrlWrapper.get_file(uri, target))
+      expect(Yast::CM::FileFromUrlWrapper.get_file(uri, target))
         .to eq("some-value")
     end
   end

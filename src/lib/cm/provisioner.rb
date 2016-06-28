@@ -4,12 +4,12 @@ require "transfer/file_from_url"
 require "pathname"
 require "yast2/execute"
 require "tmpdir"
-require "scm/key_finder"
-require "scm/file_from_url_wrapper"
+require "cm/key_finder"
+require "cm/file_from_url_wrapper"
 
 module Yast
-  module SCM
-    # This class handles the general bit of configuring/running SCM systems.
+  module CM
+    # This class handles the general bit of configuring/running CM systems.
     class Provisioner
       include Yast::Logger
 
@@ -35,39 +35,39 @@ module Yast
       class << self
         # Current provisioner
         #
-        # @return [Yast::SCM::Provisioner] Current provisioner
+        # @return [Yast::CM::Provisioner] Current provisioner
         def current
           @current
         end
 
         # Set the provisioner to be used
         #
-        # @param provisioner [Yast::SCM::Provisioner] Provisioner to be used
-        # @return [Yast::SCM::Provisioner] Current provisioner
+        # @param provisioner [Yast::CM::Provisioner] Provisioner to be used
+        # @return [Yast::CM::Provisioner] Current provisioner
         def current=(provisioner)
           @current = provisioner
         end
 
-        # Return the provisioner for a given SCM system and a configuration
+        # Return the provisioner for a given CM system and a configuration
         #
-        # @param type   [String] SCM type ("salt", "puppet", etc.)
+        # @param type   [String] CM type ("salt", "puppet", etc.)
         # @param config [Hash]   Provisioner configuration
-        # @return [Yast::SCM::Provisioner] Provisioner to handle 'type' configuration
+        # @return [Yast::CM::Provisioner] Provisioner to handle 'type' configuration
         #
         # @see .provisioner_class
         def provisioner_for(type, config)
           provisioner_class(type).new(config)
         end
 
-        # Return the provisioner class to handle a given SCM system
+        # Return the provisioner class to handle a given CM system
         #
         # It tries to find the definition.
         #
-        # @param type [String] SCM type ("salt", "puppet", etc.)
+        # @param type [String] CM type ("salt", "puppet", etc.)
         # @return [Class] Provisioner class
         def provisioner_class(type)
-          require "scm/#{type}_provisioner"
-          Yast::SCM.const_get "#{type.capitalize}Provisioner"
+          require "cm/#{type}_provisioner"
+          Yast::CM.const_get "#{type.capitalize}Provisioner"
         rescue NameError, LoadError
           raise "Provisioner for '#{type}' not found"
         end
@@ -201,7 +201,7 @@ module Yast
 
     private
 
-      # Apply the configuration using the SCM system
+      # Apply the configuration using the CM system
       #
       # To be redefined by inheriting classes.
       #
@@ -210,7 +210,7 @@ module Yast
         raise NotImplementedError
       end
 
-      # Apply the configuration using the SCM system
+      # Apply the configuration using the CM system
       #
       # Configuration is available at #config_tmpdir
       #
@@ -229,7 +229,7 @@ module Yast
         false
       end
 
-      # Update SCM system configuration
+      # Update CM system configuration
       #
       # To be defined by descending classes.
       def update_configuration

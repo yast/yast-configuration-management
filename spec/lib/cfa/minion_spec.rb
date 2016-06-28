@@ -1,11 +1,11 @@
 require_relative "../../spec_helper"
-require "scm/cfa/minion"
+require "cm/cfa/minion"
 
-describe Yast::SCM::CFA::Minion do
-  subject(:config) { Yast::SCM::CFA::Minion.new }
+describe Yast::CM::CFA::Minion do
+  subject(:config) { Yast::CM::CFA::Minion.new }
 
   before do
-    stub_const("Yast::SCM::CFA::Minion::PATH", "spec/fixtures/salt/minion")
+    stub_const("Yast::CM::CFA::Minion::PATH", "spec/fixtures/salt/minion")
     config.load
   end
 

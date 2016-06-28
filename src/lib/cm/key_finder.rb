@@ -1,9 +1,9 @@
 require "yast"
 require "uri"
-require "scm/file_from_url_wrapper"
+require "cm/file_from_url_wrapper"
 
 module Yast
-  module SCM
+  module CM
     # This class retrieves keys from a given URL
     #
     # It tries to retrieve the keys from a given URL:

@@ -1,12 +1,12 @@
 require_relative "../spec_helper"
 require "yast2/execute"
-require "scm/puppet_provisioner"
+require "cm/puppet_provisioner"
 require "cheetah"
 
-describe Yast::SCM::PuppetProvisioner do
+describe Yast::CM::PuppetProvisioner do
   Yast.import "Hostname"
 
-  subject(:provisioner) { Yast::SCM::PuppetProvisioner.new(config) }
+  subject(:provisioner) { Yast::CM::PuppetProvisioner.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
@@ -34,9 +34,9 @@ describe Yast::SCM::PuppetProvisioner do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::SCM::CFA::Puppet).to receive(:new).and_return(puppet_config)
+        allow(Yast::CM::CFA::Puppet).to receive(:new).and_return(puppet_config)
         allow(puppet_config).to receive(:server=)
-        allow(Yast::SCM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
         allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
       end
 
@@ -91,7 +91,7 @@ describe Yast::SCM::PuppetProvisioner do
       it "updates the configuration file" do
         allow(Yast::Execute).to receive(:locally)
           .with("puppet", "agent", *any_args)
-        expect(Yast::SCM::CFA::Puppet).to_not receive(:new)
+        expect(Yast::CM::CFA::Puppet).to_not receive(:new)
         provisioner.run
       end
     end

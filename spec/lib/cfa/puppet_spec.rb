@@ -1,11 +1,11 @@
 require_relative "../../spec_helper"
-require "scm/cfa/puppet"
+require "cm/cfa/puppet"
 
-describe Yast::SCM::CFA::Puppet do
-  subject(:config) { Yast::SCM::CFA::Puppet.new }
+describe Yast::CM::CFA::Puppet do
+  subject(:config) { Yast::CM::CFA::Puppet.new }
 
   before do
-    stub_const("Yast::SCM::CFA::Puppet::PATH", "spec/fixtures/puppet/puppet.conf")
+    stub_const("Yast::CM::CFA::Puppet::PATH", "spec/fixtures/puppet/puppet.conf")
     config.load
   end
 

@@ -1,16 +1,16 @@
 require_relative "../spec_helper"
-require "scm/key_finder"
+require "cm/key_finder"
 require "pathname"
 require "fileutils"
 
-describe Yast::SCM::KeyFinder do
+describe Yast::CM::KeyFinder do
   Yast.import "Hostname"
 
   let(:hostname) { "minion" }
   let(:keys_url) { URI("http://keys.example.net/salt") }
-  let(:file_from_url_wrapper) { Yast::SCM::FileFromUrlWrapper }
+  let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
 
-  subject(:finder) { Yast::SCM::KeyFinder.new(keys_url: keys_url) }
+  subject(:finder) { Yast::CM::KeyFinder.new(keys_url: keys_url) }
 
   before do
     allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
@@ -26,7 +26,7 @@ describe Yast::SCM::KeyFinder do
 
     context "when a key named after the ID is found" do
       subject(:finder) do
-        Yast::SCM::KeyFinder.new(keys_url: keys_url, id: "someid")
+        Yast::CM::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       it "copies the key and returns true" do
@@ -53,7 +53,7 @@ describe Yast::SCM::KeyFinder do
 
     context "when a key named after the hostname is found" do
       subject(:finder) do
-        Yast::SCM::KeyFinder.new(keys_url: keys_url, id: "someid")
+        Yast::CM::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       before do
