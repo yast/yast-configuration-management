@@ -5,14 +5,13 @@ require "pathname"
 require "yast2/execute"
 require "tmpdir"
 require "scm/key_finder"
+require "scm/file_from_url_wrapper"
 
 module Yast
   module SCM
     # This class handles the general bit of configuring/running SCM systems.
     class Provisioner
       include Yast::Logger
-      include Yast::I18n
-      include Yast::Transfer::FileFromUrl
 
       MODES = [:masterless, :client]
 
@@ -156,7 +155,7 @@ module Yast
       # @return [Boolean] true if configuration was fetched; false otherwise.
       def fetch_config
         config_file = config_tmpdir.join(CONFIG_LOCAL_FILENAME)
-        return false unless get_file(config_url, config_file)
+        return false unless FileFromUrlWrapper.get_file(config_url, config_file)
         Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", config_tmpdir.to_s)
         true
       rescue
@@ -252,18 +251,6 @@ module Yast
       # Return path to public key
       def public_key_path
         raise NotImplementedError
-      end
-
-      # Helper method to simplify invocation to get_file_from_url
-      #
-      # @return [Boolean] true if the file was fetched; false otherwise.
-      #
-      # @see Yast::Transfer::FileFromUrl
-      def get_file(source, target)
-        get_file_from_url(
-          scheme: source.scheme, host: source.host,
-          urlpath: source.path.to_s, urltok: {}, destdir: "/",
-          localfile: target.to_s)
       end
 
       # Return path to private key

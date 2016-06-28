@@ -1,6 +1,6 @@
 require "yast"
 require "uri"
-require "transfer/file_from_url"
+require "scm/file_from_url_wrapper"
 
 module Yast
   module SCM
@@ -19,9 +19,6 @@ module Yast
     # * IP address (not implemented)
     # * default.pem and default.key (some default) 
     class KeyFinder
-      include Yast::Transfer::FileFromUrl
-      include Yast::I18n
-
       # @return [URI]
       attr_reader :keys_url
       # @return [String]
@@ -56,15 +53,8 @@ module Yast
         key_url = keys_url.merge(File.join(keys_url.path, "#{name}.#{EXTENSIONS[:key]}"))
         pub_url = keys_url.merge(File.join(keys_url.path, "#{name}.#{EXTENSIONS[:pub]}"))
 
-        get_file(key_url, key) && get_file(pub_url, cert)
-      end
-
-      # FIXME: DRY
-      def get_file(source, target)
-        get_file_from_url(
-          scheme: source.scheme, host: source.host,
-          urlpath: source.path.to_s, urltok: {}, destdir: "/",
-          localfile: target.to_s)
+        FileFromUrlWrapper.get_file(key_url, key) &&
+          FileFromUrlWrapper.get_file(pub_url, cert)
       end
 
       # Temptative names

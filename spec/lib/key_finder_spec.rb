@@ -1,80 +1,77 @@
 require_relative "../spec_helper"
 require "scm/key_finder"
+require "pathname"
 
 describe Yast::SCM::KeyFinder do
   Yast.import "Hostname"
-  let(:hostname) { "minion" }
-  let(:base_url) { URI("http://keys.example.net/salt") }
 
-  subject(:finder) { Yast::SCM::KeyFinder.new(base_url: base_url) }
+  let(:hostname) { "minion" }
+  let(:keys_url) { URI("http://keys.example.net/salt") }
+  let(:file_from_url_wrapper) { Yast::SCM::FileFromUrlWrapper }
+
+  subject(:finder) { Yast::SCM::KeyFinder.new(keys_url: keys_url) }
 
   before do
     allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
   end
 
   describe "#fetch_to" do
-    let(:target) { "/etc/salt/pki/minion/minion" }
-    let(:get_file_from_url_params) do
-      {
-        scheme: base_url.scheme, host: base_url.host, urltok: {},
-        destdir: "/", localfile: target
-      }
-    end
+    let(:target_key) { Pathname("/etc/salt/pki/minion/minion.key") }
+    let(:target_pub) { Pathname("/etc/salt/pki/minion/minion.pub") }
 
     context "when a key named after the ID is found" do
       subject(:finder) do
-        Yast::SCM::KeyFinder.new(base_url: base_url, id: "someid")
+        Yast::SCM::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       it "copies the key and returns true" do
-        expect(finder).to receive(:get_file_from_url)
-          .with(get_file_from_url_params
-            .merge(localfile: "#{target}.key", urlpath: "/salt/someid.key"))
+        key_url = URI("#{keys_url}/someid.key")
+        expect(file_from_url_wrapper).to receive(:get_file)
+          .with(key_url, target_key)
           .and_return(true)
 
-        expect(finder).to receive(:get_file_from_url)
-          .with(get_file_from_url_params
-            .merge(localfile: "#{target}.pub", urlpath: "/salt/someid.pub"))
+        pub_url = URI("#{keys_url}/someid.pub")
+        expect(file_from_url_wrapper).to receive(:get_file)
+          .with(pub_url, target_pub)
           .and_return(true)
 
-        expect(finder.fetch_to("#{target}.key", "#{target}.pub"))
-          .to eq(true)
+        expect(finder.fetch_to(target_key, target_pub)).to eq(true)
       end
     end
 
     context "when a key named after the hostname is found" do
       subject(:finder) do
-        Yast::SCM::KeyFinder.new(base_url: base_url, id: "someid")
+        Yast::SCM::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       before do
-        allow(finder).to receive(:get_file_from_url).once.and_return(false)
+        allow(file_from_url_wrapper).to receive(:get_file)
+          .once.and_return(false)
       end
 
       it "copies the key and returns true" do
-        expect(finder).to receive(:get_file_from_url)
-          .with(get_file_from_url_params
-            .merge(localfile: "#{target}.key", urlpath: "/salt/minion.key"))
+        key_url = URI("#{keys_url}/someid.key")
+        expect(file_from_url_wrapper).to receive(:get_file)
+          .with(key_url, target_key)
           .and_return(true)
 
-        expect(finder).to receive(:get_file_from_url)
-          .with(get_file_from_url_params
-            .merge(localfile: "#{target}.pub", urlpath: "/salt/minion.pub"))
+        pub_url = URI("#{keys_url}/someid.pub")
+        expect(file_from_url_wrapper).to receive(:get_file)
+          .with(pub_url, target_pub)
           .and_return(true)
 
-        expect(finder.fetch_to("#{target}.key", "#{target}.pub"))
-          .to eq(true)
+        expect(finder.fetch_to(target_key, target_pub)).to eq(true)
       end
     end
 
     context "when no key is found" do
       before do
-        allow(finder).to receive(:get_file_from_url).and_return(false)
+        allow(file_from_url_wrapper).to receive(:get_file)
+          .and_return(false)
       end
 
       it "returns false" do
-        expect(finder.fetch_to("#{target}.key", "#{target}.pub"))
-          .to eq(false)
+        expect(finder.fetch_to(target_key, target_pub)).to eq(false)
       end
     end
   end

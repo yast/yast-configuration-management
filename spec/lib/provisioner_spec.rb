@@ -9,6 +9,7 @@ describe Yast::SCM::Provisioner do
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { nil }
+  let(:file_from_url_wrapper) { Yast::SCM::FileFromUrlWrapper }
 
   let(:config) do
     { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
@@ -178,17 +179,15 @@ describe Yast::SCM::Provisioner do
     end
 
     describe "#fetch_config" do
-      let(:tmpdir) { "tmp" }
+      let(:tmpdir) { Pathname("/tmp") }
 
       before do
         allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
       end
 
       it "downloads and uncompress the configuration to a temporal directory" do
-        expect(provisioner).to receive(:get_file_from_url).with(
-          scheme: "https", host: "yast.example.net", urlpath: "/myconfig.tgz",
-          urltok: {}, destdir: "/",
-          localfile: File.join(tmpdir, described_class.const_get(:CONFIG_LOCAL_FILENAME)))
+        expect(file_from_url_wrapper).to receive(:get_file)
+          .with(URI(config_url), tmpdir.join(Yast::SCM::Provisioner::CONFIG_LOCAL_FILENAME))
           .and_return(true)
         expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
           .and_return(true)
@@ -198,7 +197,7 @@ describe Yast::SCM::Provisioner do
 
       context "when the file is downloaded and uncompressed" do
         before do
-          allow(provisioner).to receive(:get_file_from_url).and_return(true)
+          allow(file_from_url_wrapper).to receive(:get_file).and_return(true)
           allow(Yast::Execute).to receive(:locally).with("tar", *any_args).and_return(true)
         end
 
