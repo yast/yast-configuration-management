@@ -4,6 +4,7 @@ require "transfer/file_from_url"
 require "pathname"
 require "yast2/execute"
 require "tmpdir"
+require "scm/key_finder"
 
 module Yast
   module SCM
@@ -23,6 +24,8 @@ module Yast
       attr_reader :attempts
       # @return [Integer] Authentication timeout for each retry
       attr_reader :timeout
+      # @return [URI,nil] Keys URL
+      attr_reader :keys_url
 
       # Mode could not be determined because master and config_url are
       # both nil.
@@ -83,6 +86,7 @@ module Yast
         @attempts   = config[:attempts] || 3
         @timeout    = config[:timeout] || 10
         @config_url = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
+        @keys_url   = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
       end
 
       # Return the list of packages to install
@@ -159,6 +163,16 @@ module Yast
         false
       end
 
+      # Fetch keys
+      #
+      # Fetch keys to perform authentication
+      def fetch_keys
+        return false if keys_url.nil?
+        # FIXME: inject?
+        KeyFinder.new(keys_url: keys_url)
+          .fetch_to(private_key_path, public_key_path)
+      end
+
       # Run the provisioner in masterless mode
       #
       # * Fetch the configuration from the given #config_url
@@ -182,6 +196,7 @@ module Yast
       # @see update_configuration
       # @see apply
       def run_client_mode
+        fetch_keys
         update_configuration && with_retries(attempts) { apply_client_mode }
       end
 
@@ -229,6 +244,16 @@ module Yast
         @config_tmpdir ||= Pathname.new(Dir.mktmpdir)
       end
 
+      # Return path to private key
+      def private_key_path
+        raise NotImplementedError
+      end
+
+      # Return path to public key
+      def public_key_path
+        raise NotImplementedError
+      end
+
       # Helper method to simplify invocation to get_file_from_url
       #
       # @return [Boolean] true if the file was fetched; false otherwise.
@@ -239,6 +264,20 @@ module Yast
           scheme: source.scheme, host: source.host,
           urlpath: source.path.to_s, urltok: {}, destdir: "/",
           localfile: target.to_s)
+      end
+
+      # Return path to private key
+      #
+      # @return [Pathname,nil] Path to private key
+      def private_key_path
+        defined?(PRIVATE_KEY_PATH) ? PRIVATE_KEY_PATH : nil
+      end
+
+      # Return path to public key
+      #
+      # @return [Pathname,nil] Path to public_key
+      def public_key_path
+        defined?(PUBLIC_KEY_PATH) ? PUBLIC_KEY_PATH : nil
       end
     end
   end

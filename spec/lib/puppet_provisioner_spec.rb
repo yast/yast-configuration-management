@@ -4,14 +4,18 @@ require "scm/puppet_provisioner"
 require "cheetah"
 
 describe Yast::SCM::PuppetProvisioner do
+  Yast.import "Hostname"
+
   subject(:provisioner) { Yast::SCM::PuppetProvisioner.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:keys_url) { "https://yast.example.net/keys" }
   let(:tmpdir) { Pathname.new("tmp") }
+  let(:hostname) { "myclient" }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: master, config_url: config_url }
+    { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
   end
 
   describe "#packages" do
@@ -27,10 +31,13 @@ describe Yast::SCM::PuppetProvisioner do
 
     context "when running in client mode" do
       let(:puppet_config) { double("puppet", load: true, save: true) }
+      let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
         allow(Yast::SCM::CFA::Puppet).to receive(:new).and_return(puppet_config)
         allow(puppet_config).to receive(:server=)
+        allow(Yast::SCM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
       end
 
       it "runs puppet agent" do
@@ -53,6 +60,15 @@ describe Yast::SCM::PuppetProvisioner do
         allow(Yast::Execute).to receive(:locally)
           .with("puppet", *any_args)
         expect(puppet_config).to receive(:server=).with(master)
+        provisioner.run
+      end
+
+      it "retrieves authentication keys" do
+        allow(Yast::Execute).to receive(:locally)
+          .with(any_args)
+        expect(key_finder).to receive(:fetch_to)
+          .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
+                Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
         provisioner.run
       end
     end

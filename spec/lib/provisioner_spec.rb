@@ -1,5 +1,6 @@
 require_relative "../spec_helper"
 require "scm/provisioner"
+require "scm/key_finder"
 require "yast2/execute"
 
 describe Yast::SCM::Provisioner do
@@ -7,9 +8,10 @@ describe Yast::SCM::Provisioner do
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:keys_url) { nil }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: master, config_url: config_url }
+    { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
   end
 
   describe "#master" do
@@ -77,7 +79,7 @@ describe Yast::SCM::Provisioner do
         provisioner.run
       end
 
-      context "when fetching and applying the configuration succeeds" do
+      context "and fetching and applying the configuration succeeds" do
         before do
           allow(provisioner).to receive(:apply_masterless_mode).and_return(true)
           allow(provisioner).to receive(:fetch_config).and_return(true)
@@ -88,7 +90,7 @@ describe Yast::SCM::Provisioner do
         end
       end
 
-      context "when fetching the configuration fails" do
+      context "and fetching the configuration fails" do
         let(:fetched_config) { false }
 
         it "returns false" do
@@ -96,7 +98,7 @@ describe Yast::SCM::Provisioner do
         end
       end
 
-      context "when applying the configuration fails" do
+      context "and applying the configuration fails" do
         before do
           allow(provisioner).to receive(:apply_masterless_mode).and_return(false)
         end
@@ -106,7 +108,7 @@ describe Yast::SCM::Provisioner do
         end
       end
 
-      context "when apply_masterless_mode is not redefined" do
+      context "and apply_masterless_mode is not redefined" do
         it "raises NotImplementedError" do
           expect { provisioner.run }.to raise_error(NotImplementedError)
         end
@@ -150,6 +152,28 @@ describe Yast::SCM::Provisioner do
         it "returns true" do
           expect(provisioner.run).to eq(true)
         end
+      end
+    end
+
+    describe "#fetch_keys" do
+      let(:keys_url) { "https://yast.example.net/keys" }
+      let(:key_finder) { double("key_finder") }
+      let(:public_key_path) { Pathname("/tmp/public") }
+      let(:private_key_path) { Pathname("/tmp/private") }
+
+      before do
+        allow(provisioner).to receive(:public_key_path)
+          .and_return(Pathname("/tmp/public"))
+        allow(provisioner).to receive(:private_key_path)
+          .and_return(Pathname("/tmp/private"))
+      end
+
+      it "copy keys" do
+        expect(Yast::SCM::KeyFinder).to receive(:new)
+          .with(keys_url: URI(keys_url)).and_return(key_finder)
+        expect(key_finder).to receive(:fetch_to)
+          .with(private_key_path, public_key_path)
+        provisioner.fetch_keys
       end
     end
 

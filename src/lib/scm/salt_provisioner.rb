@@ -2,11 +2,15 @@ require "yast"
 require "yast2/execute"
 require "scm/cfa/minion"
 require "scm/provisioner"
+require "pathname"
 
 module Yast
   module SCM
     # Salt integration handler
     class SaltProvisioner < Provisioner
+      PRIVATE_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pem").freeze
+      PUBLIC_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pub").freeze
+
       # List of packages to install
       #
       # Only salt-minion is needed.
@@ -55,6 +59,19 @@ module Yast
         false
       end
 
+      # Return path to private key
+      #
+      # @return [Pathname] Path to private key
+      def private_key_path
+        PRIVATE_KEY_PATH
+      end
+
+      # Return path to public key
+      #
+      # @return [Pathname] Path to public_key
+      def public_key_path
+        PUBLIC_KEY_PATH
+      end
     end
   end
 end
