@@ -37,7 +37,7 @@ describe Yast::SCM::SaltProvisioner do
       before do
         allow(Yast::SCM::CFA::Minion).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:master=)
-        expect(Yast::SCM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::SCM::KeyFinder).to receive(:new).and_return(key_finder)
       end
 
       it "runs salt-call" do

@@ -27,6 +27,8 @@ module Yast
       attr_reader :extensions
 
       EXTENSIONS = { key: "key", pub: "pub" }
+      PUBLIC_KEY_PERMS  = 0644
+      PRIVATE_KEY_PERMS = 0400
 
       def initialize(keys_url:, id: nil)
         @keys_url = keys_url
@@ -53,8 +55,14 @@ module Yast
         key_url = keys_url.merge(File.join(keys_url.path, "#{name}.#{EXTENSIONS[:key]}"))
         pub_url = keys_url.merge(File.join(keys_url.path, "#{name}.#{EXTENSIONS[:pub]}"))
 
-        FileFromUrlWrapper.get_file(key_url, key) &&
-          FileFromUrlWrapper.get_file(pub_url, cert)
+        if FileFromUrlWrapper.get_file(key_url, key) &&
+            FileFromUrlWrapper.get_file(pub_url, cert)
+          set_permissions(key, cert)
+          true
+        else
+          ::FileUtils.rm(key) if key.exist?
+          false
+        end
       end
 
       # Temptative names
@@ -66,6 +74,15 @@ module Yast
       def hostname
         Yast.import "Hostname"
         Yast::Hostname.CurrentFQ()
+      end
+
+      # Set keys permissions
+      #
+      # @see PRIVATE_KEY_PERMS
+      # @see PUBLIC_KEY_PERMS
+      def set_permissions(key, cert)
+        ::FileUtils.chmod(PRIVATE_KEY_PERMS, key)
+        ::FileUtils.chmod(PUBLIC_KEY_PERMS, cert)
       end
     end
   end
