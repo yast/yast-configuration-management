@@ -45,8 +45,8 @@ describe Yast::SCM::KeyFinder do
 
       it "sets permissions on copied keys" do
         allow(file_from_url_wrapper).to receive(:get_file).and_return(true)
-        expect(FileUtils).to receive(:chmod).with(0644, target_pub)
-        expect(FileUtils).to receive(:chmod).with(0400, target_key)
+        expect(FileUtils).to receive(:chmod).with(0o644, target_pub)
+        expect(FileUtils).to receive(:chmod).with(0o400, target_key)
         finder.fetch_to(target_key, target_pub)
       end
     end

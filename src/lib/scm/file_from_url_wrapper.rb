@@ -17,7 +17,8 @@ module Yast
         get_file_from_url(
           scheme: source.scheme.to_s, host: source.host.to_s,
           urlpath: source.path.to_s, urltok: {}, destdir: "/",
-          localfile: target.to_s)
+          localfile: target.to_s
+        )
       end
     end
   end

@@ -73,7 +73,6 @@ describe Yast::SCM::Provisioner do
         allow(provisioner).to receive(:fetch_config).and_return(fetched_config)
       end
 
-
       it "fetches the configuration" do
         allow(provisioner).to receive(:apply_masterless_mode).and_return(true)
         expect(provisioner).to receive(:fetch_config)
@@ -208,7 +207,7 @@ describe Yast::SCM::Provisioner do
 
       context "when download fails" do
         before do
-          allow(provisioner).to receive(:get_file_from_url).and_return(false)
+          allow(file_from_url_wrapper).to receive(:get_file).and_return(false)
         end
 
         it "returns false" do
@@ -218,7 +217,7 @@ describe Yast::SCM::Provisioner do
 
       context "when uncompressing fails" do
         before do
-          allow(provisioner).to receive(:get_file_from_url).and_return(true)
+          allow(file_from_url_wrapper).to receive(:get_file).and_return(true)
           allow(Yast::Execute).to receive(:locally).with("tar", *any_args).and_raise(Cheetah::ExecutionFailed)
         end
 

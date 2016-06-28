@@ -66,3 +66,6 @@ Style/TrivialAccessors:
 Style/VariableName:
   Include:
     - "library/*/src/lib/**/*.rb"
+
+AllCops:
+  TargetRubyVersion: 2.1

@@ -67,7 +67,7 @@ describe Yast::SCM::SaltProvisioner do
           .with(any_args)
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/etc/salt/pki/minion/minion.pem"),
-                Pathname("/etc/salt/pki/minion/minion.pub"))
+            Pathname("/etc/salt/pki/minion/minion.pub"))
         provisioner.run
       end
     end

@@ -43,7 +43,7 @@ describe Yast::SCM::PuppetProvisioner do
       it "runs puppet agent" do
         expect(Yast::Execute).to receive(:locally)
           .with("puppet", "agent", "--onetime", "--no-daemonize",
-          "--waitforcert", config[:timeout].to_s)
+            "--waitforcert", config[:timeout].to_s)
         expect(provisioner.run).to eq(true)
       end
 
@@ -68,7 +68,7 @@ describe Yast::SCM::PuppetProvisioner do
           .with(any_args)
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
-                Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
+            Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
         provisioner.run
       end
     end

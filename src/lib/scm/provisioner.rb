@@ -13,7 +13,7 @@ module Yast
     class Provisioner
       include Yast::Logger
 
-      MODES = [:masterless, :client]
+      MODES = [:masterless, :client].freeze
 
       # @return [String,nil] Master server hostname
       attr_reader :master
@@ -143,9 +143,9 @@ module Yast
       end
 
       # Command to uncompress configuration
-      UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<config_tmpdir>s"
+      UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<config_tmpdir>s".freeze
       # Local file name of fetched configuration
-      CONFIG_LOCAL_FILENAME = "config.tgz"
+      CONFIG_LOCAL_FILENAME = "config.tgz".freeze
 
       # Fetchs configuration from config_url
       #
@@ -169,7 +169,7 @@ module Yast
         return false if keys_url.nil?
         # FIXME: inject?
         KeyFinder.new(keys_url: keys_url)
-          .fetch_to(private_key_path, public_key_path)
+                 .fetch_to(private_key_path, public_key_path)
       end
 
       # Run the provisioner in masterless mode
@@ -251,20 +251,6 @@ module Yast
       # Return path to public key
       def public_key_path
         raise NotImplementedError
-      end
-
-      # Return path to private key
-      #
-      # @return [Pathname,nil] Path to private key
-      def private_key_path
-        defined?(PRIVATE_KEY_PATH) ? PRIVATE_KEY_PATH : nil
-      end
-
-      # Return path to public key
-      #
-      # @return [Pathname,nil] Path to public_key
-      def public_key_path
-        defined?(PUBLIC_KEY_PATH) ? PUBLIC_KEY_PATH : nil
       end
     end
   end

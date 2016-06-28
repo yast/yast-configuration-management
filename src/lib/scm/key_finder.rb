@@ -17,7 +17,7 @@ module Yast
     # * MAC address (not implemented)
     # * hostname
     # * IP address (not implemented)
-    # * default.pem and default.key (some default) 
+    # * default.pem and default.key (some default)
     class KeyFinder
       # @return [URI]
       attr_reader :keys_url
@@ -26,9 +26,9 @@ module Yast
       # @return [Array<String>]
       attr_reader :extensions
 
-      EXTENSIONS = { key: "key", pub: "pub" }
-      PUBLIC_KEY_PERMS  = 0644
-      PRIVATE_KEY_PERMS = 0400
+      EXTENSIONS = { key: "key", pub: "pub" }.freeze
+      PUBLIC_KEY_PERMS  = 0o644
+      PRIVATE_KEY_PERMS = 0o400
 
       def initialize(keys_url:, id: nil)
         @keys_url = keys_url
@@ -46,10 +46,10 @@ module Yast
       # @return [Boolean] true if keys were copied; false otherwise.
       def fetch_to(key, cert)
         ret = names.find { |n| fetch_files(n, key, cert) }
-        ret != nil
+        !ret.nil?
       end
 
-      private
+    private
 
       def fetch_files(name, key, cert)
         key_url = keys_url.merge(File.join(keys_url.path, "#{name}.#{EXTENSIONS[:key]}"))
@@ -67,7 +67,7 @@ module Yast
 
       # Temptative names
       def names
-        [ id, hostname, "default" ].compact
+        [id, hostname, "default"].compact
       end
 
       # Hostname

@@ -9,13 +9,14 @@ describe Yast::SCM::FileFromUrlWrapper do
     subject(:wrapper) { described_class }
 
     let(:uri) { URI("http://yast.example.net/some-file.txt") }
-    let(:target) { Pathname("/tmp/local-file.txt")}
+    let(:target) { Pathname("/tmp/local-file.txt") }
 
     it "decompose URI and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "http", host: "yast.example.net",
         urlpath: "/some-file.txt", urltok: {}, destdir: "/",
-        localfile: "/tmp/local-file.txt")
+        localfile: "/tmp/local-file.txt"
+      )
       wrapper.get_file(uri, target)
     end
 
