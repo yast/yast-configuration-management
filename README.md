@@ -7,12 +7,14 @@ system. Salt and Puppet are supported.
 At this time, the module is only a simple proof of concept and is not
 ready for prime time.
 
+![Running a provisioner during 2nd stage](screenshot.png "Running provisioner")
+
 ## How it works
 
 The module will take care of:
 
 * Installing needed packages.
-* Retrieving authentication keys (not implemented yet).
+* Retrieving authentication keys.
 * Updating configuration if needed.
 * Applying configuration during AutoYaST 2nd stage.
 
@@ -26,6 +28,7 @@ The module will take care of:
   <master>my-salt-server.example.net</master>
   <attempts config:type="integer">5</attempts>
   <timeout config:type="integer">10</timeout>
+  <keys_url>usb:/</keys_url> <!-- you can use HTTP, FTP... -->
 </scm>
 ```
 
