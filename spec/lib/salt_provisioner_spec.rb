@@ -41,8 +41,9 @@ describe Yast::CM::SaltProvisioner do
       end
 
       it "runs salt-call" do
-        expect(Yast::Execute).to receive(:locally)
-          .with("salt-call", "state.highstate")
+        expect(Yast::Execute).to receive(:locally).with(
+          "salt-call", "--log-level", "debug", "state.highstate",
+          stdout: $stdout, stderr: $stderr)
         expect(provisioner.run).to eq(true)
       end
 
@@ -77,8 +78,10 @@ describe Yast::CM::SaltProvisioner do
 
       it "runs salt-call" do
         allow(provisioner).to receive(:fetch_config).and_return(true)
-        expect(Yast::Execute).to receive(:locally)
-          .with("salt-call", "--local", "--file-root=#{tmpdir}", "state.highstate")
+        expect(Yast::Execute).to receive(:locally).with(
+          "salt-call", "--log-level", "debug",
+          "--local", "--file-root=#{tmpdir}", "state.highstate",
+          stdout: $stdout, stderr: $stderr)
         expect(provisioner.run).to eq(true)
       end
     end

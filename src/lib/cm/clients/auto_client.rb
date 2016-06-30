@@ -1,6 +1,7 @@
 require "yast"
 require "installation/auto_client"
 require "cm/provisioner"
+require "cm/dialogs/running"
 
 module Yast
   module CM
@@ -51,7 +52,8 @@ module Yast
       #
       # @see Provisioner#current
       def write
-        Popup.Feedback(_("Running provisioner"), _("Please wait...")) do
+        dialog = Yast::CM::Dialogs::Running.new
+        dialog.run do
           Provisioner.current.run
         end
         true

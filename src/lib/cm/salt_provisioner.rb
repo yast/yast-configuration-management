@@ -41,7 +41,8 @@ module Yast
       #
       # @see Yast::CM::Provisioner#apply_client_mode
       def apply_client_mode
-        Yast::Execute.locally("salt-call", "state.highstate")
+        Yast::Execute.locally("salt-call", "--log-level", "debug", "state.highstate",
+          stdout: $stdout, stderr: $stderr)
         true
       rescue
         sleep timeout
@@ -52,8 +53,9 @@ module Yast
       #
       # @see Yast::CM::Provisioner#apply_masterless_mode
       def apply_masterless_mode
-        Yast::Execute.locally("salt-call", "--local",
-          "--file-root=#{config_tmpdir}", "state.highstate")
+        Yast::Execute.locally("salt-call", "--log-level", "debug", "--local",
+          "--file-root=#{config_tmpdir}", "state.highstate",
+          stdout: $stdout, stderr: $stderr)
         true
       rescue
         false

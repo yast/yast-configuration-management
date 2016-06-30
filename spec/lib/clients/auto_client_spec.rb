@@ -41,6 +41,7 @@ describe Yast::CM::AutoClient do
     end
 
     it "delegates writing to current provisioner" do
+      expect(Yast::UI).to receive(:TimeoutUserInput).and_return(:ok)
       expect(provisioner).to receive(:run)
       client.write
     end
