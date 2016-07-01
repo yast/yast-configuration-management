@@ -1,3 +1,5 @@
+#!/usr/bin/env rspec
+
 require_relative "../spec_helper"
 require "cm/salt_provisioner"
 require "yast2/execute"

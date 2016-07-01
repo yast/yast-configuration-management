@@ -1,3 +1,5 @@
+#!/usr/bin/env rspec
+
 require_relative "../spec_helper"
 require "cm/file_from_url_wrapper"
 require "uri"

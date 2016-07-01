@@ -1,3 +1,5 @@
+#!/usr/bin/env rspec
+
 require_relative "../spec_helper"
 require "yast2/execute"
 require "cm/puppet_provisioner"
