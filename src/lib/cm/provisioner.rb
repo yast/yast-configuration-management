@@ -106,10 +106,15 @@ module Yast
       # Work is delegated to methods called after the mode: #run_masterless_mode
       # and #run_client_mode.
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
+      #
       # @see run_masterless_mode
       # @see run_client_mode
-      def run
-        send("run_#{mode}_mode")
+      def run(stdout = nil, stderr = nil)
+        stdout ||= $stdout
+        stderr ||= $stderr
+        send("run_#{mode}_mode", stdout, stderr)
       end
 
       # Provisioner operation mode
@@ -177,12 +182,14 @@ module Yast
       # * Fetch the configuration from the given #config_url
       # * Apply the configuration using masterless mode
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
       # @return [Boolean] true if configuration suceeded; false otherwise.
       #
       # @see fetch_config
       # @see apply_masterless_mode
-      def run_masterless_mode
-        fetch_config && apply_masterless_mode
+      def run_masterless_mode(stdout, stderr)
+        fetch_config && apply_masterless_mode(stdout, stderr)
       end
 
       # Run the provisioner in client mode
@@ -190,13 +197,15 @@ module Yast
       # * Update configuration file writing the master name
       # * Run the provisioner
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
       # @return [Boolean] true if configuration suceeded; false otherwise.
       #
       # @see update_configuration
       # @see apply
-      def run_client_mode
+      def run_client_mode(stdout, stderr)
         fetch_keys
-        update_configuration && with_retries(attempts) { apply_client_mode }
+        update_configuration && with_retries(attempts) { apply_client_mode(stdout, stderr) }
       end
 
     private
@@ -205,8 +214,11 @@ module Yast
       #
       # To be redefined by inheriting classes.
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
+      #
       # @return [Boolean] true if the configuration was applied; false otherwise.
-      def apply_client_mode
+      def apply_client_mode(_stdout, _stderr)
         raise NotImplementedError
       end
 
@@ -214,10 +226,13 @@ module Yast
       #
       # Configuration is available at #config_tmpdir
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
+      #
       # @return [Boolean] true if the configuration was applied; false otherwise.
       #
       # @see config_tmpdir
-      def apply_masterless_mode
+      def apply_masterless_mode(_stdout, _stderr)
         raise NotImplementedError
       end
 

@@ -39,10 +39,13 @@ module Yast
 
       # Try to apply system configuration
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
+      #
       # @see Yast::CM::Provisioner#apply_client_mode
-      def apply_client_mode
+      def apply_client_mode(stdout, stderr)
         Yast::Execute.locally("salt-call", "--log-level", "debug", "state.highstate",
-          stdout: $stdout, stderr: $stderr)
+          stdout: stdout, stderr: stderr)
         true
       rescue
         sleep timeout
@@ -51,11 +54,14 @@ module Yast
 
       # Try to apply system configuration in masterless mode
       #
+      # @param stdout [IO] Standard output channel used by the provisioner
+      # @param stderr [IO] Standard error channel used by the provisioner
+      #
       # @see Yast::CM::Provisioner#apply_masterless_mode
-      def apply_masterless_mode
+      def apply_masterless_mode(stdout, stderr)
         Yast::Execute.locally("salt-call", "--log-level", "debug", "--local",
           "--file-root=#{config_tmpdir}", "state.highstate",
-          stdout: $stdout, stderr: $stderr)
+          stdout: stdout, stderr: stderr)
         true
       rescue
         false

@@ -53,8 +53,9 @@ module Yast
       # @see Provisioner#current
       def write
         dialog = Yast::CM::Dialogs::Running.new
-        dialog.run do
-          Provisioner.current.run
+        dialog.run do |stdout, stderr|
+          # Connect stdout and stderr with the dialog
+          Provisioner.current.run(stdout, stderr)
         end
         true
       end

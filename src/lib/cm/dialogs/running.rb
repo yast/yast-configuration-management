@@ -118,18 +118,14 @@ module Yast
         # @see OutputHandler
         def run_block(&block)
           handler = OutputHandler.new(self)
-          old_stdout, $stdout = $stdout, handler
-          old_stderr, $stderr = $stderr, handler
-          block.call
-        ensure
-          $stdout = old_stdout
-          $stderr = old_stderr
+          block.call(handler, handler)
         end
 
         # Dialog initial content
         #
         # @return [Yast::Term] Content
         def dialog_content
+          Yast.import "Label"
           HBox(
             VSpacing(20),
             VBox(
@@ -175,9 +171,6 @@ module Yast
         # Auxiliar class used to update the dialog. This class looks like an IO
         # one to handler stdout/stderr.
         class OutputHandler
-include Yast::Logger
-          # @return [Array<String>] Lines written to stdout/stderr
-          attr_accessor :lines
           # @return [Yast::CM::Dialogs::Running] Dialog to update
           attr_reader :dialog
 
