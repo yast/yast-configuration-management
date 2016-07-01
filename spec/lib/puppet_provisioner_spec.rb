@@ -42,8 +42,8 @@ describe Yast::CM::PuppetProvisioner do
 
       it "runs puppet agent" do
         expect(Yast::Execute).to receive(:locally)
-          .with("puppet", "agent", "--onetime", "--no-daemonize",
-            "--waitforcert", config[:timeout].to_s)
+          .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
+            "--waitforcert", config[:timeout].to_s, stdout: $stdout, stderr: $stderr)
         expect(provisioner.run).to eq(true)
       end
 
@@ -78,8 +78,10 @@ describe Yast::CM::PuppetProvisioner do
 
       it "runs puppet apply" do
         allow(provisioner).to receive(:fetch_config).and_return(true)
-        expect(Yast::Execute).to receive(:locally)
-          .with("puppet", "apply", tmpdir.join("manifests", "site.pp").to_s)
+        expect(Yast::Execute).to receive(:locally).with(
+          "puppet", "apply", "--modulepath", tmpdir.join("modules").to_s,
+          tmpdir.join("manifests", "site.pp").to_s, "--debug",
+          stdout: $stdout, stderr: $stderr)
         expect(provisioner.run).to eq(true)
       end
     end

@@ -42,7 +42,8 @@ module Yast
       # @see Yast::CM::Provisioner#apply_client_mode
       def apply_client_mode
         Yast::Execute.locally("puppet", "agent", "--onetime",
-          "--no-daemonize", "--waitforcert", timeout.to_s)
+          "--debug", "--no-daemonize", "--waitforcert", timeout.to_s,
+          stdout: $stdout, stderr: $stderr)
         true
       rescue
         false
@@ -52,7 +53,10 @@ module Yast
       #
       # @see Yast::CM::Provisioner#apply_masterless_mode
       def apply_masterless_mode
-        Yast::Execute.locally("puppet", "apply", config_tmpdir.join("manifests", "site.pp").to_s)
+        Yast::Execute.locally("puppet", "apply", "--modulepath",
+          config_tmpdir.join("modules").to_s,
+          config_tmpdir.join("manifests", "site.pp").to_s, "--debug",
+          stdout: $stdout, stderr: $stderr)
         true
       rescue
         false
