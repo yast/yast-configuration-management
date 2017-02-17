@@ -13,11 +13,14 @@ module Yast
 
       # List of packages to install
       #
-      # Only salt-minion is needed.
+      # * `salt` includes the `salt-call` command.
+      # * `salt-minion` is only needed in client mode
       #
       # @return [Hash] Packages to install/remove
       def packages
-        { "install" => ["salt-minion"] }
+        salt_packages = ["salt"]
+        salt_packages << "salt-minion" if mode == :client
+        { "install" => salt_packages }
       end
 
     private

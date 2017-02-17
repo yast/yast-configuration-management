@@ -22,8 +22,18 @@ describe Yast::CM::SaltProvisioner do
   end
 
   describe "#packages" do
-    it "returns a list containing only 'salt-minion' package" do
-      expect(provisioner.packages).to eq("install" => ["salt-minion"])
+    context "when running in client mode" do
+      it "returns a list containing 'salt' and 'salt-minion' package" do
+        expect(provisioner.packages).to eq("install" => ["salt", "salt-minion"])
+      end
+    end
+
+    context "when running in masterless mode" do
+      let(:master) { nil }
+
+      it "returns a list containing only 'salt' package" do
+        expect(provisioner.packages).to eq("install" => ["salt"])
+      end
     end
   end
 
