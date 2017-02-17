@@ -59,6 +59,35 @@ module Yast
         end
         true
       end
+
+      # Determines whether the profile data has been modified
+      #
+      # This method always returns `false` because no information from this
+      # module is included in the cloned profile.
+      #
+      # @return [true]
+      def modified?
+        false
+      end
+
+      # Sets the profile as modified
+      #
+      # This method does not perform any modification because no information
+      # from this module is included in the cloned profile.
+      #
+      # @return [true]
+      def modified
+        false
+      end
+
+      # Data to include in the cloned profile
+      #
+      # No information from this module in included in the cloned profile.
+      #
+      # @return [{}] Returns an empty Hash
+      def export
+        {}
+      end
     end
   end
 end
