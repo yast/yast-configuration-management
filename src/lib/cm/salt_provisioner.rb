@@ -1,5 +1,5 @@
 require "yast"
-require "yast2/execute"
+require "cheetah"
 require "cm/cfa/minion"
 require "cm/provisioner"
 require "pathname"
@@ -45,12 +45,14 @@ module Yast
       # @param stdout [IO] Standard output channel used by the provisioner
       # @param stderr [IO] Standard error channel used by the provisioner
       #
+      # @return [Boolean] +true+ if run was successful; +false+ otherwise.
+      #
       # @see Yast::CM::Provisioner#apply_client_mode
       def apply_client_mode(stdout, stderr)
-        Yast::Execute.locally("salt-call", "--log-level", "debug", "state.highstate",
+        Cheetah.run("salt-call", "--log-level", "debug", "state.highstate",
           stdout: stdout, stderr: stderr)
         true
-      rescue
+      rescue Cheetah::ExecutionFailed
         sleep timeout
         false
       end
@@ -60,13 +62,15 @@ module Yast
       # @param stdout [IO] Standard output channel used by the provisioner
       # @param stderr [IO] Standard error channel used by the provisioner
       #
+      # @return [Boolean] +true+ if run was successful; +false+ otherwise.
+      #
       # @see Yast::CM::Provisioner#apply_masterless_mode
       def apply_masterless_mode(stdout, stderr)
-        Yast::Execute.locally("salt-call", "--log-level", "debug", "--local",
+        Cheetah.run("salt-call", "--log-level", "debug", "--local",
           "--file-root=#{config_tmpdir}", "state.highstate",
           stdout: stdout, stderr: stderr)
         true
-      rescue
+      rescue Cheetah::ExecutionFailed
         false
       end
 

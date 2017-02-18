@@ -2,7 +2,6 @@
 
 require_relative "../spec_helper"
 require "cm/salt_provisioner"
-require "yast2/execute"
 require "cheetah"
 
 describe Yast::CM::SaltProvisioner do
@@ -53,7 +52,7 @@ describe Yast::CM::SaltProvisioner do
       end
 
       it "runs salt-call" do
-        expect(Yast::Execute).to receive(:locally).with(
+        expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug", "state.highstate",
           stdout: $stdout, stderr: $stderr)
         expect(provisioner.run).to eq(true)
@@ -61,22 +60,23 @@ describe Yast::CM::SaltProvisioner do
 
       context "when salt-call fails" do
         it "retries up to 'attempts' times" do
-          expect(Yast::Execute).to receive(:locally)
-            .with("salt-call", *any_args).and_raise(Cheetah::ExecutionFailed)
+          expect(Cheetah).to receive(:run)
+            .with("salt-call", *any_args)
+            .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
             .exactly(config[:attempts]).times
           expect(provisioner.run).to eq(false)
         end
       end
 
       it "updates the configuration file" do
-        allow(Yast::Execute).to receive(:locally)
+        allow(Cheetah).to receive(:run)
           .with("salt-call", *any_args)
         expect(minion_config).to receive(:master=).with(master)
         provisioner.run
       end
 
       it "retrieves authentication keys" do
-        allow(Yast::Execute).to receive(:locally)
+        allow(Cheetah).to receive(:run)
           .with(any_args)
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/etc/salt/pki/minion/minion.pem"),
@@ -90,7 +90,7 @@ describe Yast::CM::SaltProvisioner do
 
       it "runs salt-call" do
         allow(provisioner).to receive(:fetch_config).and_return(true)
-        expect(Yast::Execute).to receive(:locally).with(
+        expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug",
           "--local", "--file-root=#{tmpdir}", "state.highstate",
           stdout: $stdout, stderr: $stderr)
@@ -103,7 +103,7 @@ describe Yast::CM::SaltProvisioner do
       let(:config_url) { nil }
 
       it "updates the configuration file" do
-        allow(Yast::Execute).to receive(:locally)
+        allow(Cheetah).to receive(:run)
           .with("salt-call", *any_args)
         expect(Yast::CM::CFA::Minion).to_not receive(:new)
         provisioner.run

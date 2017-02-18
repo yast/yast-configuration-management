@@ -1,5 +1,5 @@
 require "yast"
-require "yast2/execute"
+require "cheetah"
 require "cm/cfa/puppet"
 require "cm/provisioner"
 require "pathname"
@@ -42,13 +42,15 @@ module Yast
       # @param stdout [IO] Standard output channel used by the provisioner
       # @param stderr [IO] Standard error channel used by the provisioner
       #
+      # @return [Boolean] +true+ if run was successful; +false+ otherwise.
+      #
       # @see Yast::CM::Provisioner#apply_client_mode
       def apply_client_mode(stdout, stderr)
-        Yast::Execute.locally("puppet", "agent", "--onetime",
+        Cheetah.run("puppet", "agent", "--onetime",
           "--debug", "--no-daemonize", "--waitforcert", timeout.to_s,
           stdout: stdout, stderr: stderr)
         true
-      rescue
+      rescue Cheetah::ExecutionFailed
         false
       end
 
@@ -57,14 +59,16 @@ module Yast
       # @param stdout [IO] Standard output channel used by the provisioner
       # @param stderr [IO] Standard error channel used by the provisioner
       #
+      # @return [Boolean] +true+ if run was successful; +false+ otherwise.
+      #
       # @see Yast::CM::Provisioner#apply_masterless_mode
       def apply_masterless_mode(stdout, stderr)
-        Yast::Execute.locally("puppet", "apply", "--modulepath",
+        Cheetah.run("puppet", "apply", "--modulepath",
           config_tmpdir.join("modules").to_s,
           config_tmpdir.join("manifests", "site.pp").to_s, "--debug",
           stdout: stdout, stderr: stderr)
         true
-      rescue
+      rescue Cheetah::ExecutionFailed
         false
       end
 

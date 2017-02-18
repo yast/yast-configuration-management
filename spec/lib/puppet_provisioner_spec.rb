@@ -1,7 +1,6 @@
 #!/usr/bin/env rspec
 
 require_relative "../spec_helper"
-require "yast2/execute"
 require "cm/puppet_provisioner"
 require "cheetah"
 
@@ -43,7 +42,7 @@ describe Yast::CM::PuppetProvisioner do
       end
 
       it "runs puppet agent" do
-        expect(Yast::Execute).to receive(:locally)
+        expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
             "--waitforcert", config[:timeout].to_s, stdout: $stdout, stderr: $stderr)
         expect(provisioner.run).to eq(true)
@@ -51,22 +50,23 @@ describe Yast::CM::PuppetProvisioner do
 
       context "when puppet agent fails" do
         it "retries up to 'attempts' times" do
-          expect(Yast::Execute).to receive(:locally)
-            .with("puppet", *any_args).and_raise(Cheetah::ExecutionFailed)
+          expect(Cheetah).to receive(:run)
+            .with("puppet", *any_args)
+            .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
             .exactly(config[:attempts]).times
           expect(provisioner.run).to eq(false)
         end
       end
 
       it "updates the configuration file" do
-        allow(Yast::Execute).to receive(:locally)
+        allow(Cheetah).to receive(:run)
           .with("puppet", *any_args)
         expect(puppet_config).to receive(:server=).with(master)
         provisioner.run
       end
 
       it "retrieves authentication keys" do
-        allow(Yast::Execute).to receive(:locally)
+        allow(Cheetah).to receive(:run)
           .with(any_args)
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
@@ -80,7 +80,7 @@ describe Yast::CM::PuppetProvisioner do
 
       it "runs puppet apply" do
         allow(provisioner).to receive(:fetch_config).and_return(true)
-        expect(Yast::Execute).to receive(:locally).with(
+        expect(Cheetah).to receive(:run).with(
           "puppet", "apply", "--modulepath", tmpdir.join("modules").to_s,
           tmpdir.join("manifests", "site.pp").to_s, "--debug",
           stdout: $stdout, stderr: $stderr)
@@ -93,7 +93,7 @@ describe Yast::CM::PuppetProvisioner do
       let(:config_url) { nil }
 
       it "updates the configuration file" do
-        allow(Yast::Execute).to receive(:locally)
+        allow(Cheetah).to receive(:run)
           .with("puppet", "agent", *any_args)
         expect(Yast::CM::CFA::Puppet).to_not receive(:new)
         provisioner.run
