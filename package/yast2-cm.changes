@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Sun Feb 19 00:32:42 UTC 2017 - igonzalezsosa@suse.com
+
+- Fix the list of packages to be installed when using Salt.
+- Add missing 'modified', 'modified?' and 'export' methods in the
+  AutoYaST client although no information is exported by this
+  module.
+- Replace Yast::Execute by Cheetah.
+
+-------------------------------------------------------------------
 Mon Jun  6 14:33:06 UTC 2016 - igonzalezsosa@suse.com
 
 - Initial draft
