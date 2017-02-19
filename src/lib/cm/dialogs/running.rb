@@ -133,7 +133,7 @@ module Yast
               VSpacing(0.5),
               VBox(
                 HSpacing(70),
-                RichText(Id(:progress), "")
+                RichText(Id(:progress), Opt(:autoScrollDown), "")
               ),
               VSpacing(0.2),
               HCenter(Label(Id(:remaining_time), _("Please, wait"))),
