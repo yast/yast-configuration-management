@@ -2,30 +2,30 @@
 
 require_relative "../../spec_helper"
 require "cm/clients/auto_client"
-require "cm/salt_provisioner"
+require "cm/configurators/salt"
 
 describe Yast::CM::AutoClient do
   subject(:client) { described_class.new }
 
-  let(:provisioner) { double("provisioner", packages: packages) }
+  let(:configurator) { double("configurator", packages: packages) }
   let(:packages) { { "install" => ["pkg1"] } }
   let(:profile) { { "type" => "salt", "master" => "myserver" } }
 
   describe "#import" do
-    it "initializes the current provisioner" do
-      expect(Yast::CM::Provisioner).to receive(:provisioner_for)
+    it "initializes the current configurator" do
+      expect(Yast::CM::Configurators::Base).to receive(:configurator_for)
         .with(profile["type"], master: "myserver")
         .and_call_original
       client.import(profile)
-      expect(Yast::CM::Provisioner.current).to be_kind_of(Yast::CM::SaltProvisioner)
+      expect(Yast::CM::Configurators::Base.current).to be_kind_of(Yast::CM::Configurators::Salt)
     end
   end
 
   describe "#packages" do
     before do
-      expect(Yast::CM::Provisioner).to receive(:provisioner_for)
+      expect(Yast::CM::Configurators::Base).to receive(:configurator_for)
         .with(profile["type"], master: "myserver")
-        .and_return(provisioner)
+        .and_return(configurator)
       client.import(profile)
     end
 
@@ -36,15 +36,15 @@ describe Yast::CM::AutoClient do
 
   describe "#write" do
     before do
-      allow(Yast::CM::Provisioner).to receive(:provisioner_for)
+      allow(Yast::CM::Configurators::Base).to receive(:configurator_for)
         .with(profile["type"], any_args)
-        .and_return(provisioner)
+        .and_return(configurator)
       client.import(profile)
     end
 
-    it "delegates writing to current provisioner" do
+    it "delegates writing to current configurator" do
       expect(Yast::UI).to receive(:TimeoutUserInput).and_return(:ok)
-      expect(provisioner).to receive(:run)
+      expect(configurator).to receive(:run)
       client.write
     end
   end

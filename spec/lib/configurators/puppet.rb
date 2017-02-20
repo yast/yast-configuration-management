@@ -1,13 +1,13 @@
 #!/usr/bin/env rspec
 
-require_relative "../spec_helper"
-require "cm/puppet_provisioner"
+require_relative "../../spec_helper"
+require "cm/configurators/puppet"
 require "cheetah"
 
-describe Yast::CM::PuppetProvisioner do
+describe Yast::CM::Configurators::Puppet do
   Yast.import "Hostname"
 
-  subject(:provisioner) { Yast::CM::PuppetProvisioner.new(config) }
+  subject(:configurator) { Yast::CM::Configurators::Puppet.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
@@ -21,13 +21,13 @@ describe Yast::CM::PuppetProvisioner do
 
   describe "#packages" do
     it "returns a list containing only 'puppet' package" do
-      expect(provisioner.packages).to eq("install" => ["puppet"])
+      expect(configurator.packages).to eq("install" => ["puppet"])
     end
   end
 
   describe "#run" do
     before do
-      allow(provisioner).to receive(:config_tmpdir).and_return(tmpdir)
+      allow(configurator).to receive(:config_tmpdir).and_return(tmpdir)
     end
 
     context "when running in client mode" do
@@ -45,7 +45,7 @@ describe Yast::CM::PuppetProvisioner do
         expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
             "--waitforcert", config[:timeout].to_s, stdout: $stdout, stderr: $stderr)
-        expect(provisioner.run).to eq(true)
+        expect(configurator.run).to eq(true)
       end
 
       context "when puppet agent fails" do
@@ -54,7 +54,7 @@ describe Yast::CM::PuppetProvisioner do
             .with("puppet", *any_args)
             .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
             .exactly(config[:attempts]).times
-          expect(provisioner.run).to eq(false)
+          expect(configurator.run).to eq(false)
         end
       end
 
@@ -62,7 +62,7 @@ describe Yast::CM::PuppetProvisioner do
         allow(Cheetah).to receive(:run)
           .with("puppet", *any_args)
         expect(puppet_config).to receive(:server=).with(master)
-        provisioner.run
+        configurator.run
       end
 
       it "retrieves authentication keys" do
@@ -71,7 +71,7 @@ describe Yast::CM::PuppetProvisioner do
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
             Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
-        provisioner.run
+        configurator.run
       end
     end
 
@@ -79,12 +79,12 @@ describe Yast::CM::PuppetProvisioner do
       let(:master) { nil }
 
       it "runs puppet apply" do
-        allow(provisioner).to receive(:fetch_config).and_return(true)
+        allow(configurator).to receive(:fetch_config).and_return(true)
         expect(Cheetah).to receive(:run).with(
           "puppet", "apply", "--modulepath", tmpdir.join("modules").to_s,
           tmpdir.join("manifests", "site.pp").to_s, "--debug",
           stdout: $stdout, stderr: $stderr)
-        expect(provisioner.run).to eq(true)
+        expect(configurator.run).to eq(true)
       end
     end
 
@@ -96,7 +96,7 @@ describe Yast::CM::PuppetProvisioner do
         allow(Cheetah).to receive(:run)
           .with("puppet", "agent", *any_args)
         expect(Yast::CM::CFA::Puppet).to_not receive(:new)
-        provisioner.run
+        configurator.run
       end
     end
   end

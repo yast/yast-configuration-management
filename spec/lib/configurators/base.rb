@@ -1,12 +1,12 @@
 #!/usr/bin/env rspec
 
-require_relative "../spec_helper"
-require "cm/provisioner"
+require_relative "../../spec_helper"
+require "cm/configurators/base"
 require "cm/key_finder"
 require "yast2/execute"
 
-describe Yast::CM::Provisioner do
-  subject(:provisioner) { Yast::CM::Provisioner.new(config) }
+describe Yast::CM::Configurators::Base do
+  subject(:configurator) { Yast::CM::Configurators::Base.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
@@ -19,26 +19,26 @@ describe Yast::CM::Provisioner do
 
   describe "#master" do
     it "returns the master option" do
-      expect(provisioner.master).to eq(config[:master])
+      expect(configurator.master).to eq(config[:master])
     end
   end
 
   describe "#attempts" do
     it "returns the master option" do
-      expect(provisioner.attempts).to eq(config[:attempts])
+      expect(configurator.attempts).to eq(config[:attempts])
     end
   end
 
   describe "#timeout" do
     it "returns the timeout option" do
-      expect(provisioner.timeout).to eq(config[:timeout])
+      expect(configurator.timeout).to eq(config[:timeout])
     end
   end
 
   describe "#mode" do
     context "when a master was given" do
       it "returns :client" do
-        expect(provisioner.mode).to eq(:client)
+        expect(configurator.mode).to eq(:client)
       end
     end
 
@@ -46,7 +46,7 @@ describe Yast::CM::Provisioner do
       let(:master) { nil }
 
       it "returns :masterless" do
-        expect(provisioner.mode).to eq(:masterless)
+        expect(configurator.mode).to eq(:masterless)
       end
     end
 
@@ -55,14 +55,14 @@ describe Yast::CM::Provisioner do
       let(:config_url) { nil }
 
       it "client mode is used as fallback" do
-        expect(provisioner.mode).to eq(:client)
+        expect(configurator.mode).to eq(:client)
       end
     end
   end
 
   describe "#packages" do
     it "returns no packages to install/remove" do
-      expect(provisioner.packages).to eq({})
+      expect(configurator.packages).to eq({})
     end
   end
 
@@ -72,23 +72,23 @@ describe Yast::CM::Provisioner do
       let(:fetched_config) { true }
 
       before do
-        allow(provisioner).to receive(:fetch_config).and_return(fetched_config)
+        allow(configurator).to receive(:fetch_config).and_return(fetched_config)
       end
 
       it "fetches the configuration" do
-        allow(provisioner).to receive(:apply_masterless_mode).and_return(true)
-        expect(provisioner).to receive(:fetch_config)
-        provisioner.run
+        allow(configurator).to receive(:apply_masterless_mode).and_return(true)
+        expect(configurator).to receive(:fetch_config)
+        configurator.run
       end
 
       context "and fetching and applying the configuration succeeds" do
         before do
-          allow(provisioner).to receive(:apply_masterless_mode).and_return(true)
-          allow(provisioner).to receive(:fetch_config).and_return(true)
+          allow(configurator).to receive(:apply_masterless_mode).and_return(true)
+          allow(configurator).to receive(:fetch_config).and_return(true)
         end
 
         it "returns true" do
-          expect(provisioner.run).to eq(true)
+          expect(configurator.run).to eq(true)
         end
       end
 
@@ -96,23 +96,23 @@ describe Yast::CM::Provisioner do
         let(:fetched_config) { false }
 
         it "returns false" do
-          expect(provisioner.run).to eq(false)
+          expect(configurator.run).to eq(false)
         end
       end
 
       context "and applying the configuration fails" do
         before do
-          allow(provisioner).to receive(:apply_masterless_mode).and_return(false)
+          allow(configurator).to receive(:apply_masterless_mode).and_return(false)
         end
 
         it "returns false" do
-          expect(provisioner.run).to eq(false)
+          expect(configurator.run).to eq(false)
         end
       end
 
       context "and apply_masterless_mode is not redefined" do
         it "raises NotImplementedError" do
-          expect { provisioner.run }.to raise_error(NotImplementedError)
+          expect { configurator.run }.to raise_error(NotImplementedError)
         end
       end
     end
@@ -120,39 +120,39 @@ describe Yast::CM::Provisioner do
     context "when running in client mode" do
       context "when #update_configuration is not defined" do
         it "raises NotImplementedError" do
-          expect { provisioner.run }.to raise_error(NotImplementedError)
+          expect { configurator.run }.to raise_error(NotImplementedError)
         end
       end
 
       context "when #apply_client_mode is not defined" do
         before do
-          allow(provisioner).to receive(:update_configuration).and_return(true)
+          allow(configurator).to receive(:update_configuration).and_return(true)
         end
 
         it "raises NotImplementedError" do
-          expect { provisioner.run }.to raise_error(NotImplementedError)
+          expect { configurator.run }.to raise_error(NotImplementedError)
         end
       end
 
       context "when applying the configuration fails" do
         before do
-          allow(provisioner).to receive(:update_configuration).and_return(true)
-          allow(provisioner).to receive(:apply_client_mode).and_return(false)
+          allow(configurator).to receive(:update_configuration).and_return(true)
+          allow(configurator).to receive(:apply_client_mode).and_return(false)
         end
 
         it "returns false" do
-          expect(provisioner.run).to eq(false)
+          expect(configurator.run).to eq(false)
         end
       end
 
       context "when applying the configuration succeeds" do
         before do
-          allow(provisioner).to receive(:update_configuration).and_return(true)
-          allow(provisioner).to receive(:apply_client_mode).and_return(true)
+          allow(configurator).to receive(:update_configuration).and_return(true)
+          allow(configurator).to receive(:apply_client_mode).and_return(true)
         end
 
         it "returns true" do
-          expect(provisioner.run).to eq(true)
+          expect(configurator.run).to eq(true)
         end
       end
     end
@@ -164,9 +164,9 @@ describe Yast::CM::Provisioner do
       let(:private_key_path) { Pathname("/tmp/private") }
 
       before do
-        allow(provisioner).to receive(:public_key_path)
+        allow(configurator).to receive(:public_key_path)
           .and_return(Pathname("/tmp/public"))
-        allow(provisioner).to receive(:private_key_path)
+        allow(configurator).to receive(:private_key_path)
           .and_return(Pathname("/tmp/private"))
       end
 
@@ -175,7 +175,7 @@ describe Yast::CM::Provisioner do
           .with(keys_url: URI(keys_url)).and_return(key_finder)
         expect(key_finder).to receive(:fetch_to)
           .with(private_key_path, public_key_path)
-        provisioner.fetch_keys
+        configurator.fetch_keys
       end
     end
 
@@ -188,12 +188,12 @@ describe Yast::CM::Provisioner do
 
       it "downloads and uncompress the configuration to a temporal directory" do
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(URI(config_url), tmpdir.join(Yast::CM::Provisioner::CONFIG_LOCAL_FILENAME))
+          .with(URI(config_url), tmpdir.join(Yast::CM::Configurators::Base::CONFIG_LOCAL_FILENAME))
           .and_return(true)
         expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
           .and_return(true)
 
-        provisioner.fetch_config
+        configurator.fetch_config
       end
 
       context "when the file is downloaded and uncompressed" do
@@ -203,7 +203,7 @@ describe Yast::CM::Provisioner do
         end
 
         it "returns true" do
-          expect(provisioner.fetch_config).to eq(true)
+          expect(configurator.fetch_config).to eq(true)
         end
       end
 
@@ -213,7 +213,7 @@ describe Yast::CM::Provisioner do
         end
 
         it "returns false" do
-          expect(provisioner.fetch_config).to eq(false)
+          expect(configurator.fetch_config).to eq(false)
         end
       end
 
@@ -224,7 +224,7 @@ describe Yast::CM::Provisioner do
         end
 
         it "returns false" do
-          expect(provisioner.fetch_config).to eq(false)
+          expect(configurator.fetch_config).to eq(false)
         end
       end
     end

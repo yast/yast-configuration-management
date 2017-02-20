@@ -13,7 +13,7 @@ module Yast
     #
     # It tries to locate the files using:
     #
-    # * some kind of ID (depends on the provisioner)
+    # * some kind of ID (depends on the configurator)
     # * MAC address (not implemented)
     # * hostname
     # * IP address (not implemented)

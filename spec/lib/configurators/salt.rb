@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
-require_relative "../spec_helper"
-require "cm/salt_provisioner"
+require_relative "../../spec_helper"
+require "cm/configurators/salt"
 require "cheetah"
 
-describe Yast::CM::SaltProvisioner do
-  subject(:provisioner) { Yast::CM::SaltProvisioner.new(config) }
+describe Yast::CM::Configurators::Salt do
+  subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
@@ -17,13 +17,13 @@ describe Yast::CM::SaltProvisioner do
   end
 
   before do
-    allow(provisioner).to receive(:sleep)
+    allow(configurator).to receive(:sleep)
   end
 
   describe "#packages" do
     context "when running in client mode" do
       it "returns a list containing 'salt' and 'salt-minion' package" do
-        expect(provisioner.packages).to eq("install" => ["salt", "salt-minion"])
+        expect(configurator.packages).to eq("install" => ["salt", "salt-minion"])
       end
     end
 
@@ -31,14 +31,14 @@ describe Yast::CM::SaltProvisioner do
       let(:master) { nil }
 
       it "returns a list containing only 'salt' package" do
-        expect(provisioner.packages).to eq("install" => ["salt"])
+        expect(configurator.packages).to eq("install" => ["salt"])
       end
     end
   end
 
   describe "#run" do
     before do
-      allow(provisioner).to receive(:config_tmpdir).and_return(tmpdir)
+      allow(configurator).to receive(:config_tmpdir).and_return(tmpdir)
     end
 
     context "when running in client mode" do
@@ -55,7 +55,7 @@ describe Yast::CM::SaltProvisioner do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug", "state.highstate",
           stdout: $stdout, stderr: $stderr)
-        expect(provisioner.run).to eq(true)
+        expect(configurator.run).to eq(true)
       end
 
       context "when salt-call fails" do
@@ -64,7 +64,7 @@ describe Yast::CM::SaltProvisioner do
             .with("salt-call", *any_args)
             .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
             .exactly(config[:attempts]).times
-          expect(provisioner.run).to eq(false)
+          expect(configurator.run).to eq(false)
         end
       end
 
@@ -72,7 +72,7 @@ describe Yast::CM::SaltProvisioner do
         allow(Cheetah).to receive(:run)
           .with("salt-call", *any_args)
         expect(minion_config).to receive(:master=).with(master)
-        provisioner.run
+        configurator.run
       end
 
       it "retrieves authentication keys" do
@@ -81,7 +81,7 @@ describe Yast::CM::SaltProvisioner do
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/etc/salt/pki/minion/minion.pem"),
             Pathname("/etc/salt/pki/minion/minion.pub"))
-        provisioner.run
+        configurator.run
       end
     end
 
@@ -89,12 +89,12 @@ describe Yast::CM::SaltProvisioner do
       let(:master) { nil }
 
       it "runs salt-call" do
-        allow(provisioner).to receive(:fetch_config).and_return(true)
+        allow(configurator).to receive(:fetch_config).and_return(true)
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug",
           "--local", "--file-root=#{tmpdir}", "state.highstate",
           stdout: $stdout, stderr: $stderr)
-        expect(provisioner.run).to eq(true)
+        expect(configurator.run).to eq(true)
       end
     end
 
@@ -106,7 +106,7 @@ describe Yast::CM::SaltProvisioner do
         allow(Cheetah).to receive(:run)
           .with("salt-call", *any_args)
         expect(Yast::CM::CFA::Minion).to_not receive(:new)
-        provisioner.run
+        configurator.run
       end
     end
   end

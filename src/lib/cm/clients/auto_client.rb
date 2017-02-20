@@ -1,15 +1,15 @@
 require "yast"
 require "installation/auto_client"
-require "cm/provisioner"
+require "cm/configurators/base"
 require "cm/dialogs/running"
 
 module Yast
   module CM
     # AutoClient implementation
     #
-    # The real work is delegated to Provisioners.
+    # The real work is delegated to Configurators.
     #
-    # @see Yast::CM::Provisioner
+    # @see Yast::CM::Configurators
     class AutoClient < ::Installation::AutoClient
       include Yast::I18n
 
@@ -20,11 +20,11 @@ module Yast
 
       # Import AutoYaST configuration
       #
-      # Additional provisioner-specific options can be specified. They will be passed
-      # to the provisioner's constructor.
+      # Additional configurator-specific options can be specified. They will be passed
+      # to the configurator's constructor.
       #
       # @return profile [Hash] configuration from AutoYaST profile
-      # @option profile [String] "type"     Provisioner to use ("salt", "puppet", etc.)
+      # @option profile [String] "type"     Configurator to use ("salt", "puppet", etc.)
       # @option profile [String] "master"   Master server name
       # @option profile [String] "timeout"  Authentication timeout
       # @option profile [String] "attempts" Authentication retries
@@ -37,25 +37,25 @@ module Yast
         end
 
         type = profile["type"].nil? ? "salt" : profile["type"].downcase
-        Provisioner.current = Provisioner.provisioner_for(type, config)
+        Configurators::Base.current = Configurators::Base.configurator_for(type, config)
         true
       end
 
       # Return packages to install
       #
-      # @see Provisioner#packages
+      # @see Configurators::Base#packages
       def packages
-        Provisioner.current.packages
+        Configurators::Base.current.packages
       end
 
-      # Apply the configuration running the provisioner
+      # Apply the configuration running the configurator
       #
-      # @see Provisioner#current
+      # @see Configurators::Base#current
       def write
         dialog = Yast::CM::Dialogs::Running.new
         dialog.run do |stdout, stderr|
           # Connect stdout and stderr with the dialog
-          Provisioner.current.run(stdout, stderr)
+          Configurators::Base.current.run(stdout, stderr)
         end
         true
       end

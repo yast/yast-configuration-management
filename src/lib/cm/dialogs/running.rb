@@ -38,7 +38,7 @@ module Yast
         end
 
         # Determines if the timer has been stopped or not
-        # 
+        #
         # @return [Boolean] True if it was stopped; false otherwise.
         def timer_stopped?
           return @timer_stopped unless @timer_stopped.nil?
