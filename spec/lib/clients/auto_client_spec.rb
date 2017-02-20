@@ -10,22 +10,31 @@ describe Yast::CM::AutoClient do
   let(:configurator) { double("configurator", packages: packages) }
   let(:packages) { { "install" => ["pkg1"] } }
   let(:profile) { { "type" => "salt", "master" => "myserver" } }
+  let(:config) { Yast::CM::Config.new(profile) }
+
+  before do
+    allow(Yast::CM::Config).to receive(:new).with(profile).and_return(config)
+    allow(config).to receive(:save)
+  end
 
   describe "#import" do
     it "initializes the current configurator" do
       expect(Yast::CM::Configurators::Base).to receive(:configurator_for)
-        .with(profile["type"], master: "myserver")
-        .and_call_original
+        .with(config).and_call_original
       client.import(profile)
       expect(Yast::CM::Configurators::Base.current).to be_kind_of(Yast::CM::Configurators::Salt)
+    end
+
+    it "writes the module configuration" do
+      expect(config).to receive(:save)
+      client.import(profile)
     end
   end
 
   describe "#packages" do
     before do
       expect(Yast::CM::Configurators::Base).to receive(:configurator_for)
-        .with(profile["type"], master: "myserver")
-        .and_return(configurator)
+        .with(config).and_return(configurator)
       client.import(profile)
     end
 
@@ -37,14 +46,12 @@ describe Yast::CM::AutoClient do
   describe "#write" do
     before do
       allow(Yast::CM::Configurators::Base).to receive(:configurator_for)
-        .with(profile["type"], any_args)
-        .and_return(configurator)
+        .with(config).and_return(configurator)
       client.import(profile)
     end
 
     it "delegates writing to current configurator" do
-      expect(Yast::UI).to receive(:TimeoutUserInput).and_return(:ok)
-      expect(configurator).to receive(:run)
+      expect(configurator).to receive(:prepare)
       client.write
     end
   end

@@ -9,12 +9,13 @@ describe Yast::CM::Configurators::Base do
   subject(:configurator) { Yast::CM::Configurators::Base.new(config) }
 
   let(:master) { "myserver" }
+  let(:mode) { :client }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { nil }
   let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
+    { mode: mode, attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
   end
 
   describe "#master" do
@@ -35,31 +36,6 @@ describe Yast::CM::Configurators::Base do
     end
   end
 
-  describe "#mode" do
-    context "when a master was given" do
-      it "returns :client" do
-        expect(configurator.mode).to eq(:client)
-      end
-    end
-
-    context "when no master but configuration URL was given" do
-      let(:master) { nil }
-
-      it "returns :masterless" do
-        expect(configurator.mode).to eq(:masterless)
-      end
-    end
-
-    context "when neither master nor configuration URL are given" do
-      let(:master) { nil }
-      let(:config_url) { nil }
-
-      it "client mode is used as fallback" do
-        expect(configurator.mode).to eq(:client)
-      end
-    end
-  end
-
   describe "#packages" do
     it "returns no packages to install/remove" do
       expect(configurator.packages).to eq({})
@@ -68,7 +44,7 @@ describe Yast::CM::Configurators::Base do
 
   describe "#prepare" do
     context "when running in masterless mode" do
-      let(:master) { nil }
+      let(:mode) { :masterless }
       let(:fetched_config) { true }
 
       before do

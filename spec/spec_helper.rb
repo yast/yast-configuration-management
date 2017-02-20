@@ -1,4 +1,5 @@
 ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
+DATA_DIR = File.expand_path("../data", __FILE__)
 
 require "yast"
 

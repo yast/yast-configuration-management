@@ -22,6 +22,11 @@ module Yast
         attr_reader :config_dir
 
         class << self
+          # Return the runner for a given CM system and a configuration
+          def runner_for(config)
+            runner_class(config.type).new(config.to_hash)
+          end
+
           # Return the configurator class to handle a given CM system
           #
           # It tries to find the definition.

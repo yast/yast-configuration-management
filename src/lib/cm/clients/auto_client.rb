@@ -1,6 +1,8 @@
 require "yast"
 require "installation/auto_client"
 require "cm/configurators/base"
+require "cm/config"
+require "pathname"
 
 module Yast
   module CM
@@ -18,20 +20,16 @@ module Yast
       # to the configurator's constructor.
       #
       # @return profile [Hash] configuration from AutoYaST profile
-      # @option profile [String] "type"     Configurator to use ("salt", "puppet", etc.)
-      # @option profile [String] "master"   Master server name
-      # @option profile [String] "timeout"  Authentication timeout
-      # @option profile [String] "attempts" Authentication retries
+      # @option profile [String] "type"       Configurator to use ("salt", "puppet", etc.)
+      # @option profile [String] "master"     Master server name
+      # @option profile [String] "timeout"    Authentication timeout
+      # @option profile [String] "attempts"   Authentication retries
+      # @option profile [String] "config_url" Configuration URL
+      # @option profile [String] "keys_url"   Authentication keys URL
       def import(profile = {})
-        config = {}
-        profile.each_with_object(config) do |option, cfg|
-          key = option[0].to_sym
-          val = option[1]
-          cfg[key] = val unless key == :type
-        end
-
-        type = profile["type"].nil? ? "salt" : profile["type"].downcase
-        self.configurator = Configurators::Base.configurator_for(type, config)
+        config = Config.new(profile)
+        config.save
+        self.configurator = Configurators::Base.configurator_for(config)
         true
       end
 

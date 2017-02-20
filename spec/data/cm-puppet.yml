@@ -1,0 +1,5 @@
+---
+:mode: :masterless
+:attempts: 3
+:timeout: 10
+:type: puppet

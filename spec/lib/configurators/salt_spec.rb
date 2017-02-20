@@ -7,12 +7,13 @@ describe Yast::CM::Configurators::Salt do
   subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
+  let(:mode) { :client }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { "https://yast.example.net/keys" }
   let(:tmpdir) { Pathname.new("/tmp") }
 
   let(:config) do
-    { master: master, config_url: config_url, keys_url: keys_url }
+    { mode: mode, master: master, config_url: config_url, keys_url: keys_url }
   end
 
   describe "#packages" do
@@ -23,7 +24,7 @@ describe Yast::CM::Configurators::Salt do
     end
 
     context "when running in masterless mode" do
-      let(:master) { nil }
+      let(:mode) { :masterless }
 
       it "returns a list containing only 'salt' package" do
         expect(configurator.packages).to eq("install" => ["salt"])
@@ -55,16 +56,6 @@ describe Yast::CM::Configurators::Salt do
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/etc/salt/pki/minion/minion.pem"),
             Pathname("/etc/salt/pki/minion/minion.pub"))
-        configurator.prepare
-      end
-    end
-
-    context "when neither master server nor url is specified through the configuration" do
-      let(:master) { nil }
-      let(:config_url) { nil }
-
-      it "does not update the configuration file" do
-        expect(Yast::CM::CFA::Minion).to_not receive(:new)
         configurator.prepare
       end
     end

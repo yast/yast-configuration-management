@@ -9,13 +9,14 @@ describe Yast::CM::Configurators::Puppet do
   subject(:configurator) { Yast::CM::Configurators::Puppet.new(config) }
 
   let(:master) { "myserver" }
+  let(:mode) { :client }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { "https://yast.example.net/keys" }
   let(:tmpdir) { Pathname.new("tmp") }
   let(:hostname) { "myclient" }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
+    { mode: mode, attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
   end
 
   describe "#packages" do
@@ -49,16 +50,6 @@ describe Yast::CM::Configurators::Puppet do
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
             Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
-        configurator.prepare
-      end
-    end
-
-    context "when neither master server nor url is specified through the configuration" do
-      let(:master) { nil }
-      let(:config_url) { nil }
-
-      it "does not update the configuration file" do
-        expect(Yast::CM::CFA::Puppet).to_not receive(:new)
         configurator.prepare
       end
     end

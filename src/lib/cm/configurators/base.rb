@@ -14,8 +14,8 @@ module Yast
       class Base
         include Yast::Logger
 
-        MODES = [:masterless, :client].freeze
-
+        # @return [Symbol] Operation mode (:client or :masterless)
+        attr_reader :mode
         # @return [String,nil] Master server hostname
         attr_reader :master
         # @return [URI,nil] Config URL
@@ -56,8 +56,8 @@ module Yast
           # @return [Yast::CM::Configurators::Base] Configurator to handle 'type' configuration
           #
           # @see .configurator_class
-          def configurator_for(type, config)
-            configurator_class(type).new(config)
+          def configurator_for(config)
+            configurator_class(config.type).new(config.to_hash)
           end
 
           # Return the configurator class to handle a given CM system
@@ -79,7 +79,8 @@ module Yast
         # @param config [Hash] options
         # @option config [Integer] :master   Master server's name
         # @option config [Integer] :attempts Number of authentication retries
-        # @option config [Integer] :timeout Authentication timeout for each retry
+        # @option config [Integer] :timeout  Authentication timeout for each retry
+        # @option config [Integer] :mode     Operation mode (:client or :masterless)
         def initialize(config = {})
           log.info "Initializing configurator #{self.class.name} with #{config}"
           @master     = config[:master]
@@ -87,6 +88,7 @@ module Yast
           @timeout    = config[:timeout] || 10
           @config_url = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
           @keys_url   = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
+          @mode       = config[:mode]
         end
 
         # Return the list of packages to install
@@ -111,29 +113,6 @@ module Yast
         # @see prepare_client_mode
         def prepare
           send("prepare_#{mode}_mode")
-        end
-
-        # Configurator operation mode
-        #
-        # The mode is decided depending on 'master' and 'config_url'
-        # values.
-        #
-        # * If 'master' is specified -> :client
-        # * If 'config_url' is -> :masterless
-        # * Otherwise -> :client
-        #
-        # @param proposed [String] Proposed mode
-        # @return [Symbol] Mode. Possible values are listed in MODE constant.
-        #
-        # @see MODE
-        def mode
-          return @mode unless @mode.nil?
-          @mode =
-            if master || (master.nil? && config_url.nil?)
-              :client
-            else
-              :masterless
-            end
         end
 
         # Determines whether the configurator is operating in the given module
