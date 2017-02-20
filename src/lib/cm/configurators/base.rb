@@ -197,7 +197,6 @@ module Yast
 
       private
 
-
         # Update CM system configuration
         #
         # To be defined by descending classes.
