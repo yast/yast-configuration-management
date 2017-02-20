@@ -65,4 +65,6 @@ rake install DESTDIR="%{buildroot}"
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/CONTRIBUTING.md
 
+%{yast_ystartupdir}/startup
+
 %changelog
