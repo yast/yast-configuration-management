@@ -1,7 +1,6 @@
 require "yast"
 require "installation/auto_client"
 require "cm/configurators/base"
-require "cm/dialogs/running"
 
 module Yast
   module CM
@@ -12,11 +11,6 @@ module Yast
     # @see Yast::CM::Configurators
     class AutoClient < ::Installation::AutoClient
       include Yast::I18n
-
-      # Constructor
-      def initialize
-        Yast.import "Popup"
-      end
 
       # Import AutoYaST configuration
       #
@@ -37,7 +31,7 @@ module Yast
         end
 
         type = profile["type"].nil? ? "salt" : profile["type"].downcase
-        Configurators::Base.current = Configurators::Base.configurator_for(type, config)
+        self.configurator = Configurators::Base.configurator_for(type, config)
         true
       end
 
@@ -45,18 +39,14 @@ module Yast
       #
       # @see Configurators::Base#packages
       def packages
-        Configurators::Base.current.packages
+        configurator.nil? ? [] : configurator.packages
       end
 
       # Apply the configuration running the configurator
       #
       # @see Configurators::Base#current
       def write
-        dialog = Yast::CM::Dialogs::Running.new
-        dialog.run do |stdout, stderr|
-          # Connect stdout and stderr with the dialog
-          Configurators::Base.current.run(stdout, stderr)
-        end
+        configurator.prepare if configurator
         true
       end
 
@@ -87,6 +77,26 @@ module Yast
       # @return [{}] Returns an empty Hash
       def export
         {}
+      end
+
+    private
+
+      # Convenience helper method to get the current configurator
+      #
+      # @return [Configurators::Base] Configurator to use
+      #
+      # @see Configurators::Base.current
+      def configurator
+        Configurators::Base.current
+      end
+
+      # Convenience helper method to set the current configurator
+      #
+      # @param value [Configurators::Base] Configurator to use
+      #
+      # @see Configurators::Base.current=
+      def configurator=(value)
+        Configurators::Base.current = value
       end
     end
   end
