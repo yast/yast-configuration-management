@@ -2,7 +2,6 @@
 
 require_relative "../../spec_helper"
 require "cm/configurators/salt"
-require "cheetah"
 
 describe Yast::CM::Configurators::Salt do
   subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
@@ -13,11 +12,7 @@ describe Yast::CM::Configurators::Salt do
   let(:tmpdir) { Pathname.new("/tmp") }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
-  end
-
-  before do
-    allow(configurator).to receive(:sleep)
+    { master: master, config_url: config_url, keys_url: keys_url }
   end
 
   describe "#packages" do
@@ -36,7 +31,7 @@ describe Yast::CM::Configurators::Salt do
     end
   end
 
-  describe "#run" do
+  describe "#prepare" do
     before do
       allow(configurator).to receive(:config_tmpdir).and_return(tmpdir)
     end
@@ -51,50 +46,16 @@ describe Yast::CM::Configurators::Salt do
         allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
       end
 
-      it "runs salt-call" do
-        expect(Cheetah).to receive(:run).with(
-          "salt-call", "--log-level", "debug", "state.highstate",
-          stdout: $stdout, stderr: $stderr)
-        expect(configurator.run).to eq(true)
-      end
-
-      context "when salt-call fails" do
-        it "retries up to 'attempts' times" do
-          expect(Cheetah).to receive(:run)
-            .with("salt-call", *any_args)
-            .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
-            .exactly(config[:attempts]).times
-          expect(configurator.run).to eq(false)
-        end
-      end
-
       it "updates the configuration file" do
-        allow(Cheetah).to receive(:run)
-          .with("salt-call", *any_args)
         expect(minion_config).to receive(:master=).with(master)
-        configurator.run
+        configurator.prepare
       end
 
       it "retrieves authentication keys" do
-        allow(Cheetah).to receive(:run)
-          .with(any_args)
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/etc/salt/pki/minion/minion.pem"),
             Pathname("/etc/salt/pki/minion/minion.pub"))
-        configurator.run
-      end
-    end
-
-    context "when running in masterless mode" do
-      let(:master) { nil }
-
-      it "runs salt-call" do
-        allow(configurator).to receive(:fetch_config).and_return(true)
-        expect(Cheetah).to receive(:run).with(
-          "salt-call", "--log-level", "debug",
-          "--local", "--file-root=#{tmpdir}", "state.highstate",
-          stdout: $stdout, stderr: $stderr)
-        expect(configurator.run).to eq(true)
+        configurator.prepare
       end
     end
 
@@ -102,11 +63,9 @@ describe Yast::CM::Configurators::Salt do
       let(:master) { nil }
       let(:config_url) { nil }
 
-      it "updates the configuration file" do
-        allow(Cheetah).to receive(:run)
-          .with("salt-call", *any_args)
+      it "does not update the configuration file" do
         expect(Yast::CM::CFA::Minion).to_not receive(:new)
-        configurator.run
+        configurator.prepare
       end
     end
   end

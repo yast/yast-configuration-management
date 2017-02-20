@@ -66,7 +66,7 @@ describe Yast::CM::Configurators::Base do
     end
   end
 
-  describe "#run" do
+  describe "#prepare" do
     context "when running in masterless mode" do
       let(:master) { nil }
       let(:fetched_config) { true }
@@ -76,83 +76,35 @@ describe Yast::CM::Configurators::Base do
       end
 
       it "fetches the configuration" do
-        allow(configurator).to receive(:apply_masterless_mode).and_return(true)
         expect(configurator).to receive(:fetch_config)
-        configurator.run
-      end
-
-      context "and fetching and applying the configuration succeeds" do
-        before do
-          allow(configurator).to receive(:apply_masterless_mode).and_return(true)
-          allow(configurator).to receive(:fetch_config).and_return(true)
-        end
-
-        it "returns true" do
-          expect(configurator.run).to eq(true)
-        end
-      end
-
-      context "and fetching the configuration fails" do
-        let(:fetched_config) { false }
-
-        it "returns false" do
-          expect(configurator.run).to eq(false)
-        end
-      end
-
-      context "and applying the configuration fails" do
-        before do
-          allow(configurator).to receive(:apply_masterless_mode).and_return(false)
-        end
-
-        it "returns false" do
-          expect(configurator.run).to eq(false)
-        end
-      end
-
-      context "and apply_masterless_mode is not redefined" do
-        it "raises NotImplementedError" do
-          expect { configurator.run }.to raise_error(NotImplementedError)
-        end
+        configurator.prepare
       end
     end
 
     context "when running in client mode" do
+      before do
+        allow(configurator).to receive(:fetch_keys).and_return(true)
+      end
+
+      it "fetches the authentication keys" do
+        expect(configurator).to receive(:fetch_keys).and_return(true)
+        allow(configurator).to receive(:update_configuration).and_return(true)
+        configurator.prepare
+      end
+
+      it "updates the configuration" do
+        expect(configurator).to receive(:update_configuration).and_return(true)
+        configurator.prepare
+      end
+
+      it "returns true" do
+        allow(configurator).to receive(:update_configuration).and_return(true)
+        expect(configurator.prepare).to eq(true)
+      end
+
       context "when #update_configuration is not defined" do
         it "raises NotImplementedError" do
-          expect { configurator.run }.to raise_error(NotImplementedError)
-        end
-      end
-
-      context "when #apply_client_mode is not defined" do
-        before do
-          allow(configurator).to receive(:update_configuration).and_return(true)
-        end
-
-        it "raises NotImplementedError" do
-          expect { configurator.run }.to raise_error(NotImplementedError)
-        end
-      end
-
-      context "when applying the configuration fails" do
-        before do
-          allow(configurator).to receive(:update_configuration).and_return(true)
-          allow(configurator).to receive(:apply_client_mode).and_return(false)
-        end
-
-        it "returns false" do
-          expect(configurator.run).to eq(false)
-        end
-      end
-
-      context "when applying the configuration succeeds" do
-        before do
-          allow(configurator).to receive(:update_configuration).and_return(true)
-          allow(configurator).to receive(:apply_client_mode).and_return(true)
-        end
-
-        it "returns true" do
-          expect(configurator.run).to eq(true)
+          expect { configurator.prepare }.to raise_error(NotImplementedError)
         end
       end
     end
@@ -220,7 +172,7 @@ describe Yast::CM::Configurators::Base do
       context "when uncompressing fails" do
         before do
           allow(file_from_url_wrapper).to receive(:get_file).and_return(true)
-          allow(Yast::Execute).to receive(:locally).with("tar", *any_args).and_raise(Cheetah::ExecutionFailed)
+          allow(Yast::Execute).to receive(:locally).with("tar", *any_args).and_return(false)
         end
 
         it "returns false" do

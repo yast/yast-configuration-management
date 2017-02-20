@@ -102,20 +102,15 @@ module Yast
           {}
         end
 
-        # Run the configurator applying the configuration to the system
+        # Prepare the system to run the provisioner
         #
-        # Work is delegated to methods called after the mode: #run_masterless_mode
-        # and #run_client_mode.
+        # Work is delegated to methods called after the mode: #prepare_masterless_mode
+        # and #prepare_client_mode.
         #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
-        #
-        # @see run_masterless_mode
-        # @see run_client_mode
-        def run(stdout = nil, stderr = nil)
-          stdout ||= $stdout
-          stderr ||= $stderr
-          send("run_#{mode}_mode", stdout, stderr)
+        # @see prepare_masterless_mode
+        # @see prepare_client_mode
+        def prepare
+          send("prepare_#{mode}_mode")
         end
 
         # Configurator operation mode
@@ -163,9 +158,6 @@ module Yast
           config_file = config_tmpdir.join(CONFIG_LOCAL_FILENAME)
           return false unless FileFromUrlWrapper.get_file(config_url, config_file)
           Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", config_tmpdir.to_s)
-          true
-        rescue
-          false
         end
 
         # Fetch keys
@@ -178,72 +170,33 @@ module Yast
                    .fetch_to(private_key_path, public_key_path)
         end
 
-        # Run the configurator in masterless mode
+        # Prepare the system to run in masterless mode
         #
-        # * Fetch the configuration from the given #config_url
-        # * Apply the configuration using masterless mode
+        # Just fetch the configuration from the given #config_url
         #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
         # @return [Boolean] true if configuration suceeded; false otherwise.
         #
         # @see fetch_config
-        # @see apply_masterless_mode
-        def run_masterless_mode(stdout, stderr)
-          fetch_config && apply_masterless_mode(stdout, stderr)
+        # @see prepare
+        def prepare_masterless_mode
+          fetch_config
         end
 
-        # Run the configurator in client mode
+        # Prepare the system to run in client mode
         #
         # * Update configuration file writing the master name
-        # * Run the configurator
+        # * Fetch the authentication public/private key
         #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
         # @return [Boolean] true if configuration suceeded; false otherwise.
         #
+        # @see fetch_keys
         # @see update_configuration
-        # @see apply
-        def run_client_mode(stdout, stderr)
-          fetch_keys
-          update_configuration && with_retries(attempts) { apply_client_mode(stdout, stderr) }
+        def prepare_client_mode
+          fetch_keys && update_configuration
         end
 
       private
 
-        # Apply the configuration using the CM system
-        #
-        # To be redefined by inheriting classes.
-        #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
-        #
-        # @return [Boolean] true if the configuration was applied; false otherwise.
-        def apply_client_mode(_stdout, _stderr)
-          raise NotImplementedError
-        end
-
-        # Apply the configuration using the CM system
-        #
-        # Configuration is available at #config_tmpdir
-        #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
-        #
-        # @return [Boolean] true if the configuration was applied; false otherwise.
-        #
-        # @see config_tmpdir
-        def apply_masterless_mode(_stdout, _stderr)
-          raise NotImplementedError
-        end
-
-        def with_retries(attempts = 1)
-          attempts.times do |i|
-            log.info "Applying configuration (try #{i + 1}/#{attempts})"
-            return true if yield
-          end
-          false
-        end
 
         # Update CM system configuration
         #

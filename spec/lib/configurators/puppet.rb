@@ -2,7 +2,6 @@
 
 require_relative "../../spec_helper"
 require "cm/configurators/puppet"
-require "cheetah"
 
 describe Yast::CM::Configurators::Puppet do
   Yast.import "Hostname"
@@ -25,7 +24,7 @@ describe Yast::CM::Configurators::Puppet do
     end
   end
 
-  describe "#run" do
+  describe "#prepare" do
     before do
       allow(configurator).to receive(:config_tmpdir).and_return(tmpdir)
     end
@@ -41,50 +40,16 @@ describe Yast::CM::Configurators::Puppet do
         allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
       end
 
-      it "runs puppet agent" do
-        expect(Cheetah).to receive(:run)
-          .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
-            "--waitforcert", config[:timeout].to_s, stdout: $stdout, stderr: $stderr)
-        expect(configurator.run).to eq(true)
-      end
-
-      context "when puppet agent fails" do
-        it "retries up to 'attempts' times" do
-          expect(Cheetah).to receive(:run)
-            .with("puppet", *any_args)
-            .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
-            .exactly(config[:attempts]).times
-          expect(configurator.run).to eq(false)
-        end
-      end
-
       it "updates the configuration file" do
-        allow(Cheetah).to receive(:run)
-          .with("puppet", *any_args)
         expect(puppet_config).to receive(:server=).with(master)
-        configurator.run
+        configurator.prepare
       end
 
       it "retrieves authentication keys" do
-        allow(Cheetah).to receive(:run)
-          .with(any_args)
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
             Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
-        configurator.run
-      end
-    end
-
-    context "when running in masterless mode" do
-      let(:master) { nil }
-
-      it "runs puppet apply" do
-        allow(configurator).to receive(:fetch_config).and_return(true)
-        expect(Cheetah).to receive(:run).with(
-          "puppet", "apply", "--modulepath", tmpdir.join("modules").to_s,
-          tmpdir.join("manifests", "site.pp").to_s, "--debug",
-          stdout: $stdout, stderr: $stderr)
-        expect(configurator.run).to eq(true)
+        configurator.prepare
       end
     end
 
@@ -92,11 +57,9 @@ describe Yast::CM::Configurators::Puppet do
       let(:master) { nil }
       let(:config_url) { nil }
 
-      it "updates the configuration file" do
-        allow(Cheetah).to receive(:run)
-          .with("puppet", "agent", *any_args)
+      it "does not update the configuration file" do
         expect(Yast::CM::CFA::Puppet).to_not receive(:new)
-        configurator.run
+        configurator.prepare
       end
     end
   end

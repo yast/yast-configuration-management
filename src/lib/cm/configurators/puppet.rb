@@ -38,41 +38,6 @@ module Yast
           config.save
         end
 
-        # Try to apply system configuration in client mode
-        #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
-        #
-        # @return [Boolean] +true+ if run was successful; +false+ otherwise.
-        #
-        # @see Yast::CM::Configurators::Base#apply_client_mode
-        def apply_client_mode(stdout, stderr)
-          Cheetah.run("puppet", "agent", "--onetime",
-            "--debug", "--no-daemonize", "--waitforcert", timeout.to_s,
-            stdout: stdout, stderr: stderr)
-          true
-        rescue Cheetah::ExecutionFailed
-          false
-        end
-
-        # Try to apply system configuration in masterless mode
-        #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
-        #
-        # @return [Boolean] +true+ if run was successful; +false+ otherwise.
-        #
-        # @see Yast::CM::Configurators::Base#apply_masterless_mode
-        def apply_masterless_mode(stdout, stderr)
-          Cheetah.run("puppet", "apply", "--modulepath",
-            config_tmpdir.join("modules").to_s,
-            config_tmpdir.join("manifests", "site.pp").to_s, "--debug",
-            stdout: stdout, stderr: stderr)
-          true
-        rescue Cheetah::ExecutionFailed
-          false
-        end
-
         # Return path to private key
         #
         # @return [Pathname] Path to private key
