@@ -1,6 +1,8 @@
 -------------------------------------------------------------------
-Sun Feb 19 00:32:42 UTC 2017 - igonzalezsosa@suse.com
+Tue Feb 21 01:50:19 UTC 2017 - igonzalezsosa@suse.com
 
+- The provisioner runs after the 2nd stage to avoid interferences
+  with AutoYaST.
 - Fix the list of packages to be installed when using Salt.
 - Add missing 'modified', 'modified?' and 'export' methods in the
   AutoYaST client although no information is exported by this
