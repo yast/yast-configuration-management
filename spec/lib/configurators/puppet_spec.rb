@@ -11,12 +11,13 @@ describe Yast::CM::Configurators::Puppet do
   let(:master) { "myserver" }
   let(:mode) { :client }
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:config_dir) { "/tmp/config" }
   let(:keys_url) { "https://yast.example.net/keys" }
-  let(:tmpdir) { Pathname.new("tmp") }
   let(:hostname) { "myclient" }
 
   let(:config) do
-    { mode: mode, attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
+    { mode: mode, attempts: 3, timeout: 10, master: master,
+      config_url: config_url, config_dir: config_dir, keys_url: keys_url }
   end
 
   describe "#packages" do
@@ -26,10 +27,6 @@ describe Yast::CM::Configurators::Puppet do
   end
 
   describe "#prepare" do
-    before do
-      allow(configurator).to receive(:config_tmpdir).and_return(tmpdir)
-    end
-
     context "when running in client mode" do
       let(:puppet_config) { double("puppet", load: true, save: true) }
       let(:key_finder) { double("key_finder", fetch_to: true) }

@@ -26,6 +26,8 @@ module Yast
         attr_reader :timeout
         # @return [URI,nil] Keys URL
         attr_reader :keys_url
+        # @return [Pathname] Configuration directory for masterless mode
+        attr_reader :config_dir
 
         # Mode could not be determined because master and config_url are
         # both nil.
@@ -77,10 +79,11 @@ module Yast
         # Constructor
         #
         # @param config [Hash] options
-        # @option config [Integer] :master   Master server's name
-        # @option config [Integer] :attempts Number of authentication retries
-        # @option config [Integer] :timeout  Authentication timeout for each retry
-        # @option config [Integer] :mode     Operation mode (:client or :masterless)
+        # @option config [Integer] :master     Master server's name
+        # @option config [Integer] :attempts   Number of authentication retries
+        # @option config [Integer] :timeout    Authentication timeout for each retry
+        # @option config [Integer] :mode       Operation mode (:client or :masterless)
+        # @option config [String]  :config_dir masterless configuration directory
         def initialize(config = {})
           log.info "Initializing configurator #{self.class.name} with #{config}"
           @master     = config[:master]
@@ -89,6 +92,7 @@ module Yast
           @config_url = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
           @keys_url   = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
           @mode       = config[:mode]
+          @config_dir = Pathname.new(config[:config_dir]) unless config[:config_dir].nil?
         end
 
         # Return the list of packages to install
@@ -123,7 +127,7 @@ module Yast
         end
 
         # Command to uncompress configuration
-        UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<config_tmpdir>s".freeze
+        UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<config_dir>s".freeze
         # Local file name of fetched configuration
         CONFIG_LOCAL_FILENAME = "config.tgz".freeze
 
@@ -134,9 +138,9 @@ module Yast
         #
         # @return [Boolean] true if configuration was fetched; false otherwise.
         def fetch_config
-          config_file = config_tmpdir.join(CONFIG_LOCAL_FILENAME)
+          config_file = config_dir.join(CONFIG_LOCAL_FILENAME)
           return false unless FileFromUrlWrapper.get_file(config_url, config_file)
-          Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", config_tmpdir.to_s)
+          Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", config_dir.to_s)
         end
 
         # Fetch keys
@@ -182,13 +186,6 @@ module Yast
         # To be defined by descending classes.
         def update_configuration
           raise NotImplementedError
-        end
-
-        # Return a path to a temporal directory to extract configuration
-        #
-        # @return [Pathname] Path name to the temporal directory
-        def config_tmpdir
-          @config_tmpdir ||= Pathname.new(Dir.mktmpdir)
         end
 
         # Return path to private key

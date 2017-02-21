@@ -13,9 +13,11 @@ describe Yast::CM::Configurators::Base do
   let(:config_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { nil }
   let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
+  let(:config_dir) { File.join(DATA_DIR, "tmp") }
 
   let(:config) do
-    { mode: mode, attempts: 3, timeout: 10, master: master, config_url: config_url, keys_url: keys_url }
+    { mode: mode, attempts: 3, timeout: 10, master: master,
+      config_url: config_url, keys_url: keys_url, config_dir: config_dir }
   end
 
   describe "#master" do
@@ -103,15 +105,9 @@ describe Yast::CM::Configurators::Base do
     end
 
     describe "#fetch_config" do
-      let(:tmpdir) { Pathname("/tmp") }
-
-      before do
-        allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
-      end
-
       it "downloads and uncompress the configuration to a temporal directory" do
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(URI(config_url), tmpdir.join(Yast::CM::Configurators::Base::CONFIG_LOCAL_FILENAME))
+          .with(URI(config_url), Pathname(config_dir).join(Yast::CM::Configurators::Base::CONFIG_LOCAL_FILENAME))
           .and_return(true)
         expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
           .and_return(true)

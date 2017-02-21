@@ -70,14 +70,16 @@ describe Yast::CM::Config do
 
   describe "#to_hash" do
     it "returns a hash with non-nil configuration values" do
+      allow(Dir).to receive(:mktmpdir).and_return("/tmp/config-dir")
       expect(config.to_hash).to eq(
         {
-          attempts:  profile["attempts"],
-          timeout:   profile["timeout"],
-          keys_url:  profile["keys_url"],
-          type:      profile["type"],
-          mode:      :client,
-          master:    profile["master"]
+          attempts:   profile["attempts"],
+          timeout:    profile["timeout"],
+          keys_url:   profile["keys_url"],
+          type:       profile["type"],
+          mode:       :client,
+          master:     profile["master"],
+          config_dir: "/tmp/config-dir"
         }
       )
     end

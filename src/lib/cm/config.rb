@@ -1,5 +1,6 @@
 require "yaml"
 require "pathname"
+require "tmpdir"
 
 module Yast
   module CM
@@ -48,6 +49,7 @@ module Yast
         @master     = symbolized_opts[:master]
         @mode       = @master ? :client : :masterless
         @config_url = symbolized_opts[:config_url]
+        @config_dir = symbolized_opts[:config_dir]
         @keys_url   = symbolized_opts[:keys_url]
         @attempts   = symbolized_opts[:attempts]
         @timeout    = symbolized_opts[:timeout]
@@ -64,7 +66,7 @@ module Yast
       #
       # @return [Hash] Configuration values
       def to_hash
-        %i(type mode master attempts timeout config_url keys_url).each_with_object({}) do |key, memo|
+        %i(type mode master attempts timeout config_url keys_url config_dir).each_with_object({}) do |key, memo|
           value = send(key)
           memo[key] = value unless value.nil?
         end
@@ -75,6 +77,13 @@ module Yast
       # @return [String] YAML representation of configuraton values
       def to_yaml
         to_hash.to_yaml
+      end
+
+      # Return a path to a temporal directory to extract configuration
+      #
+      # @return [String] Path name to the temporal directory
+      def config_dir
+        @config_dir ||= Dir.mktmpdir
       end
     end
   end
