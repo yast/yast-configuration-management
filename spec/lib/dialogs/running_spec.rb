@@ -8,7 +8,7 @@ describe Yast::CM::Dialogs::Running do
   subject(:dialog) { described_class.new }
 
   describe "#run" do
-    let(:block) { lambda { |_o, _e| _o } }
+    let(:block) { ->(o, _e) { o } }
 
     before do
       allow(Yast::UI).to receive(:TimeoutUserInput).and_return(:ok)
@@ -23,7 +23,7 @@ describe Yast::CM::Dialogs::Running do
     end
 
     context "when block writes to the output channel" do
-      let(:block) { lambda { |o, _e| o << "out" } }
+      let(:block) { ->(o, _e) { o << "out" } }
       it "displays blocks' stdout in real-time" do
         expect(Yast::UI).to receive(:ChangeWidget)
           .with(Id(:progress), :Value, "out")
@@ -32,7 +32,7 @@ describe Yast::CM::Dialogs::Running do
     end
 
     context "when block writes to the error channel" do
-      let(:block) { lambda { |_o, e| e << "err" } }
+      let(:block) { ->(_o, e) { e << "err" } }
 
       it "displays blocks' stderr in real-time" do
         expect(Yast::UI).to receive(:ChangeWidget)
@@ -42,7 +42,7 @@ describe Yast::CM::Dialogs::Running do
     end
 
     context "when some content was displayed" do
-      let(:block) { lambda { |o, e| o << "second\nthird" } }
+      let(:block) { ->(o, _e) { o << "second\nthird" } }
 
       before do
         allow(Yast::UI).to receive(:QueryWidget)
