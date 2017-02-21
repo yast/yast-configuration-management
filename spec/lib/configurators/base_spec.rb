@@ -51,10 +51,16 @@ describe Yast::CM::Configurators::Base do
 
       before do
         allow(configurator).to receive(:fetch_config).and_return(fetched_config)
+        allow(configurator).to receive(:update_configuration)
       end
 
       it "fetches the configuration" do
         expect(configurator).to receive(:fetch_config)
+        configurator.prepare
+      end
+
+      it "updates the provisioner configuration" do
+        expect(configurator).to receive(:update_configuration)
         configurator.prepare
       end
     end
@@ -70,7 +76,7 @@ describe Yast::CM::Configurators::Base do
         configurator.prepare
       end
 
-      it "updates the configuration" do
+      it "updates the provisioner configuration" do
         expect(configurator).to receive(:update_configuration)
         configurator.prepare
       end

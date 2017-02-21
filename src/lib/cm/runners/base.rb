@@ -69,12 +69,7 @@ module Yast
         def run(stdout = nil, stderr = nil)
           stdout ||= $stdout
           stderr ||= $stderr
-          case mode
-          when :client
-            with_retries(attempts) { |i| run_client_mode(stdout, stderr, i) }
-          when :masterless
-            run_masterless_mode(stdout, stderr)
-          end
+          send("run_#{mode}_mode", stdout, stderr)
         end
 
       protected
@@ -85,10 +80,9 @@ module Yast
         #
         # @param stdout  [IO]     Standard output channel used by the configurator
         # @param stderr  [IO]     Standard error channel used by the configurator
-        # @param attempt [Fixnum] Attempt number
         #
         # @return [Boolean] true if the configuration was applied; false otherwise.
-        def run_client_mode(_stdout, _stderr, _attempt)
+        def run_client_mode(_stdout, _stderr)
           raise NotImplementedError
         end
 
@@ -108,6 +102,7 @@ module Yast
 
         def with_retries(attempts = 1)
           attempts.times do |i|
+            return false if i >= attempts
             log.info "Running provisioner (try #{i + 1}/#{attempts})"
             return true if yield(i)
           end

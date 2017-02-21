@@ -40,12 +40,14 @@ describe Yast::CM::Configurators::Salt do
 
       before do
         allow(Yast::CM::CFA::Minion).to receive(:new).and_return(minion_config)
-        allow(minion_config).to receive(:master=)
+        allow(minion_config).to receive(:update)
         allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
       end
 
       it "updates the configuration file" do
-        expect(minion_config).to receive(:master=).with(master)
+        expect(minion_config).to receive(:update).with(
+          master: master, auth_tries: config[:attempts], auth_timeout: config[:timeout]
+        )
         configurator.prepare
       end
 

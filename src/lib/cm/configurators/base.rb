@@ -110,12 +110,13 @@ module Yast
 
         # Prepare the system to run the provisioner
         #
-        # Work is delegated to methods called after the mode: #prepare_masterless_mode
-        # and #prepare_client_mode.
+        # Configuration is updated and, after that, the work is delegated to methods
+        # called after the mode: #prepare_masterless_mode and #prepare_client_mode.
         #
         # @see prepare_masterless_mode
         # @see prepare_client_mode
         def prepare
+          update_configuration
           send("prepare_#{mode}_mode")
         end
 
@@ -176,7 +177,6 @@ module Yast
         # @see update_configuration
         def prepare_client_mode
           fetch_keys
-          update_configuration
         end
 
       private

@@ -37,7 +37,7 @@ module Yast
           log.info "Updating minion configuration file"
           config = CFA::Minion.new
           config.load
-          config.master = master
+          config.update(master: master, auth_tries: attempts, auth_timeout: timeout)
           config.save
         end
 
