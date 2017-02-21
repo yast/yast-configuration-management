@@ -171,7 +171,8 @@ module Yast
         # @see fetch_keys
         # @see update_configuration
         def prepare_client_mode
-          fetch_keys && update_configuration
+          fetch_keys
+          update_configuration
         end
 
       private

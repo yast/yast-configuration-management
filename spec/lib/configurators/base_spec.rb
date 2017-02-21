@@ -59,23 +59,18 @@ describe Yast::CM::Configurators::Base do
 
     context "when running in client mode" do
       before do
-        allow(configurator).to receive(:fetch_keys).and_return(true)
+        allow(configurator).to receive(:fetch_keys)
       end
 
       it "fetches the authentication keys" do
-        expect(configurator).to receive(:fetch_keys).and_return(true)
-        allow(configurator).to receive(:update_configuration).and_return(true)
+        expect(configurator).to receive(:fetch_keys)
+        allow(configurator).to receive(:update_configuration)
         configurator.prepare
       end
 
       it "updates the configuration" do
-        expect(configurator).to receive(:update_configuration).and_return(true)
+        expect(configurator).to receive(:update_configuration)
         configurator.prepare
-      end
-
-      it "returns true" do
-        allow(configurator).to receive(:update_configuration).and_return(true)
-        expect(configurator.prepare).to eq(true)
       end
 
       context "when #update_configuration is not defined" do
