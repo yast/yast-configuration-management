@@ -10,12 +10,12 @@ describe Yast::CM::Config do
   let(:master) { "some-server.suse.com" }
   let(:profile) do
     {
-      "type"       => "salt",
-      "master"     => master,
-      "attempts"   => 3,
-      "timeout"    => 10,
-      "config_url" => nil,
-      "keys_url"   =>  "http://internal-server.com/keys.tgz"
+      "type"            => "salt",
+      "master"          => master,
+      "auth_attempts"   => 3,
+      "auth_time_out"   => 10,
+      "definitions_url" => nil,
+      "keys_url"        => "http://internal-server.com/keys.tgz"
     }
   end
   let(:default_path) { Pathname(DATA_DIR).join("cm-salt.yml") }
@@ -72,22 +72,20 @@ describe Yast::CM::Config do
     it "returns a hash with non-nil configuration values" do
       allow(Dir).to receive(:mktmpdir).and_return("/tmp/config-dir")
       expect(config.to_hash).to eq(
-        {
-          attempts:   profile["attempts"],
-          timeout:    profile["timeout"],
-          keys_url:   profile["keys_url"],
-          type:       profile["type"],
-          mode:       :client,
-          master:     profile["master"],
-          config_dir: "/tmp/config-dir"
-        }
+        auth_attempts:    profile["auth_attempts"],
+        auth_time_out:    profile["auth_time_out"],
+        keys_url:         profile["keys_url"],
+        type:             profile["type"],
+        mode:             :client,
+        master:           profile["master"],
+        definitions_root: "/tmp/config-dir"
       )
     end
   end
 
   describe "#to_yaml" do
     it "returns a YAML string with non-nil configuration values" do
-      allow(config).to receive(:to_hash).and_return({type: "salt"})
+      allow(config).to receive(:to_hash).and_return(type: "salt")
       expect(config.to_yaml).to eq("---\n:type: salt\n")
     end
   end

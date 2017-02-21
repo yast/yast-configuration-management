@@ -17,12 +17,12 @@ module Yast
       attr_reader :mode
       # @return [String,nil] Master server hostname
       attr_reader :master
-      # @return [URI,nil] Config URL
-      attr_reader :config_url
-      # @return [Integer] Number of authentication retries
-      attr_reader :attempts
-      # @return [Integer] Authentication timeout for each retry
-      attr_reader :timeout
+      # @return [URI,nil] System definition URL (states, recipes, etc.)
+      attr_reader :definitions_url
+      # @return [Integer] Number of authentication attempts
+      attr_reader :auth_attempts
+      # @return [Integer] Authentication time out for each authentication attempt
+      attr_reader :auth_time_out
       # @return [URI,nil] Keys URL
       attr_reader :keys_url
 
@@ -42,17 +42,17 @@ module Yast
       # Constructor
       #
       # TODO: validations:
-      # * master or config_url should be specified
+      # * master or definitions_url should be specified
       def initialize(options)
-        symbolized_opts = Hash[options.map { |k,v| [k.to_sym, v] }]
-        @type       = symbolized_opts[:type].nil? ? "salt" : symbolized_opts[:type].downcase
-        @master     = symbolized_opts[:master]
-        @mode       = @master ? :client : :masterless
-        @config_url = symbolized_opts[:config_url]
-        @config_dir = symbolized_opts[:config_dir]
-        @keys_url   = symbolized_opts[:keys_url]
-        @attempts   = symbolized_opts[:attempts]
-        @timeout    = symbolized_opts[:timeout]
+        symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
+        @type             = symbolized_opts[:type].nil? ? "salt" : symbolized_opts[:type].downcase
+        @master           = symbolized_opts[:master]
+        @mode             = @master ? :client : :masterless
+        @definitions_url  = symbolized_opts[:definitions_url]
+        @definitions_root = symbolized_opts[:definitions_root]
+        @keys_url         = symbolized_opts[:keys_url]
+        @auth_attempts    = symbolized_opts[:auth_attempts]
+        @auth_time_out    = symbolized_opts[:auth_time_out]
       end
 
       # Save configuration to the given file
@@ -66,7 +66,7 @@ module Yast
       #
       # @return [Hash] Configuration values
       def to_hash
-        %i(type mode master attempts timeout config_url keys_url config_dir).each_with_object({}) do |key, memo|
+        %i(type mode master auth_attempts auth_time_out definitions_url keys_url definitions_root).each_with_object({}) do |key, memo|
           value = send(key)
           memo[key] = value unless value.nil?
         end
@@ -82,8 +82,8 @@ module Yast
       # Return a path to a temporal directory to extract configuration
       #
       # @return [String] Path name to the temporal directory
-      def config_dir
-        @config_dir ||= Dir.mktmpdir
+      def definitions_root
+        @definitions_root ||= Dir.mktmpdir
       end
     end
   end

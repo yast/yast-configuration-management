@@ -9,8 +9,8 @@ describe Yast::CM::Runners::Salt do
   let(:tmpdir) { "/tmp/salt" }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: "some-server.suse.com",
-      mode: mode, config_dir: tmpdir }
+    { auth_attempts: 3, auth_time_out: 10, master: "some-server.suse.com",
+      mode: mode, definitions_root: tmpdir }
   end
 
   describe "#run" do
@@ -24,7 +24,8 @@ describe Yast::CM::Runners::Salt do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug", "state.highstate",
-          stdout: $stdout, stderr: $stderr)
+          stdout: $stdout, stderr: $stderr
+        )
         expect(runner.run).to eq(true)
       end
 
@@ -45,7 +46,8 @@ describe Yast::CM::Runners::Salt do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug",
           "--local", "--file-root=#{tmpdir}", "state.highstate",
-          stdout: $stdout, stderr: $stderr)
+          stdout: $stdout, stderr: $stderr
+        )
         expect(runner.run).to eq(true)
       end
     end

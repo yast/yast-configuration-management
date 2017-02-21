@@ -20,12 +20,12 @@ module Yast
       # to the configurator's constructor.
       #
       # @return profile [Hash] configuration from AutoYaST profile
-      # @option profile [String] "type"       Configurator to use ("salt", "puppet", etc.)
-      # @option profile [String] "master"     Master server name
-      # @option profile [String] "timeout"    Authentication timeout
-      # @option profile [String] "attempts"   Authentication retries
-      # @option profile [String] "config_url" Configuration URL
-      # @option profile [String] "keys_url"   Authentication keys URL
+      # @option profile [String] "type"            Configurator to use ("salt", "puppet", etc.)
+      # @option profile [String] "master"          Master server name
+      # @option profile [String] "auth_attempts"   Number of authentication attempts
+      # @option profile [String] "auth_time_out"   Authentication time out for each authentication attempt
+      # @option profile [String] "definitions_url" Definitions URL (states, recipes, etc.)
+      # @option profile [String] "keys_url"        Authentication keys URL
       def import(profile = {})
         config = Config.new(profile)
         config.save

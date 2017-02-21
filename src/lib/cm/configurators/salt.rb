@@ -33,11 +33,10 @@ module Yast
         # @see Yast::CM::Configurators::Base#update_configuration
         # @see #master
         def update_configuration
-          return unless master.is_a?(::String)
           log.info "Updating minion configuration file"
           config = CFA::Minion.new
           config.load
-          config.update(master: master, auth_tries: attempts, auth_timeout: timeout)
+          config.update(master: master, auth_tries: auth_tries, auth_timeout: auth_timeout)
           config.save
         end
 

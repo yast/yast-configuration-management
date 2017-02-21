@@ -10,14 +10,14 @@ describe Yast::CM::Configurators::Base do
 
   let(:master) { "myserver" }
   let(:mode) { :client }
-  let(:config_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { nil }
   let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
-  let(:config_dir) { File.join(DATA_DIR, "tmp") }
+  let(:definitions_root) { File.join(DATA_DIR, "tmp") }
 
   let(:config) do
-    { mode: mode, attempts: 3, timeout: 10, master: master,
-      config_url: config_url, keys_url: keys_url, config_dir: config_dir }
+    { mode: mode, auth_attempts: 3, auth_time_out: 10, master: master,
+      definitions_url: definitions_url, keys_url: keys_url, definitions_root: definitions_root }
   end
 
   describe "#master" do
@@ -26,15 +26,15 @@ describe Yast::CM::Configurators::Base do
     end
   end
 
-  describe "#attempts" do
+  describe "#auth_attempts" do
     it "returns the master option" do
-      expect(configurator.attempts).to eq(config[:attempts])
+      expect(configurator.auth_attempts).to eq(config[:auth_attempts])
     end
   end
 
-  describe "#timeout" do
-    it "returns the timeout option" do
-      expect(configurator.timeout).to eq(config[:timeout])
+  describe "#auth_time_out" do
+    it "returns the auth_time_out option" do
+      expect(configurator.auth_time_out).to eq(config[:auth_time_out])
     end
   end
 
@@ -113,7 +113,7 @@ describe Yast::CM::Configurators::Base do
     describe "#fetch_config" do
       it "downloads and uncompress the configuration to a temporal directory" do
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(URI(config_url), Pathname(config_dir).join(Yast::CM::Configurators::Base::CONFIG_LOCAL_FILENAME))
+          .with(URI(definitions_url), Pathname(definitions_root).join(Yast::CM::Configurators::Base::CONFIG_LOCAL_FILENAME))
           .and_return(true)
         expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
           .and_return(true)

@@ -1,6 +1,6 @@
 ---
 :master: default.suse.com
 :mode: :client
-:attempts: 3
-:timeout: 10
+:auth_tries: 3
+:auth_timeout: 10
 :type: salt

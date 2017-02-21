@@ -9,8 +9,8 @@ describe Yast::CM::Runners::Puppet do
   let(:tmpdir) { Pathname.new("/tmp/salt") }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: "some-server.suse.com",
-      mode: mode, config_dir: tmpdir }
+    { auth_attempts: 3, auth_time_out: 10, master: "some-server.suse.com",
+      mode: mode, definitions_root: tmpdir }
   end
 
   describe "#run" do
@@ -24,16 +24,16 @@ describe Yast::CM::Runners::Puppet do
       it "runs puppet agent" do
         expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
-          "--waitforcert", config[:timeout].to_s, stdout: $stdout, stderr: $stderr)
+            "--waitforcert", config[:auth_time_out].to_s, stdout: $stdout, stderr: $stderr)
         expect(runner.run).to eq(true)
       end
 
       context "when puppet agent fails" do
-        it "retries up to 'attempts' times" do
+        it "retries up to 'auth_attempts' times" do
           expect(Cheetah).to receive(:run)
             .with("puppet", *any_args)
             .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
-            .exactly(config[:attempts]).times
+            .exactly(config[:auth_attempts]).times
           expect(runner.run).to eq(false)
         end
       end
@@ -46,7 +46,8 @@ describe Yast::CM::Runners::Puppet do
         expect(Cheetah).to receive(:run).with(
           "puppet", "apply", "--modulepath", tmpdir.join("modules").to_s,
           tmpdir.join("manifests", "site.pp").to_s, "--debug",
-          stdout: $stdout, stderr: $stderr)
+          stdout: $stdout, stderr: $stderr
+        )
         expect(runner.run).to eq(true)
       end
     end

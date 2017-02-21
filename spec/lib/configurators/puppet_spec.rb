@@ -10,14 +10,14 @@ describe Yast::CM::Configurators::Puppet do
 
   let(:master) { "myserver" }
   let(:mode) { :client }
-  let(:config_url) { "https://yast.example.net/myconfig.tgz" }
-  let(:config_dir) { "/tmp/config" }
+  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:definitions_root) { "/tmp/config" }
   let(:keys_url) { "https://yast.example.net/keys" }
   let(:hostname) { "myclient" }
 
   let(:config) do
-    { mode: mode, attempts: 3, timeout: 10, master: master,
-      config_url: config_url, config_dir: config_dir, keys_url: keys_url }
+    { mode: mode, auth_attempts: 3, auth_time_out: 10, master: master,
+      definitions_url: definitions_url, definitions_root: definitions_root, keys_url: keys_url }
   end
 
   describe "#packages" do

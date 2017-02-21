@@ -26,8 +26,8 @@ The module will take care of:
 <cm>
   <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
-  <attempts config:type="integer">5</attempts>
-  <timeout config:type="integer">10</timeout>
+  <auth_attempts config:type="integer">5</auth_attempts>
+  <auth_time_out config:type="integer">10</auth_time_out>
   <keys_url>usb:/</keys_url> <!-- you can use HTTP, FTP... -->
 </cm>
 ```
@@ -38,7 +38,7 @@ The module will take care of:
 <cm>
   <type>salt</type> <!-- you can use "puppet" -->
   <config_url>http://myserver.example.net/states.tgz</config_url>
-  <attempts config:type="integer">3</attempts>
+  <auth_attempts config:type="integer">3</auth_attempts>
 </cm>
 ```
 

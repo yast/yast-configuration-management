@@ -11,7 +11,7 @@ module Yast
 
         # Try to apply system configuration in client mode
         #
-        # The Salt runner does not care about retries and timeouts as they
+        # The Salt runner does not care about retries and auth_timeouts as they
         # are set in the minion's configuration file.
         #
         # @param stdout [IO] Standard output channel used by the configurator
@@ -30,7 +30,7 @@ module Yast
 
         # Try to apply system configuration in masterless mode
         #
-        # The Salt runner does not care about retries and timeouts as they
+        # The Salt runner does not care about retries and auth_timeouts as they
         # are set in the minion's configuration file.
         #
         # @param stdout [IO] Standard output channel used by the configurator
@@ -41,7 +41,7 @@ module Yast
         # @see Yast::CM::Runners::Base#run_masterless_mode
         def run_masterless_mode(stdout, stderr)
           Cheetah.run("salt-call", "--log-level", "debug", "--local",
-            "--file-root=#{config_dir}", "state.highstate",
+            "--file-root=#{definitions_root}", "state.highstate",
             stdout: stdout, stderr: stderr)
           true
         rescue Cheetah::ExecutionFailed

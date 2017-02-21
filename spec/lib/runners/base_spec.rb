@@ -8,7 +8,7 @@ describe Yast::CM::Runners::Base do
   let(:mode) { :masterless }
 
   let(:config) do
-    { attempts: 3, timeout: 10, master: "some-server.suse.com", mode: mode }
+    { auth_attempts: 3, auth_time_out: 10, master: "some-server.suse.com", mode: mode }
   end
 
   describe "#run" do

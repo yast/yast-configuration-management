@@ -13,13 +13,13 @@ module Yast
         # @return [String,nil] Master server hostname
         attr_reader :master
         # @return [Integer] Number of authentication retries
-        attr_reader :attempts
-        # @return [Integer] Authentication timeout for each retry
-        attr_reader :timeout
+        attr_reader :auth_attempts
+        # @return [Integer] Authentication time out for each attempt
+        attr_reader :auth_time_out
         # @return [Symbol] Mode. Possible values are listed in MODE constant.
         attr_reader :mode
         # @return [Pathname] Directory where the configuration lives.
-        attr_reader :config_dir
+        attr_reader :definitions_root
 
         class << self
           # Return the runner for a given CM system and a configuration
@@ -44,16 +44,16 @@ module Yast
         # Constructor
         #
         # @param config [Hash] config
-        # @option config [Integer] :mode     Operation's mode
-        # @option config [Integer] :attempts Number of authentication retries
-        # @option config [Integer] :timeout  Authentication timeout for each retry
+        # @option config [Integer] :mode          Operation's mode
+        # @option config [Integer] :auth_attempts Number of authentication attempts
+        # @option config [Integer] :auth_time_out Authentication time out for each attempt
         def initialize(config = {})
           log.info "Initializing runner #{self.class.name} with #{config}"
-          @master     = config[:master]
-          @attempts   = config[:attempts]
-          @timeout    = config[:timeout]
-          @mode       = config[:mode]
-          @config_dir = Pathname.new(config[:config_dir]) unless config[:config_dir].nil?
+          @master           = config[:master]
+          @auth_attempts    = config[:auth_attempts]
+          @auth_time_out    = config[:auth_time_out]
+          @mode             = config[:mode]
+          @definitions_root = Pathname.new(config[:definitions_root]) unless config[:definitions_root].nil?
         end
 
         # Run the configurator applying the configuration to the system
@@ -78,8 +78,8 @@ module Yast
         #
         # To be redefined by inheriting classes.
         #
-        # @param stdout  [IO]     Standard output channel used by the configurator
-        # @param stderr  [IO]     Standard error channel used by the configurator
+        # @param stdout [IO] Standard output channel used by the configurator
+        # @param stderr [IO] Standard error channel used by the configurator
         #
         # @return [Boolean] true if the configuration was applied; false otherwise.
         def run_client_mode(_stdout, _stderr)
@@ -90,8 +90,8 @@ module Yast
         #
         # Configuration is available at #config_tmpdir
         #
-        # @param stdout  [IO]     Standard output channel used by the configurator
-        # @param stderr  [IO]     Standard error channel used by the configurator
+        # @param stdout [IO] Standard output channel used by the configurator
+        # @param stderr [IO] Standard error channel used by the configurator
         #
         # @return [Boolean] true if the configuration was applied; false otherwise.
         #
@@ -102,7 +102,6 @@ module Yast
 
         def with_retries(attempts = 1)
           attempts.times do |i|
-            return false if i >= attempts
             log.info "Running provisioner (try #{i + 1}/#{attempts})"
             return true if yield(i)
           end

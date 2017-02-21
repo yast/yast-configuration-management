@@ -16,9 +16,9 @@ module Yast
         #
         # @see Yast::CM::Runners::Base#run_client_mode
         def run_client_mode(stdout, stderr)
-          with_retries(attempts) do
+          with_retries(auth_attempts) do
             run_puppet_cmd("puppet", "agent", "--onetime",
-              "--debug", "--no-daemonize", "--waitforcert", timeout.to_s,
+              "--debug", "--no-daemonize", "--waitforcert", auth_time_out.to_s,
               stdout: stdout, stderr: stderr)
           end
         end
@@ -32,10 +32,10 @@ module Yast
         #
         # @see Yast::CM::Runners::Base#run_masterless_mode
         def run_masterless_mode(stdout, stderr)
-          with_retries(attempts) do
+          with_retries(auth_attempts) do
             run_puppet_cmd("puppet", "apply", "--modulepath",
-              config_dir.join("modules").to_s,
-              config_dir.join("manifests", "site.pp").to_s, "--debug",
+              definitions_root.join("modules").to_s,
+              definitions_root.join("manifests", "site.pp").to_s, "--debug",
               stdout: stdout, stderr: stderr)
           end
         end

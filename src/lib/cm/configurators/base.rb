@@ -19,20 +19,20 @@ module Yast
         # @return [String,nil] Master server hostname
         attr_reader :master
         # @return [URI,nil] Config URL
-        attr_reader :config_url
-        # @return [Integer] Number of authentication retries
-        attr_reader :attempts
-        # @return [Integer] Authentication timeout for each retry
-        attr_reader :timeout
-        # @return [URI,nil] Keys URL
+        attr_reader :definitions_url
+        # @return [Integer] Number of authentication attempts
+        attr_reader :auth_attempts
+        # @return [Integer] Authentication time out for each attempt
+        attr_reader :auth_time_out
+        # @return [URI,nil] Authentication keys URL
         attr_reader :keys_url
         # @return [Pathname] Configuration directory for masterless mode
-        attr_reader :config_dir
+        attr_reader :definitions_root
 
-        # Mode could not be determined because master and config_url are
+        # Mode could not be determined because master and definitions_url are
         # both nil.
         class CouldNotDetermineMode < StandardError; end
-        # Configuration (specified via config_url) could not be fetched
+        # Configuration (specified via definitions_url) could not be fetched
         class ConfigurationNotFetched < StandardError; end
 
         class << self
@@ -79,20 +79,22 @@ module Yast
         # Constructor
         #
         # @param config [Hash] options
-        # @option config [Integer] :master     Master server's name
-        # @option config [Integer] :attempts   Number of authentication retries
-        # @option config [Integer] :timeout    Authentication timeout for each retry
-        # @option config [Integer] :mode       Operation mode (:client or :masterless)
-        # @option config [String]  :config_dir masterless configuration directory
+        # @option config [Integer] :master           Master server's name
+        # @option config [Integer] :auth_attempts    Number of authentication attempts
+        # @option config [Integer] :auth_time_out    Authentication time out for each authentication attempt
+        # @option config [Symbol]  :mode             Operation mode (:client or :masterless)
+        # @option config [String]  :definitions_url  Definitions URL (states, recipes, etc.)
+        # @option config [String]  :definitions_root masterless configuration directory
+        # @option config [String]  :keys_url         Authentication keys URL
         def initialize(config = {})
           log.info "Initializing configurator #{self.class.name} with #{config}"
-          @master     = config[:master]
-          @attempts   = config[:attempts] || 3
-          @timeout    = config[:timeout] || 10
-          @config_url = config[:config_url].is_a?(::String) ? URI(config[:config_url]) : nil
-          @keys_url   = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
-          @mode       = config[:mode]
-          @config_dir = Pathname.new(config[:config_dir]) unless config[:config_dir].nil?
+          @master           = config[:master]
+          @auth_attempts    = config[:auth_attempts] || 3
+          @auth_time_out    = config[:auth_time_out] || 10
+          @definitions_url  = config[:definitions_url].is_a?(::String) ? URI(config[:definitions_url]) : nil
+          @keys_url         = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
+          @mode             = config[:mode]
+          @definitions_root = Pathname.new(config[:definitions_root]) unless config[:definitions_root].nil?
         end
 
         # Return the list of packages to install
@@ -128,20 +130,20 @@ module Yast
         end
 
         # Command to uncompress configuration
-        UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<config_dir>s".freeze
+        UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<definitions_root>s".freeze
         # Local file name of fetched configuration
         CONFIG_LOCAL_FILENAME = "config.tgz".freeze
 
-        # Fetchs configuration from config_url
+        # Fetchs configuration from definitions_url
         #
         # FIXME: this code should be in another class. We want to extend this
         # mechanism to support, for example, git repositories.
         #
         # @return [Boolean] true if configuration was fetched; false otherwise.
         def fetch_config
-          config_file = config_dir.join(CONFIG_LOCAL_FILENAME)
-          return false unless FileFromUrlWrapper.get_file(config_url, config_file)
-          Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", config_dir.to_s)
+          config_file = definitions_root.join(CONFIG_LOCAL_FILENAME)
+          return false unless FileFromUrlWrapper.get_file(definitions_url, config_file)
+          Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", definitions_root.to_s)
         end
 
         # Fetch keys
@@ -156,7 +158,7 @@ module Yast
 
         # Prepare the system to run in masterless mode
         #
-        # Just fetch the configuration from the given #config_url
+        # Just fetch the configuration from the given #definitions_url
         #
         # @return [Boolean] true if configuration suceeded; false otherwise.
         #
