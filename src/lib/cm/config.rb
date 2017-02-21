@@ -12,6 +12,10 @@ module Yast
       TYPES = ["salt", "puppet"].freeze
       # Attributes to include when exporting to a hash
       ATTRIBUTES = %i(type mode master auth_attempts auth_time_out definitions_url keys_url definitions_root).freeze
+      # Default value for auth_attempts
+      DEFAULT_AUTH_ATTEMPTS = 3
+      # Defaull value for auth_time_out
+      DEFAULT_AUTH_TIME_OUT = 15
 
       # @return [String] Provisioner type (only "salt" and "puppet" are supported)
       attr_reader :type
@@ -53,8 +57,8 @@ module Yast
         @definitions_url  = symbolized_opts[:definitions_url]
         @definitions_root = symbolized_opts[:definitions_root]
         @keys_url         = symbolized_opts[:keys_url]
-        @auth_attempts    = symbolized_opts[:auth_attempts]
-        @auth_time_out    = symbolized_opts[:auth_time_out]
+        @auth_attempts    = symbolized_opts[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
+        @auth_time_out    = symbolized_opts[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
       end
 
       # Save configuration to the given file

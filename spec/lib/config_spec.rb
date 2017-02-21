@@ -14,7 +14,7 @@ describe Yast::CM::Config do
     {
       "type"            => "salt",
       "master"          => master,
-      "auth_attempts"   => 3,
+      "auth_attempts"   => 5,
       "auth_time_out"   => 10,
       "definitions_url" => "http://internal-server.com/definitions.tgz",
       "keys_url"        => "http://internal-server.com/keys.tgz"
@@ -24,6 +24,28 @@ describe Yast::CM::Config do
 
   before do
     stub_const("Yast::CM::Config::DEFAULT_PATH", default_path)
+  end
+
+  describe "#auth_attempts" do
+    it "returns the auth_attempts configuration value" do
+      expect(config.auth_attempts).to eq(profile["auth_attempts"])
+    end
+
+    it "defaults to 3" do
+      profile.delete("auth_attempts")
+      expect(config.auth_attempts).to eq(3)
+    end
+  end
+
+  describe "#auth_time_out" do
+    it "returns the auth_time_out configuration value" do
+      expect(config.auth_time_out).to eq(profile["auth_time_out"])
+    end
+
+    it "defaults to 15" do
+      profile.delete("auth_time_out")
+      expect(config.auth_time_out).to eq(15)
+    end
   end
 
   describe ".load" do
