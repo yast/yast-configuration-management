@@ -8,13 +8,15 @@ describe Yast::CM::Config do
   subject(:config) { Yast::CM::Config.new(profile) }
 
   let(:master) { "some-server.suse.com" }
+  let(:auth_attempts) { 3 }
+
   let(:profile) do
     {
       "type"            => "salt",
       "master"          => master,
       "auth_attempts"   => 3,
       "auth_time_out"   => 10,
-      "definitions_url" => nil,
+      "definitions_url" => "http://internal-server.com/definitions.tgz",
       "keys_url"        => "http://internal-server.com/keys.tgz"
     }
   end
@@ -69,6 +71,8 @@ describe Yast::CM::Config do
   end
 
   describe "#to_hash" do
+    let(:auth_attempts) { nil }
+
     it "returns a hash with non-nil configuration values" do
       allow(Dir).to receive(:mktmpdir).and_return("/tmp/config-dir")
       expect(config.to_hash).to eq(
@@ -78,15 +82,23 @@ describe Yast::CM::Config do
         type:             profile["type"],
         mode:             :client,
         master:           profile["master"],
+        definitions_url:  profile["definitions_url"],
         definitions_root: "/tmp/config-dir"
       )
     end
   end
 
-  describe "#to_yaml" do
-    it "returns a YAML string with non-nil configuration values" do
-      allow(config).to receive(:to_hash).and_return(type: "salt")
-      expect(config.to_yaml).to eq("---\n:type: salt\n")
+  describe "#to_secure_hash" do
+    it "returns a hash filtering sensible information" do
+      allow(Dir).to receive(:mktmpdir).and_return("/tmp/config-dir")
+      expect(config.to_secure_hash).to eq(
+        auth_attempts:    profile["auth_attempts"],
+        auth_time_out:    profile["auth_time_out"],
+        type:             profile["type"],
+        mode:             :client,
+        master:           profile["master"],
+        definitions_root: "/tmp/config-dir"
+      )
     end
   end
 
@@ -106,7 +118,7 @@ describe Yast::CM::Config do
         expect(default_path).to_not be_file
         expect(custom_path).to be_file
         content = YAML.load_file(custom_path)
-        expect(content).to eq(config.to_hash)
+        expect(content).to eq(config.to_secure_hash)
       end
     end
 
@@ -115,7 +127,7 @@ describe Yast::CM::Config do
         config.save
         expect(default_path).to be_file
         content = YAML.load_file(default_path)
-        expect(content).to eq(config.to_hash)
+        expect(content).to eq(config.to_secure_hash)
       end
     end
   end

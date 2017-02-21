@@ -10,6 +10,8 @@ module Yast
       DEFAULT_PATH = Pathname.new("/var/adm/autoinstall/cm.yml")
       # Supported provisioner types
       TYPES = ["salt", "puppet"].freeze
+      # Attributes to include when exporting to a hash
+      ATTRIBUTES = %i(type mode master auth_attempts auth_time_out definitions_url keys_url definitions_root).freeze
 
       # @return [String] Provisioner type (only "salt" and "puppet" are supported)
       attr_reader :type
@@ -59,24 +61,24 @@ module Yast
       #
       # @param path [Pathname] Path to file
       def save(path = DEFAULT_PATH)
-        File.open(path, "w+") { |f| f.puts to_yaml }
+        File.open(path, "w+") { |f| f.puts to_secure_hash.to_yaml }
       end
 
       # Return configuration values in a hash
       #
       # @return [Hash] Configuration values
       def to_hash
-        %i(type mode master auth_attempts auth_time_out definitions_url keys_url definitions_root).each_with_object({}) do |key, memo|
+        ATTRIBUTES.each_with_object({}) do |key, memo|
           value = send(key)
           memo[key] = value unless value.nil?
         end
       end
 
-      # Return configuration values in a YAML string
+      # Return configuration filtering sensible information
       #
-      # @return [String] YAML representation of configuraton values
-      def to_yaml
-        to_hash.to_yaml
+      # @return [Hash] Configuration values filtering sensible information.
+      def to_secure_hash
+        to_hash.reject { |k| k.to_s.end_with?("_url") }
       end
 
       # Return a path to a temporal directory to extract configuration
