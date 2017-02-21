@@ -17,7 +17,7 @@ module Yast
         # @see Yast::CM::Runners::Base#run_client_mode
         def run_client_mode(stdout, stderr)
           with_retries(auth_attempts) do
-            run_puppet_cmd("puppet", "agent", "--onetime",
+            run_cmd("puppet", "agent", "--onetime",
               "--debug", "--no-daemonize", "--waitforcert", auth_time_out.to_s,
               stdout: stdout, stderr: stderr)
           end
@@ -33,23 +33,11 @@ module Yast
         # @see Yast::CM::Runners::Base#run_masterless_mode
         def run_masterless_mode(stdout, stderr)
           with_retries(auth_attempts) do
-            run_puppet_cmd("puppet", "apply", "--modulepath",
+            run_cmd("puppet", "apply", "--modulepath",
               definitions_root.join("modules").to_s,
               definitions_root.join("manifests", "site.pp").to_s, "--debug",
               stdout: stdout, stderr: stderr)
           end
-        end
-
-      private
-
-        # Run a puppet command a return a boolean value (success, failure)
-        #
-        # @return [Boolean] true if command ran successfully; false otherwise.
-        def run_puppet_cmd(*args)
-          Cheetah.run(*args)
-          true
-        rescue Cheetah::ExecutionFailed
-          false
         end
       end
     end

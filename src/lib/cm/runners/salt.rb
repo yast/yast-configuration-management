@@ -11,27 +11,20 @@ module Yast
 
         # Try to apply system configuration in client mode
         #
-        # The Salt runner does not care about retries and auth_timeouts as they
+        # The Salt runner does not care about retries and auth_time_outs as they
         # are set in the minion's configuration file.
-        #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
         #
         # @return [Boolean] +true+ if run was successful; +false+ otherwise.
         #
         # @see Yast::CM::Runners::Base#run_client_mode
         def run_client_mode(stdout, stderr)
-          Cheetah.run("salt-call", "--log-level", "debug", "state.highstate",
-            stdout: stdout, stderr: stderr)
-          true
-        rescue Cheetah::ExecutionFailed
-          false
+          with_retries(auth_attempts, auth_time_out) do
+            run_cmd("salt-call", "--log-level", "debug", "state.highstate",
+              stdout: stdout, stderr: stderr)
+          end
         end
 
         # Try to apply system configuration in masterless mode
-        #
-        # The Salt runner does not care about retries and auth_timeouts as they
-        # are set in the minion's configuration file.
         #
         # @param stdout [IO] Standard output channel used by the configurator
         # @param stderr [IO] Standard error channel used by the configurator
@@ -40,12 +33,11 @@ module Yast
         #
         # @see Yast::CM::Runners::Base#run_masterless_mode
         def run_masterless_mode(stdout, stderr)
-          Cheetah.run("salt-call", "--log-level", "debug", "--local",
-            "--file-root=#{definitions_root}", "state.highstate",
-            stdout: stdout, stderr: stderr)
-          true
-        rescue Cheetah::ExecutionFailed
-          false
+          with_retries(auth_attempts, auth_time_out) do
+            run_cmd("salt-call", "--log-level", "debug", "--local",
+              "--file-root=#{definitions_root}", "state.highstate",
+              stdout: stdout, stderr: stderr)
+          end
         end
       end
     end

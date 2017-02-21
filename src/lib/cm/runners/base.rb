@@ -100,11 +100,24 @@ module Yast
           raise NotImplementedError
         end
 
-        def with_retries(attempts = 1)
+      private
+
+        def with_retries(attempts = 1, time_out = nil)
           attempts.times do |i|
             log.info "Running provisioner (try #{i + 1}/#{attempts})"
             return true if yield(i)
+            sleep time_out if time_out && i < attempts - 1 # Sleep unless it's the last attempt
           end
+          false
+        end
+
+        # Run a puppet command a return a boolean value (success, failure)
+        #
+        # @return [Boolean] true if command ran successfully; false otherwise.
+        def run_cmd(*args)
+          Cheetah.run(*args)
+          true
+        rescue Cheetah::ExecutionFailed
           false
         end
       end

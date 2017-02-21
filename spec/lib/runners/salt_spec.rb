@@ -34,6 +34,7 @@ describe Yast::CM::Runners::Salt do
           expect(Cheetah).to receive(:run)
             .with("salt-call", *any_args)
             .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
+            .exactly(config[:auth_attempts]).times
           expect(runner.run).to eq(false)
         end
       end
