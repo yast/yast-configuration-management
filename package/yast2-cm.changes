@@ -1,15 +1,17 @@
 -------------------------------------------------------------------
-Tue Feb 21 01:50:19 UTC 2017 - igonzalezsosa@suse.com
+Tue Feb 21 16:21:45 UTC 2017 - igonzalezsosa@suse.com
 
 - The provisioner runs after the 2nd stage to avoid interferences
   with AutoYaST.
+- Rename profile elements (see new ones in the README.md file)
 - Fix the list of packages to be installed when using Salt.
 - Add missing 'modified', 'modified?' and 'export' methods in the
   AutoYaST client although no information is exported by this
   module.
-- Replace Yast::Execute by Cheetah.
+- Version 0.1.0
 
 -------------------------------------------------------------------
 Mon Jun  6 14:33:06 UTC 2016 - igonzalezsosa@suse.com
 
 - Initial draft
+- Version 0.0.1
