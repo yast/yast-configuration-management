@@ -171,6 +171,9 @@ module Yast
         # Auxiliar class used to update the dialog. This class looks like an IO
         # one to handler stdout/stderr.
         class OutputHandler
+          # String encoding to use in order to avoid problems in the dialog
+          ENCODING = "UTF-8"
+
           # @return [Yast::CM::Dialogs::Running] Dialog to update
           attr_reader :dialog
 
@@ -186,7 +189,7 @@ module Yast
           #
           # @param line [String] Line to add
           def <<(line)
-            dialog.add_lines(line.split("\n"))
+            dialog.add_lines(line.force_encoding(ENCODING).split("\n"))
           end
 
           # Fake implementations to look like an IO object.
