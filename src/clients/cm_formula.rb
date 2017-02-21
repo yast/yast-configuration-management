@@ -103,6 +103,21 @@ module CM
       Convert.to_symbol(UI.UserInput)
     end
 
+    # Builds the group tree UI widget tems
+    # Needs a starting path for the ids ('')
+    def build_group_tree_items(path, h)
+      h.map do |k, v|
+        if v['$type'] == 'group'
+          Item(Id(path + '.' + k), k, true, build_group_tree_items(path + '.' + k, v).compact)
+        end
+      end
+    end
+
+    # Builds the group tree UI widget
+    def build_group_tree(h)
+      Tree(Id(:group_tree), "Groups", build_group_tree_items('', h))
+    end
+
     def build_form_element(name, element)
       case element['$type']
       when 'group'
@@ -117,7 +132,6 @@ module CM
       when 'select'
         Left(ComboBox(Id(name.to_sym), _(name), element['$values'].map{|x| Item(x)}))
       else
-        #HBox(Left(Label(_(name))), InputField(Id(name.to_sym), Opt(:hstretch), ""))
         InputField(Id(name.to_sym), Opt(:hstretch), _(name))
       end
     end
@@ -132,7 +146,10 @@ module CM
       log.error form.inspect
       form_widgets = form.map { |key, val| build_form_element(key, val) }
       log.info form_widgets.inspect
-      return VBox(*form_widgets)
+      #return VBox(*form_widgets)
+      return HBox(
+               build_group_tree(form),
+               VBox(*form_widgets))
     end
     
     def parametrize_formula(formula)
@@ -140,7 +157,7 @@ module CM
         # dialog title
         _(formula),
         build_form(formula),
-        "Oh No",
+        "",
         false,
         false
       )
@@ -151,7 +168,7 @@ module CM
       Yast::Wizard.SetContents(
         _("Applying formulas"),
         Label(_(formula)),
-        "Oh No",
+        "",
         false,
         false
       )
