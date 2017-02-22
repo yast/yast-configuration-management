@@ -3,12 +3,18 @@ require "cm/configurations/base"
 module Yast
   module CM
     module Configurations
-      # This class inteprets the module configuration
+      # This class represents the module's configuration when
+      # using Salt.
+      #
+      # It extends the Configurations::Base class with some
+      # custom attributes (@see #states_url).
       class Salt < Base
-        # @return [URI,nil] System definition URL (states, recipes, etc.)
+        # @return [URI,nil] Location of Salt states
         attr_reader :states_url
 
-        # Constructor
+        # Custom initialization code
+        #
+        # @return options [Hash] Constructor options
         def post_initialize(options)
           @type       = "salt"
           @states_url = options[:states_url]

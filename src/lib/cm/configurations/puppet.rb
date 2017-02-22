@@ -3,12 +3,18 @@ require "cm/configurations/base"
 module Yast
   module CM
     module Configurations
-      # This class inteprets the module configuration
+      # This class represents the module's configuration when
+      # using Puppet.
+      #
+      # It extends the Configurations::Base class with some
+      # custom attributes (@see #modules_url).
       class Puppet < Base
-        # @return [URI,nil] System definition URL (states, recipes, etc.)
+        # @return [URI,nil] Location of Puppet modules
         attr_reader :modules_url
 
-        # Constructor
+        # Custom initialization code
+        #
+        # @return options [Hash] Constructor options
         def post_initialize(options)
           @type        = "puppet"
           @modules_url = options[:modules_url]
