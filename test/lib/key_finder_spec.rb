@@ -26,55 +26,62 @@ describe Yast::CM::KeyFinder do
       allow(::FileUtils).to receive(:chmod)
     end
 
-    context "when a key named after the ID is found" do
+    context "when keys were retrieved" do
+      before do
+        allow(file_from_url_wrapper).to receive(:get_file)
+          .and_return(true)
+      end
+
+      it "returns true" do
+        expect(finder.fetch_to(target_key, target_pub)).to eq(true)
+
+      end
+    end
+
+    context "when a pair of keys named after the ID is found" do
+      before do
+        allow(file_from_url_wrapper).to receive(:get_file).and_return(true)
+      end
+
       subject(:finder) do
         Yast::CM::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
-      it "copies the key and returns true" do
-        key_url = URI("#{keys_url}/someid.key")
+      it "copies the pair of keys 'someid'" do
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(key_url, target_key)
+          .with(URI("#{keys_url}/someid.key"), target_key)
           .and_return(true)
-
-        pub_url = URI("#{keys_url}/someid.pub")
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(pub_url, target_pub)
+          .with(URI("#{keys_url}/someid.pub"), target_pub)
           .and_return(true)
-
-        expect(finder.fetch_to(target_key, target_pub)).to eq(true)
+        finder.fetch_to(target_key, target_pub)
       end
 
       it "sets permissions on copied keys" do
-        allow(file_from_url_wrapper).to receive(:get_file).and_return(true)
         expect(FileUtils).to receive(:chmod).with(0o644, target_pub)
         expect(FileUtils).to receive(:chmod).with(0o400, target_key)
         finder.fetch_to(target_key, target_pub)
       end
     end
 
-    context "when a key named after the hostname is found" do
+    context "when a pair of keys named after the hostname is found" do
       subject(:finder) do
         Yast::CM::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       before do
         allow(file_from_url_wrapper).to receive(:get_file)
-          .once.and_return(false)
+          .twice.and_return(false)
       end
 
-      it "copies the key and returns true" do
-        key_url = URI("#{keys_url}/someid.key")
+      it "copies the pair of keys for that hostname" do
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(key_url, target_key)
+          .with(URI("#{keys_url}/#{hostname}.key"), target_key)
           .and_return(true)
-
-        pub_url = URI("#{keys_url}/someid.pub")
         expect(file_from_url_wrapper).to receive(:get_file)
-          .with(pub_url, target_pub)
+          .with(URI("#{keys_url}/#{hostname}.pub"), target_pub)
           .and_return(true)
-
-        expect(finder.fetch_to(target_key, target_pub)).to eq(true)
+        finder.fetch_to(target_key, target_pub)
       end
     end
 
@@ -108,6 +115,5 @@ describe Yast::CM::KeyFinder do
         finder.fetch_to(target_key, target_pub)
       end
     end
-
   end
 end
