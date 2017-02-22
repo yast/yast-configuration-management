@@ -84,13 +84,17 @@ module CM
       @path = path
 
       metadata_filename = File.join(@path, 'metadata.yml')
-      metadata = YAML::load(File.read(metadata_filename))
+      @metadata = YAML::load(File.read(metadata_filename))
       form_filename = File.join(@path, 'form.yml')
       @form = YAML::load(File.read(form_filename))
     end
 
     def name
       @path.basename.to_s
+    end
+
+    def description
+      @metadata['description']
     end
 
     # retrieves the form data for this formula
@@ -196,7 +200,7 @@ module CM
           VSpacing(1.0),
           Frame(
             _('Choose which formulas to apply:'),
-            *@formulas.map {|formula| Left(CheckBox(formula.name))}
+            *@formulas.map {|formula| Left(CheckBox("#{formula.name}: #{formula.description}"))}
           ),
           VStretch(),
         ),
