@@ -9,16 +9,8 @@ module Yast
       class Base
         include Yast::Logger
 
-        # @return [String,nil] Master server hostname
-        attr_reader :master
-        # @return [Integer] Number of authentication retries
-        attr_reader :auth_attempts
-        # @return [Integer] Authentication time out for each attempt
-        attr_reader :auth_time_out
-        # @return [Symbol] Mode (:masterless and :client are supported)
-        attr_reader :mode
-        # @return [Pathname] Directory where provisioner definitions are stored (states, recipes, etc.)
-        attr_reader :definitions_root
+        # @return [Configurations::Salt] Configuration object
+        attr_reader :config
 
         class << self
           # Return the runner for a given CM system and a configuration
@@ -46,13 +38,9 @@ module Yast
         # @option config [Integer] :mode          Operation's mode
         # @option config [Integer] :auth_attempts Number of authentication attempts
         # @option config [Integer] :auth_time_out Authentication time out for each attempt
-        def initialize(config = {})
-          log.info "Initializing runner #{self.class.name} with #{config}"
-          @master           = config[:master]
-          @auth_attempts    = config[:auth_attempts]
-          @auth_time_out    = config[:auth_time_out]
-          @mode             = config[:mode]
-          @definitions_root = Pathname.new(config[:definitions_root]) unless config[:definitions_root].nil?
+        def initialize(config)
+          log.info "Initializing runner #{self.class.name}"
+          @config = config
         end
 
         # Run the configurator applying the configuration to the system
@@ -68,7 +56,7 @@ module Yast
         def run(stdout = nil, stderr = nil)
           stdout ||= $stdout
           stderr ||= $stderr
-          send("run_#{mode}_mode", stdout, stderr)
+          send("run_#{config.mode}_mode", stdout, stderr)
         end
 
       protected

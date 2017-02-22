@@ -18,7 +18,7 @@ module Yast
         #
         # @see Yast::CM::Runners::Base#run_client_mode
         def run_client_mode(stdout, stderr)
-          with_retries(auth_attempts, auth_time_out) do
+          with_retries(config.auth_attempts, config.auth_time_out) do
             run_cmd("salt-call", "--log-level", "debug", "state.highstate",
               stdout: stdout, stderr: stderr)
           end
@@ -33,9 +33,9 @@ module Yast
         #
         # @see Yast::CM::Runners::Base#run_masterless_mode
         def run_masterless_mode(stdout, stderr)
-          with_retries(auth_attempts, auth_time_out) do
+          with_retries(config.auth_attempts, config.auth_time_out) do
             run_cmd("salt-call", "--log-level", "debug", "--local",
-              "--file-root=#{definitions_root}", "state.highstate",
+              "--file-root=#{config.work_dir}", "state.highstate",
               stdout: stdout, stderr: stderr)
           end
         end

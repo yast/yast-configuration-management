@@ -104,7 +104,7 @@ module Yast
         #
         # @return [String] Path name to the temporal directory
         def work_dir
-          @work_dir ||= Dir.mktmpdir
+          @work_dir ||= Pathname(Dir.mktmpdir)
         end
       end
     end

@@ -2,15 +2,17 @@
 
 require_relative "../../spec_helper"
 require "cm/runners/puppet"
+require "cm/configurations/puppet"
 
 describe Yast::CM::Runners::Puppet do
   subject(:runner) { Yast::CM::Runners::Puppet.new(config) }
+
   let(:mode) { :masterless }
-  let(:tmpdir) { Pathname.new("/tmp/salt") }
+  let(:master) { "puppet.suse.de" }
+  let(:work_dir) { config.work_dir }
 
   let(:config) do
-    { auth_attempts: 3, auth_time_out: 10, master: "some-server.suse.com",
-      mode: mode, definitions_root: tmpdir }
+    Yast::CM::Configurations::Puppet.new(master: master)
   end
 
   describe "#run" do
@@ -19,12 +21,10 @@ describe Yast::CM::Runners::Puppet do
     end
 
     context "when running in client mode" do
-      let(:mode) { :client }
-
       it "runs puppet agent" do
         expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
-            "--waitforcert", config[:auth_time_out].to_s, stdout: $stdout, stderr: $stderr)
+            "--waitforcert", config.auth_time_out.to_s, stdout: $stdout, stderr: $stderr)
         expect(runner.run).to eq(true)
       end
 
@@ -33,19 +33,19 @@ describe Yast::CM::Runners::Puppet do
           expect(Cheetah).to receive(:run)
             .with("puppet", *any_args)
             .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
-            .exactly(config[:auth_attempts]).times
+            .exactly(config.auth_attempts).times
           expect(runner.run).to eq(false)
         end
       end
     end
 
     context "when running in masterless mode" do
-      let(:mode) { :masterless }
+      let(:master) { nil }
 
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "puppet", "apply", "--modulepath", tmpdir.join("modules").to_s,
-          tmpdir.join("manifests", "site.pp").to_s, "--debug",
+          "puppet", "apply", "--modulepath", work_dir.join("modules").to_s,
+          work_dir.join("manifests", "site.pp").to_s, "--debug",
           stdout: $stdout, stderr: $stderr
         )
         expect(runner.run).to eq(true)
