@@ -27,24 +27,33 @@ module CM
 
     def self.build_form_element(name, element)
       return nil if name[0] == '$'
-      
-      case element['$type']
-      when 'group'
-      #  Frame(
-      #    _(name),
-      #    VBox(
-      #    *element.reject {|k| k[0] == '$'}
-      #       .map { |k, v| build_form_element(k,v) })
-      #  )
-      when 'boolean'
-        Left(CheckBox(Id(name.to_sym), _(name), element['$default'] == 'true'))
-      when 'select'
-        Left(ComboBox(Id(name.to_sym), _(name), element['$values'].map{|x| Item(x)}))
-      when 'password'
-        Password(Id(name.to_sym), Opt(:hstretch), _(name))
-      else
-        InputField(Id(name.to_sym), Opt(:hstretch), _(name))
+
+      opts = [:hstretch]
+      # this does not work at the group level yet
+      case element['$scope']
+      when 'readonly'
+        opts << :disabled
       end
+
+      widget = case element['$type']
+               when 'group'
+               # We don't render the subgroup as it is in the tree
+               #  Frame(
+               #    _(name),
+               #    VBox(
+               #    *element.reject {|k| k[0] == '$'}
+               #       .map { |k, v| build_form_element(k,v) })
+               #  )
+               when 'boolean'
+                 Left(CheckBox(Id(name.to_sym), Opt(*opts), _(name), element['$default'] == 'true'))
+               when 'select'
+                 Left(ComboBox(Id(name.to_sym), Opt(*opts), _(name), element['$values'].map{|x| Item(x)}))
+               when 'password'
+                 Password(Id(name.to_sym), Opt(*opts), _(name), element.fetch('$default', '').to_s)
+               else
+                 InputField(Id(name.to_sym), Opt(*opts), _(name), element.fetch('$default', '').to_s)
+               end
+      widget
     end
 
     def self.build_form_widget(form)
