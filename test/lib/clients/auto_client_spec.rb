@@ -10,10 +10,10 @@ describe Yast::CM::AutoClient do
   let(:configurator) { double("configurator", packages: packages) }
   let(:packages) { { "install" => ["pkg1"] } }
   let(:profile) { { "type" => "salt", "master" => "myserver" } }
-  let(:config) { Yast::CM::Config.new(profile) }
+  let(:config) { Yast::CM::Configurations::Base.configuration_for(profile) }
 
   before do
-    allow(Yast::CM::Config).to receive(:new).with(profile).and_return(config)
+    allow(Yast::CM::Configurations::Base).to receive(:configuration_for).with(profile).and_return(config)
     allow(config).to receive(:save)
   end
 

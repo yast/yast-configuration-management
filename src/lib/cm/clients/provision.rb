@@ -1,7 +1,7 @@
 require "yast"
 require "cm/runners/base"
 require "cm/dialogs/running"
-require "cm/config"
+require "cm/configurations/base"
 
 module Yast
   module CM
@@ -36,7 +36,7 @@ module Yast
         #
         # @return [Yast::CM::Config] Module configuration
         def config
-          @config ||= Config.load
+          @config ||= Yast::CM::Configurations::Base.load
         end
       end
     end

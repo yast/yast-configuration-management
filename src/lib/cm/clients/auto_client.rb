@@ -1,7 +1,7 @@
 require "yast"
 require "installation/auto_client"
 require "cm/configurators/base"
-require "cm/config"
+require "cm/configurations/base"
 require "pathname"
 
 module Yast
@@ -27,7 +27,7 @@ module Yast
       # @option profile [String] "definitions_url" Definitions URL (states, recipes, etc.)
       # @option profile [String] "keys_url"        Authentication keys URL
       def import(profile = {})
-        config = Config.new(profile)
+        config = Yast::CM::Configurations::Base.configuration_for(profile)
         config.save
         self.configurator = Configurators::Base.configurator_for(config)
         true
