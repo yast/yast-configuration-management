@@ -17,4 +17,4 @@ ratings:
   - src/clients/**
   - "**.rb"
 exclude_paths:
-- spec/**/*
+- "test/"
