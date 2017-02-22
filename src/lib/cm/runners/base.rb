@@ -22,8 +22,8 @@ module Yast
 
         class << self
           # Return the runner for a given CM system and a configuration
-          def runner_for(config)
-            runner_class(config.type).new(config.to_hash)
+          def for(config)
+            class_for(config.type).new(config.to_hash)
           end
 
           # Return the configurator class to handle a given CM system
@@ -32,7 +32,7 @@ module Yast
           #
           # @param type [String] CM type ("salt", "puppet", etc.)
           # @return [Class] Runner class
-          def runner_class(type)
+          def class_for(type)
             require "cm/runners/#{type}"
             Yast::CM::Runners.const_get type.capitalize
           rescue NameError, LoadError

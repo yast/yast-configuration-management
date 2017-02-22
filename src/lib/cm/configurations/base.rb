@@ -14,7 +14,7 @@ module Yast
         # Defaull value for auth_time_out
         DEFAULT_AUTH_TIME_OUT = 15
 
-        # @return [String] Provisioner type (only "salt" and "puppet" are supported)
+        # @return [String] Provisioner type ("salt" and "puppet" are supported)
         attr_reader :type
         # @return [:client, :masterless] Operation mode
         attr_reader :mode
@@ -32,25 +32,25 @@ module Yast
           #
           # If not specified, the DEFAULT_PATH is used.
           #
-          # @return [String,Pathname] File path
+          # @return [Pathname] File path
           # @return [Config] Configuration
           #
           # @see DEFAULT_PATH
           def load(path = DEFAULT_PATH)
             return false unless path.exist?
             content = YAML.load_file(path)
-            configuration_class(content[:type]).new(content)
+            class_for(content[:type]).new(content)
           end
 
-          def configuration_for(config)
-            configuration_class(config["type"]).new(config)
+          def for(config)
+            class_for(config["type"]).new(config)
           end
 
-          def configuration_class(type)
+          def class_for(type)
             require "cm/configurations/#{type}"
             Yast::CM::Configurations.const_get type.capitalize
           rescue NameError, LoadError
-            raise "Configurator for '#{type}' not found"
+            raise "Configuration handler for '#{type}' not found"
           end
         end
 

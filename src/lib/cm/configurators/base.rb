@@ -42,7 +42,7 @@ module Yast
             @current
           end
 
-          # Set the configurator to be used
+          # Set the configurator to use
           #
           # @param configurator [Yast::CM::Configurators::Base] Configurator to be used
           # @return [Yast::CM::Configurators::Base] Current configurator
@@ -56,9 +56,9 @@ module Yast
           # @param config [Hash]   Configurator configuration
           # @return [Yast::CM::Configurators::Base] Configurator to handle 'type' configuration
           #
-          # @see .configurator_class
-          def configurator_for(config)
-            configurator_class(config.type).new(config)
+          # @see .class_for
+          def for(config)
+            class_for(config.type).new(config)
           end
 
           # Return the configurator class to handle a given CM system
@@ -67,7 +67,7 @@ module Yast
           #
           # @param type [String] CM type ("salt", "puppet", etc.)
           # @return [Class] Configurator class
-          def configurator_class(type)
+          def class_for(type)
             require "cm/configurators/#{type}"
             Yast::CM::Configurators.const_get type.capitalize
           rescue NameError, LoadError

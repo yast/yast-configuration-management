@@ -27,9 +27,9 @@ module Yast
       # @option profile [String] "definitions_url" Definitions URL (states, recipes, etc.)
       # @option profile [String] "keys_url"        Authentication keys URL
       def import(profile = {})
-        config = Yast::CM::Configurations::Base.configuration_for(profile)
+        config = Yast::CM::Configurations::Base.for(profile)
         config.save
-        self.configurator = Configurators::Base.configurator_for(config)
+        self.configurator = Configurators::Base.for(config)
         true
       end
 
