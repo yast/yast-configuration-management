@@ -7,7 +7,7 @@ describe Yast::CM::CFA::Minion do
   subject(:config) { Yast::CM::CFA::Minion.new }
 
   before do
-    stub_const("Yast::CM::CFA::Minion::PATH", "spec/fixtures/salt/minion")
+    stub_const("Yast::CM::CFA::Minion::PATH", FIXTURES_PATH.join("salt", "minion"))
     config.load
   end
 
