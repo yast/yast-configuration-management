@@ -13,26 +13,29 @@ module Yast
       class Base
         include Yast::Logger
 
-        def self.mode(mode, &block)
-          define_method("prepare_#{mode}", block)
-        end
+        # @return [Configurations::Salt] Configuration object
+        attr_reader :config
 
-        # Run a command
-        #
-        # Commands are defined as classes in the Yast::CM::Commands namespace
-        #
-        # @return [Object] Commands return value
-        #
-        # @see Yast::CM::Commands namespace
-        def self.command(name, *args)
-          Yast::CM::Commands::Base.find(name).run(*args)
-        end
+        class << self
+          # Method to define modes
+          #
+          # @param mode [Symbol] Operation mode (:client, :masterless)
+          # @param block [Proc]] Code to execute in the given module
+          def mode(mode, &block)
+            define_method("prepare_#{mode}", block)
+          end
 
-        # Mode could not be determined because master and definitions_url are
-        # both nil.
-        class CouldNotDetermineMode < StandardError; end
-        # Configuration (specified via definitions_url) could not be fetched
-        class ConfigurationNotFetched < StandardError; end
+          # Run a command
+          #
+          # Commands are defined as classes in the Yast::CM::Commands namespace
+          #
+          # @return [Object] Commands return value
+          #
+          # @see Yast::CM::Commands namespace
+          def command(name, *args)
+            Yast::CM::Commands::Base.find(name).run(*args)
+          end
+        end
 
         class << self
           # Current configurator
@@ -74,9 +77,6 @@ module Yast
             raise "Configurator for '#{type}' not found"
           end
         end
-
-        # @return [Configurations::Salt] Configuration object
-        attr_reader :config
 
         # Constructor
         #
