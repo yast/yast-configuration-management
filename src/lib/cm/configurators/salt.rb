@@ -14,6 +14,16 @@ module Yast
         PRIVATE_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pem").freeze
         PUBLIC_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pub").freeze
 
+        mode(:masterless) do
+          update_configuration
+          fetch_config(config.states_url, work_dir)
+        end
+
+        mode(:client) do
+          update_configuration
+          fetch_keys(config.keys_url, private_key_path, public_key_path)
+        end
+
         # List of packages to install
         #
         # * `salt` includes the `salt-call` command.
@@ -22,7 +32,7 @@ module Yast
         # @return [Hash] Packages to install/remove
         def packages
           salt_packages = ["salt"]
-          salt_packages << "salt-minion" if mode == :client
+          salt_packages << "salt-minion" if config.mode == :client
           { "install" => salt_packages }
         end
 
@@ -35,12 +45,12 @@ module Yast
         # @see Yast::CM::Configurators::Base#update_configuration
         # @see #master
         def update_configuration
-          return unless master.is_a?(::String)
+          return unless config.master.is_a?(::String)
           log.info "Updating minion configuration file"
-          config = CFA::Minion.new
-          config.load
-          config.master = master
-          config.save
+          config_file = CFA::Minion.new
+          config_file.load
+          config_file.master = config.master
+          config_file.save
         end
 
         # Return path to private key

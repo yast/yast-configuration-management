@@ -14,6 +14,16 @@ module Yast
         PRIVATE_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/private_keys").freeze
         PUBLIC_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/public_keys").freeze
 
+        mode(:masterless) do
+          update_configuration
+          fetch_config(config.states_url, work_dir)
+        end
+
+        mode(:client) do
+          update_configuration
+          fetch_keys(config.keys_url, private_key_path, public_key_path)
+        end
+
         # List of packages to install
         #
         # Only puppet is needed.
@@ -32,12 +42,12 @@ module Yast
         # @see Yast::CM::Configurators::Base#update_configuration
         # @see #master
         def update_configuration
-          return unless master.is_a?(::String)
+          return unless config.master.is_a?(::String)
           log.info "Updating puppet configuration file"
-          config = CFA::Puppet.new
-          config.load
-          config.server = master
-          config.save
+          config_file = CFA::Puppet.new
+          config_file.load
+          config_file.server = config.master
+          config_file.save
         end
 
         # Return path to private key

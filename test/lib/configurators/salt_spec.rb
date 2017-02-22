@@ -1,20 +1,26 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
+require "cm/configurations/salt"
 require "cm/configurators/salt"
 
 describe Yast::CM::Configurators::Salt do
   subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
-  let(:mode) { :client }
   let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
   let(:definitions_root) { "/tmp/config" }
   let(:keys_url) { "https://yast.example.net/keys" }
 
   let(:config) do
-    { mode: mode, auth_attempts: 3, auth_time_out: 10, master: master,
-      definitions_root: definitions_root, definitions_url: definitions_url, keys_url: keys_url }
+    Yast::CM::Configurations::Salt.new(
+      auth_attempts: 3,
+      auth_time_out: 10,
+      master:        master,
+      work_dir:      definitions_root,
+      states_url:    definitions_url,
+      keys_url:      keys_url
+    )
   end
 
   describe "#packages" do
@@ -25,7 +31,7 @@ describe Yast::CM::Configurators::Salt do
     end
 
     context "when running in masterless mode" do
-      let(:mode) { :masterless }
+      let(:master) { nil }
 
       it "returns a list containing only the 'salt' package" do
         expect(configurator.packages).to eq("install" => ["salt"])

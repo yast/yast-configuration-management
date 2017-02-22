@@ -2,6 +2,7 @@
 
 require_relative "../../spec_helper"
 require "cm/configurators/puppet"
+require "cm/configurations/puppet"
 
 describe Yast::CM::Configurators::Puppet do
   Yast.import "Hostname"
@@ -16,8 +17,14 @@ describe Yast::CM::Configurators::Puppet do
   let(:hostname) { "myclient" }
 
   let(:config) do
-    { mode: mode, auth_attempts: 3, auth_time_out: 10, master: master,
-      definitions_url: definitions_url, definitions_root: definitions_root, keys_url: keys_url }
+    Yast::CM::Configurations::Puppet.new(
+      auth_attempts: 3,
+      auth_time_out: 10,
+      master:        master,
+      work_dir:      definitions_root,
+      states_url:    definitions_url,
+      keys_url:      keys_url
+    )
   end
 
   describe "#packages" do
@@ -28,7 +35,7 @@ describe Yast::CM::Configurators::Puppet do
 
   describe "#prepare" do
     context "when running in client mode" do
-      let(:puppet_config) { double("puppet", load: true, save: true) }
+      let(:puppet_config) { double("puppet", load: true, save: true, keys_url: keys_url) }
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do

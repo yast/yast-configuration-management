@@ -13,20 +13,20 @@ module Yast
       class Base
         include Yast::Logger
 
-        # @return [Symbol] Operation mode (:client or :masterless)
-        attr_reader :mode
-        # @return [String,nil] Master server hostname
-        attr_reader :master
-        # @return [URI,nil] Config URL
-        attr_reader :definitions_url
-        # @return [Integer] Number of authentication attempts
-        attr_reader :auth_attempts
-        # @return [Integer] Authentication time out for each attempt
-        attr_reader :auth_time_out
-        # @return [URI,nil] Authentication keys URL
-        attr_reader :keys_url
-        # @return [Pathname] Configuration directory for masterless mode
-        attr_reader :definitions_root
+        def self.mode(mode, &block)
+          define_method("prepare_#{mode}", block)
+        end
+
+        # Run a command
+        #
+        # Commands are defined as classes in the Yast::CM::Commands namespace
+        #
+        # @return [Object] Commands return value
+        #
+        # @see Yast::CM::Commands namespace
+        def self.command(name, *args)
+          Yast::CM::Commands::Base.find(name).run(*args)
+        end
 
         # Mode could not be determined because master and definitions_url are
         # both nil.
@@ -58,7 +58,7 @@ module Yast
           #
           # @see .configurator_class
           def configurator_for(config)
-            configurator_class(config.type).new(config.to_hash)
+            configurator_class(config.type).new(config)
           end
 
           # Return the configurator class to handle a given CM system
@@ -75,25 +75,15 @@ module Yast
           end
         end
 
+        # @return [Configurations::Salt] Configuration object
+        attr_reader :config
+
         # Constructor
         #
-        # @param config [Hash] options
-        # @option config [Integer] :master           Master server's name
-        # @option config [Integer] :auth_attempts    Number of authentication attempts
-        # @option config [Integer] :auth_time_out    Authentication time out for each authentication attempt
-        # @option config [Symbol]  :mode             Operation mode (:client or :masterless)
-        # @option config [String]  :definitions_url  Definitions URL (states, recipes, etc.)
-        # @option config [String]  :definitions_root masterless configuration directory
-        # @option config [String]  :keys_url         Authentication keys URL
-        def initialize(config = {})
-          log.info "Initializing configurator #{self.class.name} with #{config}"
-          @master           = config[:master]
-          @mode             = config[:mode]
-          @auth_attempts    = config[:auth_attempts] || 3
-          @auth_time_out    = config[:auth_time_out] || 10
-          @keys_url         = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
-          @definitions_url  = config[:definitions_url].is_a?(::String) ? URI(config[:definitions_url]) : nil
-          @definitions_root = Pathname.new(config[:definitions_root]) unless config[:definitions_root].nil?
+        # @param config [Configurations::Salt] Configuration object
+        def initialize(config)
+          log.info "Initializing configurator #{self.class.name}"
+          @config = config
         end
 
         # Return the list of packages to install
@@ -117,8 +107,7 @@ module Yast
         # @see prepare_masterless_mode
         # @see prepare_client_mode
         def prepare
-          update_configuration
-          send("prepare_#{mode}_mode")
+          send("prepare_#{config.mode}")
         end
 
         # Determines whether the configurator is operating in the given module
@@ -137,63 +126,22 @@ module Yast
         # mechanism to support, for example, git repositories.
         #
         # @return [Boolean] true if configuration was fetched; false otherwise.
-        def fetch_config
-          config_file = definitions_root.join(CONFIG_LOCAL_FILENAME)
-          return false unless FileFromUrlWrapper.get_file(definitions_url, config_file)
-          Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", definitions_root.to_s)
+        def fetch_config(url, target)
+          config_file = target.join(CONFIG_LOCAL_FILENAME)
+          return false unless FileFromUrlWrapper.get_file(url, config_file)
+          Yast::Execute.locally("tar", "xf", config_file.to_s, "-C", target.to_s)
         end
 
         # Fetch keys
         #
         # Fetch keys to perform authentication
-        def fetch_keys
-          return false if keys_url.nil?
-          KeyFinder.new(keys_url: keys_url)
-                   .fetch_to(private_key_path, public_key_path)
-        end
-
-        # Prepare the system to run in masterless mode
         #
-        # Just fetch the configuration from the given #definitions_url
-        #
-        # @return [Boolean] true if configuration suceeded; false otherwise.
-        #
-        # @see fetch_config
-        # @see prepare
-        def prepare_masterless_mode
-          fetch_config
-        end
-
-        # Prepare the system to run in client mode
-        #
-        # * Update configuration file writing the master name
-        # * Fetch the authentication public/private key
-        #
-        # @return [Boolean] true if configuration suceeded; false otherwise.
-        #
-        # @see fetch_keys
-        # @see update_configuration
-        def prepare_client_mode
-          fetch_keys
-        end
-
-      private
-
-        # Update provisioning system configuration
-        #
-        # To be defined by descending classes.
-        def update_configuration
-          raise NotImplementedError
-        end
-
-        # Return path to private key
-        def private_key_path
-          raise NotImplementedError
-        end
-
-        # Return path to public key
-        def public_key_path
-          raise NotImplementedError
+        # @param url [URI] Base URL to search the keys
+        # @param private_key_path [Pathname] Path to private key
+        # @param public_key_path  [Pathname] Path to public key
+        def fetch_keys(url, private_key_path, public_key_path)
+          return false if url.nil? # FIXME: should be move to the caller
+          KeyFinder.new(keys_url: url).fetch_to(private_key_path, public_key_path)
         end
       end
     end
