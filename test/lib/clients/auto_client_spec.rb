@@ -56,4 +56,22 @@ describe Yast::CM::AutoClient do
       client.write
     end
   end
+
+  describe "#export" do
+    it "returns an empty hash" do
+      expect(client.export).to eq({})
+    end
+  end
+
+  describe "#modified" do
+    it "returns false" do
+      expect(client.modified).to eq(false)
+    end
+  end
+
+  describe "#modified?" do
+    it "returns false" do
+      expect(client.modified).to eq(false)
+    end
+  end
 end
