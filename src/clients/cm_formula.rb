@@ -87,6 +87,17 @@ module CM
       @metadata = YAML::load(File.read(metadata_filename))
       form_filename = File.join(@path, 'form.yml')
       @form = YAML::load(File.read(form_filename))
+      @enabled = false
+    end
+
+    # whether to apply this formula
+    def enabled?
+      @enabled
+    end
+
+    # enable/apply this formula
+    def enable!
+      @enabled = true
     end
 
     def name
@@ -200,7 +211,7 @@ module CM
           VSpacing(1.0),
           Frame(
             _('Choose which formulas to apply:'),
-            *@formulas.map {|formula| Left(CheckBox("#{formula.name}: #{formula.description}"))}
+            *@formulas.map {|formula| Left(CheckBox(Id(formula.name.to_sym), "#{formula.name}: #{formula.description}"))}
           ),
           VStretch(),
         ),
@@ -210,7 +221,18 @@ module CM
         true
       )
       Wizard.RestoreNextButton
-      Convert.to_symbol(UI.UserInput)
+      loop do
+        case Convert.to_symbol(UI.UserInput)
+        when :next
+          @formulas.each do |formula|
+            log.info "#{formula.name}: #{Convert.to_boolean(UI.QueryWidget(formula.name.to_sym, :Value))}"
+            formula.enable! if Convert.to_boolean(UI.QueryWidget(formula.name.to_sym, :Value))
+          end
+          return :next
+        else
+          return :abort
+        end
+      end
     end
 
     # to keep the entered data we need to cache the widgets
@@ -220,8 +242,10 @@ module CM
       end
       @widgets[formula.name][group]
     end
-    
+
     def parametrize_formula(formula)
+      return :next unless formula.enabled?
+
       group_tree = FormulaHelper.build_group_tree_widget(formula.form)
       Yast::Wizard.SetContents(
         # dialog title
@@ -250,14 +274,16 @@ module CM
       end
     end
 
+    # Apply selected formulas
     def apply_formulas
       Yast::Wizard.SetContents(
         _("Applying formulas"),
-        Label(_(formula)),
+        Label(@formulas.select(&:enabled?).map(&:name).join(', ')),
         "",
         false,
         false
       )
+      return UI.UserInput
     end
 
   end
