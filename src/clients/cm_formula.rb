@@ -5,6 +5,17 @@ require "ui/dialog"
 
 module CM
 
+  module IntHelper
+    # IntField needs limits, and the machine limits
+    # N_BYTES = [42].pack('i').size
+    # N_BITS = N_BYTES * 16
+    # do not work when passed down to ycp.
+    # Use 32 bit min/max, as for a form, should be enough.
+    N_BITS = 32
+    MAX = 2 ** (N_BITS - 2) - 1
+    MIN = -MAX - 1
+  end
+
   # Helper to create UI from a formula
   module FormulaHelper
     extend Yast::UIShortcuts
@@ -50,6 +61,8 @@ module CM
                  Left(ComboBox(Id(name.to_sym), Opt(*opts), _(name), element['$values'].map{|x| Item(x)}))
                when 'password'
                  Password(Id(name.to_sym), Opt(*opts), _(name), element.fetch('$default', '').to_s)
+               when 'number'
+                 IntField(Id(name.to_sym), _(name), IntHelper::MIN, IntHelper::MAX, element.fetch('$default', 0).to_i)
                else
                  InputField(Id(name.to_sym), Opt(*opts), _(name), element.fetch('$default', '').to_s)
                end
