@@ -23,12 +23,12 @@ module Yast
       attr_reader :mode
       # @return [String,nil] Master server hostname
       attr_reader :master
-      # @return [URI,nil] System definition URL (states, recipes, etc.)
-      attr_reader :definitions_url
       # @return [Integer] Number of authentication attempts
       attr_reader :auth_attempts
       # @return [Integer] Authentication time out for each authentication attempt
       attr_reader :auth_time_out
+      # @return [URI,nil] System definition URL (states, recipes, etc.)
+      attr_reader :definitions_url
       # @return [URI,nil] Keys URL
       attr_reader :keys_url
 
@@ -46,9 +46,6 @@ module Yast
       end
 
       # Constructor
-      #
-      # TODO: validations:
-      # * master or definitions_url should be specified
       def initialize(options)
         symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
         @type             = symbolized_opts[:type].nil? ? "salt" : symbolized_opts[:type].downcase
@@ -78,7 +75,7 @@ module Yast
         end
       end
 
-      # Return configuration filtering sensible information
+      # Return configuration values in a hash but filtering sensible information
       #
       # @return [Hash] Configuration values filtering sensible information.
       def to_secure_hash

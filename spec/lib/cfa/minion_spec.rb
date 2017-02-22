@@ -19,8 +19,7 @@ describe Yast::CM::CFA::Minion do
 
   describe "#master=" do
     it "sets the master server name" do
-      config.master = "alternative"
-      expect(config.master).to eq("alternative")
+      expect { config.master = "alt" }.to change { config.master }.to("alt")
     end
   end
 end

@@ -7,7 +7,9 @@ require "pathname"
 module Yast
   module CM
     module Configurators
-      # Puppet integration handler
+      # Puppet configurator
+      #
+      # This class is responsible for configuring Pupppet before running it.
       class Puppet < Base
         PRIVATE_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/private_keys").freeze
         PUBLIC_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/public_keys").freeze
@@ -23,7 +25,7 @@ module Yast
 
       private
 
-        # Update puppet's configuration
+        # Update Puppet's configuration
         #
         # At this time, only the master server is handled.
         #

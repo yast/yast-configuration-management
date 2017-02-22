@@ -20,10 +20,38 @@ describe Yast::CM::Config do
       "keys_url"        => "http://internal-server.com/keys.tgz"
     }
   end
-  let(:default_path) { Pathname(DATA_DIR).join("cm-salt.yml") }
+  let(:default_path) { FIXTURES_PATH.join("cm-salt.yml") }
 
   before do
     stub_const("Yast::CM::Config::DEFAULT_PATH", default_path)
+  end
+
+  describe ".load" do
+    context "when a path is given" do
+      let(:custom_path) { FIXTURES_PATH.join("cm-puppet.yml") }
+
+      it "returns the configuration from the given path" do
+        expect(YAML).to receive(:load_file).with(custom_path).and_call_original
+        config = described_class.load(custom_path)
+        expect(config.type).to eq("puppet")
+      end
+    end
+
+    context "when a path is not given" do
+      it "returns the configuration from the default path" do
+        expect(YAML).to receive(:load_file).with(default_path).and_call_original
+        config = described_class.load
+        expect(config.type).to eq("salt")
+      end
+    end
+
+    context "when the path does not exist" do
+      let(:custom_path) { FIXTURES_PATH.join("non-existent.yml") }
+
+      it "returns false" do
+        expect(described_class.load(custom_path)).to eq(false)
+      end
+    end
   end
 
   describe "#auth_attempts" do
@@ -48,34 +76,6 @@ describe Yast::CM::Config do
     end
   end
 
-  describe ".load" do
-    context "when a path is given" do
-      let(:custom_path) { Pathname(DATA_DIR).join("cm-puppet.yml") }
-
-      it "returns the configuration from the given path" do
-        expect(YAML).to receive(:load_file).with(custom_path).and_call_original
-        config = described_class.load(custom_path)
-        expect(config.type).to eq("puppet")
-      end
-    end
-
-    context "when a path is not given" do
-      it "returns the configuration from the default path" do
-        expect(YAML).to receive(:load_file).with(default_path).and_call_original
-        config = described_class.load
-        expect(config.type).to eq("salt")
-      end
-    end
-
-    context "when the path does not exist" do
-      let(:custom_path) { Pathname(DATA_DIR).join("non-existent.yml") }
-
-      it "returns false" do
-        expect(described_class.load(custom_path)).to eq(false)
-      end
-    end
-  end
-
   describe "#mode" do
     context "when a master server is not specified" do
       let(:master) { nil }
@@ -86,7 +86,7 @@ describe Yast::CM::Config do
     end
 
     context "when a master server is specified" do
-      it "returns :masterless" do
+      it "returns :client" do
         expect(config.mode).to eq(:client)
       end
     end

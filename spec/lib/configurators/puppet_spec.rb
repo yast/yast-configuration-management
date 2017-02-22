@@ -10,9 +10,9 @@ describe Yast::CM::Configurators::Puppet do
 
   let(:master) { "myserver" }
   let(:mode) { :client }
+  let(:keys_url) { "https://yast.example.net/keys" }
   let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
   let(:definitions_root) { "/tmp/config" }
-  let(:keys_url) { "https://yast.example.net/keys" }
   let(:hostname) { "myclient" }
 
   let(:config) do
@@ -21,7 +21,7 @@ describe Yast::CM::Configurators::Puppet do
   end
 
   describe "#packages" do
-    it "returns a list containing only 'puppet' package" do
+    it "returns a hash containing only the 'puppet' package" do
       expect(configurator.packages).to eq("install" => ["puppet"])
     end
   end
@@ -43,7 +43,7 @@ describe Yast::CM::Configurators::Puppet do
         configurator.prepare
       end
 
-      it "retrieves authentication keys" do
+      it "retrieves the authentication keys" do
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
             Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))

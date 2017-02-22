@@ -4,8 +4,8 @@ require "cheetah"
 module Yast
   module CM
     module Runners
+      # Runs Salt in order to configure the system
       class Salt < Base
-        include Yast::Logger
 
       private
 

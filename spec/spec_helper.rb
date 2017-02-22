@@ -1,7 +1,10 @@
 ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
-DATA_DIR = File.expand_path("../data", __FILE__)
 
 require "yast"
+require "pathname"
+
+TESTS_PATH = Pathname.new(File.dirname(__FILE__))
+FIXTURES_PATH = TESTS_PATH.join("fixtures")
 
 if ENV["COVERAGE"]
   require "simplecov"

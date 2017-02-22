@@ -2,38 +2,36 @@
 
 require_relative "../../spec_helper"
 require "cm/configurators/base"
-require "cm/key_finder"
-require "yast2/execute"
 
 describe Yast::CM::Configurators::Base do
   subject(:configurator) { Yast::CM::Configurators::Base.new(config) }
 
   let(:master) { "myserver" }
   let(:mode) { :client }
-  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
   let(:keys_url) { nil }
+  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:definitions_root) { FIXTURES_PATH.join("tmp") }
   let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
-  let(:definitions_root) { File.join(DATA_DIR, "tmp") }
 
   let(:config) do
     { mode: mode, auth_attempts: 3, auth_time_out: 10, master: master,
-      definitions_url: definitions_url, keys_url: keys_url, definitions_root: definitions_root }
+      keys_url: keys_url, definitions_url: definitions_url, definitions_root: definitions_root }
   end
 
   describe "#master" do
-    it "returns the master option" do
+    it "returns the master option value" do
       expect(configurator.master).to eq(config[:master])
     end
   end
 
   describe "#auth_attempts" do
-    it "returns the master option" do
+    it "returns the auth_attempts option value" do
       expect(configurator.auth_attempts).to eq(config[:auth_attempts])
     end
   end
 
   describe "#auth_time_out" do
-    it "returns the auth_time_out option" do
+    it "returns the auth_time_out option value" do
       expect(configurator.auth_time_out).to eq(config[:auth_time_out])
     end
   end
@@ -101,7 +99,7 @@ describe Yast::CM::Configurators::Base do
           .and_return(Pathname("/tmp/private"))
       end
 
-      it "copy keys" do
+      it "retrieves the authentication keys" do
         expect(Yast::CM::KeyFinder).to receive(:new)
           .with(keys_url: URI(keys_url)).and_return(key_finder)
         expect(key_finder).to receive(:fetch_to)

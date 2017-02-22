@@ -7,7 +7,9 @@ require "pathname"
 module Yast
   module CM
     module Configurators
-      # Salt integration handler
+      # Salt configurator
+      #
+      # This class is responsible for configuring Salt before running it.
       class Salt < Base
         PRIVATE_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pem").freeze
         PUBLIC_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pub").freeze

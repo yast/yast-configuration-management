@@ -4,11 +4,10 @@ require "pathname"
 module Yast
   module CM
     module Runners
+      # A runner is a class which takes care of using a provisioner (Salt, Puppet, etc.)
+      # to configure the system.
       class Base
         include Yast::Logger
-
-        # FIXME: duplicated in configurators/base.rb
-        MODES = [:masterless, :client].freeze
 
         # @return [String,nil] Master server hostname
         attr_reader :master
@@ -16,9 +15,9 @@ module Yast
         attr_reader :auth_attempts
         # @return [Integer] Authentication time out for each attempt
         attr_reader :auth_time_out
-        # @return [Symbol] Mode. Possible values are listed in MODE constant.
+        # @return [Symbol] Mode (:masterless and :client are supported)
         attr_reader :mode
-        # @return [Pathname] Directory where the configuration lives.
+        # @return [Pathname] Directory where provisioner definitions are stored (states, recipes, etc.)
         attr_reader :definitions_root
 
         class << self

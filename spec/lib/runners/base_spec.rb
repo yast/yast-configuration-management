@@ -16,7 +16,7 @@ describe Yast::CM::Runners::Base do
       let(:mode) { :masterless }
 
       it "runs run_masterless_mode if defined" do
-        allow(runner).to receive(:run_masterless_mode).and_return(true)
+        expect(runner).to receive(:run_masterless_mode).and_return(true)
         runner.run
       end
 
@@ -29,7 +29,7 @@ describe Yast::CM::Runners::Base do
       let(:mode) { :client }
 
       it "runs run_client_mode if defined" do
-        allow(runner).to receive(:run_client_mode).and_return(true)
+        expect(runner).to receive(:run_client_mode).and_return(true)
         runner.run
       end
 

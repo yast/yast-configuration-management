@@ -3,7 +3,6 @@ require "uri"
 require "transfer/file_from_url"
 require "pathname"
 require "yast2/execute"
-require "tmpdir"
 require "cm/key_finder"
 require "cm/file_from_url_wrapper"
 
@@ -89,11 +88,11 @@ module Yast
         def initialize(config = {})
           log.info "Initializing configurator #{self.class.name} with #{config}"
           @master           = config[:master]
+          @mode             = config[:mode]
           @auth_attempts    = config[:auth_attempts] || 3
           @auth_time_out    = config[:auth_time_out] || 10
-          @definitions_url  = config[:definitions_url].is_a?(::String) ? URI(config[:definitions_url]) : nil
           @keys_url         = config[:keys_url].is_a?(::String) ? URI(config[:keys_url]) : nil
-          @mode             = config[:mode]
+          @definitions_url  = config[:definitions_url].is_a?(::String) ? URI(config[:definitions_url]) : nil
           @definitions_root = Pathname.new(config[:definitions_root]) unless config[:definitions_root].nil?
         end
 
@@ -129,8 +128,6 @@ module Yast
           mode == value
         end
 
-        # Command to uncompress configuration
-        UNCOMPRESS_CONFIG = "tar xf %<config_file>s -C %<definitions_root>s".freeze
         # Local file name of fetched configuration
         CONFIG_LOCAL_FILENAME = "config.tgz".freeze
 
@@ -151,7 +148,6 @@ module Yast
         # Fetch keys to perform authentication
         def fetch_keys
           return false if keys_url.nil?
-          # FIXME: inject?
           KeyFinder.new(keys_url: keys_url)
                    .fetch_to(private_key_path, public_key_path)
         end
@@ -183,7 +179,7 @@ module Yast
 
       private
 
-        # Update CM system configuration
+        # Update provisioning system configuration
         #
         # To be defined by descending classes.
         def update_configuration

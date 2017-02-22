@@ -4,8 +4,8 @@ require "cheetah"
 module Yast
   module CM
     module Runners
+      # Runs Puppet in order to configure the system
       class Puppet < Base
-        include Yast::Logger
 
         # Try to apply system configuration in client mode
         #

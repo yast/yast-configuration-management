@@ -14,12 +14,12 @@ describe Yast::CM::Configurators::Salt do
 
   let(:config) do
     { mode: mode, auth_attempts: 3, auth_time_out: 10, master: master,
-      definitions_url: definitions_url, definitions_root: definitions_root, keys_url: keys_url }
+      definitions_root: definitions_root, definitions_url: definitions_url, keys_url: keys_url }
   end
 
   describe "#packages" do
     context "when running in client mode" do
-      it "returns a list containing 'salt' and 'salt-minion' package" do
+      it "returns a list containing 'salt' and 'salt-minion' packages" do
         expect(configurator.packages).to eq("install" => ["salt", "salt-minion"])
       end
     end
@@ -27,7 +27,7 @@ describe Yast::CM::Configurators::Salt do
     context "when running in masterless mode" do
       let(:mode) { :masterless }
 
-      it "returns a list containing only 'salt' package" do
+      it "returns a list containing only the 'salt' package" do
         expect(configurator.packages).to eq("install" => ["salt"])
       end
     end
