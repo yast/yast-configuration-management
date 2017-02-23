@@ -43,6 +43,13 @@ module Yast
         def pillar_root
           work_dir.join("pillar")
         end
+
+        # Return path to the Salt pillar directory
+        #
+        # @return [Pathname] Path to Salt pillars
+        def formulas_root
+          work_dir.join("formulas")
+        end
       end
     end
   end

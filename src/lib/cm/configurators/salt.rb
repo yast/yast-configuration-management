@@ -1,6 +1,7 @@
 require "yast"
 require "cheetah"
 require "cm/cfa/minion"
+require "cm/cfa/simple_minion"
 require "cm/configurators/base"
 require "pathname"
 
@@ -15,14 +16,14 @@ module Yast
         PUBLIC_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pub").freeze
 
         mode(:masterless) do
-          update_configuration
-          fetch_config(config.states_url, config.states_root) if config.states_url
+          fetch_config(config.states_url, config.work_dir) if config.states_url
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
+          overwrite_configuration
         end
 
         mode(:client) do
-          update_configuration
           fetch_keys(config.keys_url, private_key_path, public_key_path)
+          update_configuration
         end
 
         # List of packages to install
@@ -51,6 +52,23 @@ module Yast
           config_file = CFA::Minion.new
           config_file.load
           config_file.master = config.master
+          config_file.save
+        end
+
+        # Update the minion's configuration file
+        #
+        # It does not use the CFA::Minion class because YAML
+        # support in Augeas is incomplete. For instance, two
+        # nesting levels are not supported.
+        #
+        # Comments, blank lines and any other option will be
+        # removed.
+        #
+        # The configuration file will be overwritten.
+        def overwrite_configuration
+          config_file = CFA::SimpleMinion.new
+          config_file.load
+          config_file.set_file_roots([config.states_root, config.formulas_root])
           config_file.save
         end
 

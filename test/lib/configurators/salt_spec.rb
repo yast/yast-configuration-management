@@ -71,15 +71,15 @@ describe Yast::CM::Configurators::Salt do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::CM::CFA::Minion).to receive(:new).and_return(minion_config)
-        allow(minion_config).to receive(:master=)
-        allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::CM::CFA::SimpleMinion).to receive(:new).and_return(minion_config)
+        allow(minion_config).to receive(:set_file_roots)
+          .with([config.states_root, config.formulas_root])
         allow(configurator).to receive(:fetch_config)
       end
 
       it "retrieves the Salt states" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(states_url), work_dir.join("salt"))
+          .with(URI(states_url), work_dir)
         expect(configurator).to receive(:fetch_config)
           .with(URI(pillar_url), work_dir.join("pillar"))
         configurator.prepare
