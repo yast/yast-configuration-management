@@ -120,7 +120,7 @@ module Yast
         # Local file name of fetched configuration
         CONFIG_LOCAL_FILENAME = "config.tgz".freeze
 
-        # Fetchs configuration from definitions_url
+        # Fetchs CM configuration (states, recipes, etc.)
         #
         # FIXME: this code should be in another class. We want to extend this
         # mechanism to support, for example, git repositories.

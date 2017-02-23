@@ -24,7 +24,8 @@ module Yast
       # @option profile [String] "master"          Master server name
       # @option profile [String] "auth_attempts"   Number of authentication attempts
       # @option profile [String] "auth_time_out"   Authentication time out for each authentication attempt
-      # @option profile [String] "definitions_url" Definitions URL (states, recipes, etc.)
+      # @option profile [String] "states_url"      Location of Salt states
+      # @option profile [String] "modules_url"     Location of Puppet modules
       # @option profile [String] "keys_url"        Authentication keys URL
       def import(profile = {})
         config = Yast::CM::Configurations::Base.for(profile)

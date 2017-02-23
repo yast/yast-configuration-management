@@ -12,8 +12,8 @@ describe Yast::CM::Configurators::Puppet do
   let(:master) { "myserver" }
   let(:mode) { :client }
   let(:keys_url) { "https://yast.example.net/keys" }
-  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
-  let(:definitions_root) { "/tmp/config" }
+  let(:modules_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:work_dir) { "/tmp/config" }
   let(:hostname) { "myclient" }
 
   let(:config) do
@@ -21,8 +21,8 @@ describe Yast::CM::Configurators::Puppet do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      definitions_root,
-      states_url:    definitions_url,
+      work_dir:      work_dir,
+      modules_url:   modules_url,
       keys_url:      keys_url
     )
   end

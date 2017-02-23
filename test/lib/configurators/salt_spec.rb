@@ -8,8 +8,8 @@ describe Yast::CM::Configurators::Salt do
   subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
-  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
-  let(:definitions_root) { "/tmp/config" }
+  let(:states_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:work_dir) { "/tmp/config" }
   let(:keys_url) { "https://yast.example.net/keys" }
 
   let(:config) do
@@ -17,8 +17,8 @@ describe Yast::CM::Configurators::Salt do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      definitions_root,
-      states_url:    definitions_url,
+      work_dir:      work_dir,
+      states_url:    states_url,
       keys_url:      keys_url
     )
   end

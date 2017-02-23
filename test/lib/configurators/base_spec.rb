@@ -10,8 +10,8 @@ describe Yast::CM::Configurators::Base do
   let(:master) { "myserver" }
   let(:mode) { :client }
   let(:keys_url) { nil }
-  let(:definitions_url) { "https://yast.example.net/myconfig.tgz" }
-  let(:definitions_root) { FIXTURES_PATH.join("tmp") }
+  let(:states_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:work_dir) { FIXTURES_PATH.join("tmp") }
   let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
 
   let(:config) do
@@ -19,8 +19,8 @@ describe Yast::CM::Configurators::Base do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      definitions_root,
-      states_url:    definitions_url,
+      work_dir:      work_dir,
+      states_url:    states_url,
       keys_url:      keys_url
     )
   end
