@@ -7,9 +7,15 @@ describe Yast::CM::Runners::Base do
   subject(:runner) { Yast::CM::Runners::Base.new(config) }
   let(:mode) { :masterless }
 
-  let(:config) { double("config", master: "salt.suse.de", mode: mode) }
+  let(:config) { double("config", master: "salt.suse.de", mode: mode, type: "salt") }
 
   describe ".for" do
+    it "returns a runner for the given configuration" do
+      runner = described_class.for(config)
+      expect(runner).to be_kind_of(Yast::CM::Runners::Salt)
+      expect(runner.config).to eq(config)
+    end
+
     context "when type is unknown" do
       before do
         allow(config).to receive(:type).and_return("unknown")

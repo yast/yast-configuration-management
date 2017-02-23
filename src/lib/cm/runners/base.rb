@@ -15,7 +15,7 @@ module Yast
         class << self
           # Return the runner for a given CM system and a configuration
           def for(config)
-            class_for(config.type).new(config.to_hash)
+            class_for(config.type).new(config)
           end
 
           # Return the configurator class to handle a given CM system
