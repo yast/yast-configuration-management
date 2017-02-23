@@ -29,7 +29,7 @@ module Yast
         # @return [Yast::CM::Runners::Base] Runner
         def runner
           return @runner if @runner
-          @runner = Yast::CM::Runners::Base.runner_for(config) if config
+          @runner = Yast::CM::Runners::Base.for(config) if config
         end
 
         # Returns the module configuration
