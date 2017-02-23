@@ -34,15 +34,18 @@ describe Yast::CM::Configurators::Puppet do
   end
 
   describe "#prepare" do
-    context "when running in client mode" do
-      let(:puppet_config) { double("puppet", load: true, save: true, keys_url: keys_url) }
-      let(:key_finder) { double("key_finder", fetch_to: true) }
+    let(:puppet_config) { double("puppet", load: true, save: true, keys_url: keys_url) }
+    let(:key_finder) { double("key_finder", fetch_to: true) }
 
+    before do
+      allow(Yast::CM::CFA::Puppet).to receive(:new).and_return(puppet_config)
+      allow(puppet_config).to receive(:server=)
+      allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
+    end
+
+    context "when running in client mode" do
       before do
-        allow(Yast::CM::CFA::Puppet).to receive(:new).and_return(puppet_config)
-        allow(puppet_config).to receive(:server=)
         allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
-        allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
       end
 
       it "updates the configuration file" do
@@ -54,6 +57,20 @@ describe Yast::CM::Configurators::Puppet do
         expect(key_finder).to receive(:fetch_to)
           .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
             Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
+        configurator.prepare
+      end
+    end
+
+    context "when running in masterless" do
+      let(:master) { nil }
+
+      before do
+        allow(configurator).to receive(:fetch_config)
+      end
+
+      it "retrieves the Puppet modules" do
+        expect(configurator).to receive(:fetch_config)
+          .with(URI(modules_url), work_dir)
         configurator.prepare
       end
     end
