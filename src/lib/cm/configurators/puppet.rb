@@ -16,7 +16,7 @@ module Yast
 
         mode(:masterless) do
           update_configuration
-          fetch_config(config.states_url, work_dir)
+          fetch_config(config.states_url, config.work_dir)
         end
 
         mode(:client) do
