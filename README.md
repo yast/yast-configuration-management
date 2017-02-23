@@ -38,6 +38,7 @@ The module will take care of:
 <cm>
   <type>salt</type> <!-- you can use "puppet" -->
   <states_url>http://myserver.example.net/states.tgz</states_url>
+  <pillar_url>http://myserver.example.net/pillar.tgz</pillar_url> <!-- optional -->
 </cm>
 ```
 

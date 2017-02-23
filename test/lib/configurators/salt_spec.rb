@@ -8,8 +8,9 @@ describe Yast::CM::Configurators::Salt do
   subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
-  let(:states_url) { "https://yast.example.net/myconfig.tgz" }
-  let(:work_dir) { "/tmp/config" }
+  let(:states_url) { "https://yast.example.net/mystates.tgz" }
+  let(:pillar_url) { "https://yast.example.net/mypillar.tgz" }
+  let(:work_dir) { Pathname("/tmp/config") }
   let(:keys_url) { "https://yast.example.net/keys" }
 
   let(:config) do
@@ -19,6 +20,7 @@ describe Yast::CM::Configurators::Salt do
       master:        master,
       work_dir:      work_dir,
       states_url:    states_url,
+      pillar_url:    pillar_url,
       keys_url:      keys_url
     )
   end
@@ -77,7 +79,9 @@ describe Yast::CM::Configurators::Salt do
 
       it "retrieves the Salt states" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(states_url), work_dir)
+          .with(URI(states_url), work_dir.join("salt"))
+        expect(configurator).to receive(:fetch_config)
+          .with(URI(pillar_url), work_dir.join("pillar"))
         configurator.prepare
       end
     end

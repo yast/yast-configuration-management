@@ -9,7 +9,7 @@ describe Yast::CM::Runners::Salt do
   let(:work_dir) { config.work_dir }
 
   let(:config) do
-    Yast::CM::Configurations::Puppet.new(master: master)
+    Yast::CM::Configurations::Salt.new(master: master)
   end
 
   describe "#run" do
@@ -43,7 +43,9 @@ describe Yast::CM::Runners::Salt do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug",
-          "--local", "--file-root=#{work_dir}", "state.highstate",
+          "--local", "--file-root=#{config.states_root}",
+          "--pillar-root=#{config.pillar_root}",
+          "state.highstate",
           stdout: $stdout, stderr: $stderr
         )
         expect(runner.run).to eq(true)

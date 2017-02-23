@@ -16,7 +16,8 @@ module Yast
 
         mode(:masterless) do
           update_configuration
-          fetch_config(config.states_url, config.work_dir)
+          fetch_config(config.states_url, config.states_root) if config.states_url
+          fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
         end
 
         mode(:client) do

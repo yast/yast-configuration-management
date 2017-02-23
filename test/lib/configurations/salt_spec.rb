@@ -42,4 +42,16 @@ describe Yast::CM::Configurations::Salt do
       end
     end
   end
+
+  describe "#states_root" do
+    it "returns work_dir + 'salt'" do
+      expect(config.states_root).to eq(config.work_dir.join("salt"))
+    end
+  end
+
+  describe "#pillar_root" do
+    it "returns work_dir + 'pillar'" do
+      expect(config.pillar_root).to eq(config.work_dir.join("pillar"))
+    end
+  end
 end
