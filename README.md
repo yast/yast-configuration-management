@@ -37,8 +37,7 @@ The module will take care of:
 ```xml
 <cm>
   <type>salt</type> <!-- you can use "puppet" -->
-  <config_url>http://myserver.example.net/states.tgz</config_url>
-  <auth_attempts config:type="integer">3</auth_attempts>
+  <states_url>http://myserver.example.net/states.tgz</states_url>
 </cm>
 ```
 
