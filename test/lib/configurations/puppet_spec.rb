@@ -24,13 +24,13 @@ describe Yast::CM::Configurations::Puppet do
   end
 
   describe "given a configuration" do
-    it { is_expected.to have_attributes(modules_url: modules_url) }
+    it { is_expected.to have_attributes(modules_url: URI(modules_url)) }
   end
 
   describe "#to_hash" do
     it "returns configuration values" do
       expect(config.to_hash).to include(
-        master: master, modules_url: modules_url
+        master: master, modules_url: URI(modules_url)
       )
     end
 

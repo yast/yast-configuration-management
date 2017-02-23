@@ -59,7 +59,7 @@ module Yast
           @master           = symbolized_opts[:master]
           @mode             = @master ? :client : :masterless
           @work_dir         = symbolized_opts[:work_dir]
-          @keys_url         = symbolized_opts[:keys_url]
+          @keys_url         = URI(symbolized_opts[:keys_url]) if symbolized_opts[:keys_url]
           @auth_attempts    = symbolized_opts[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
           @auth_time_out    = symbolized_opts[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
           post_initialize(symbolized_opts)

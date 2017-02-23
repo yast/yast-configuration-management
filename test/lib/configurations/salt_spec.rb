@@ -13,7 +13,7 @@ describe Yast::CM::Configurations::Salt do
   let(:profile) do
     {
       master:     master,
-      states_url: states_url
+      states_url: URI(states_url)
     }
   end
 
@@ -24,13 +24,13 @@ describe Yast::CM::Configurations::Salt do
   end
 
   describe "given a configuration" do
-    it { is_expected.to have_attributes(states_url: states_url) }
+    it { is_expected.to have_attributes(states_url: URI(states_url)) }
   end
 
   describe "#to_hash" do
     it "returns configuration values" do
       expect(config.to_hash).to include(
-        master: master, states_url: states_url
+        master: master, states_url: URI(states_url)
       )
     end
 

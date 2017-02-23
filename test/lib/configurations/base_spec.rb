@@ -92,7 +92,7 @@ describe Yast::CM::Configurations::Base do
       expect(config.to_hash).to eq(
         auth_attempts: profile["auth_attempts"],
         auth_time_out: profile["auth_time_out"],
-        keys_url:      profile["keys_url"],
+        keys_url:      URI(profile["keys_url"]),
         mode:          :client,
         master:        profile["master"],
         work_dir:      work_dir

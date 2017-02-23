@@ -17,7 +17,7 @@ module Yast
         # @return options [Hash] Constructor options
         def post_initialize(options)
           @type       = "salt"
-          @states_url = options[:states_url]
+          @states_url = URI(options[:states_url]) if options[:states_url]
         end
 
         # Return an array of exportable attributes

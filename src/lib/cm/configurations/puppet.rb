@@ -17,7 +17,7 @@ module Yast
         # @return options [Hash] Constructor options
         def post_initialize(options)
           @type        = "puppet"
-          @modules_url = options[:modules_url]
+          @modules_url = URI(options[:modules_url]) if options[:modules_url]
         end
 
         # Return an array of exportable attributes
