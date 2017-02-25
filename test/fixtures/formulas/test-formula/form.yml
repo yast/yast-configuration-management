@@ -1,0 +1,84 @@
+demo:
+  $type: group
+
+  text:
+    $default: some text
+    $help: this is a help text
+  hint:
+    $placeholder: this is a hint for you
+  password:
+    $type: password
+  super-secret:
+    $scope: readonly
+    $default: This is a super secret message!
+    $visibleIf: demo$password == supersecretpassword
+  number:
+    $type: number
+    $default: 12345
+  email:
+    $type: email
+  url:
+    $type: url
+  show:
+    $type: select
+    $values: ["select", "checkbox"]
+  checkbox:
+    $type: boolean
+    $visibleIf: demo$show != select
+    $help: help for checkbox
+  select:
+    $type: select
+    $values: ["value a", "value b"]
+    $visibleIf: demo$show != checkbox
+    $help: help for select
+
+  test-check:
+    $type: boolean
+
+  test-group:
+    $type: group
+    $visibleIf: demo$test-check == true
+
+    text1:
+      $default: text1
+    text2:
+      $default: text2
+    text3:
+      $default: text3
+
+  group:
+    $type: group
+    $scope: group
+
+    text:
+      $default: text
+    checkbox:
+      $type: boolean
+
+  system:
+    $type: group
+    $scope: system
+
+    text:
+      $default: text
+    checkbox:
+      $type: boolean
+
+    subsystem:
+      $type: group
+      $scope: group
+
+      text:
+        $default: text
+      checkbox:
+        $type: boolean
+
+  readonly:
+    $type: group
+    $scope: readonly
+
+    text:
+      $default: text
+    checkbox:
+      $type: boolean
+      $default: true
