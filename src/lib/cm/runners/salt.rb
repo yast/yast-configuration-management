@@ -35,29 +35,8 @@ module Yast
         def run_masterless_mode(stdout, stderr)
           with_retries(config.auth_attempts, config.auth_time_out) do
             run_cmd("salt-call", "--log-level", "debug", "--local",
-              *masterless_options, "state.highstate",
+              "--pillar-root=#{config.pillar_root}", "state.highstate",
               stdout: stdout, stderr: stderr)
-          end
-        end
-
-      private
-
-        # Map command line options to config values
-        MASTERLESS_OPTIONS_MAP = {
-          "pillar-root" => :pillar_root,
-          "file-root"   => :states_root
-        }.freeze
-
-        # Returns an array of options to use in masterless mode
-        #
-        # Options are always sorted alphabetically.
-        #
-        # @return [Array<String>] Array of options
-        def masterless_options
-          MASTERLESS_OPTIONS_MAP.sort_by { |n, m| n  }.each_with_object([]) do |option, all|
-            name, meth = option
-            value = config.send(meth)
-            all.push("--#{name}=#{value}") if value
           end
         end
       end

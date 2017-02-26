@@ -43,8 +43,7 @@ describe Yast::CM::Runners::Salt do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug",
-          "--local", "--file-root=#{config.states_root}",
-          "--pillar-root=#{config.pillar_root}",
+          "--local", "--pillar-root=#{config.pillar_root}",
           "state.highstate",
           stdout: $stdout, stderr: $stderr
         )
