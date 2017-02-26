@@ -98,7 +98,9 @@ module CM
           VSpacing(1.0),
           Frame(
             _('Choose which formulas to apply:'),
-            *formulas.map {|formula| Left(CheckBox(Id(formula.name.to_sym), "#{formula.name}: #{formula.description}"))}
+            VBox(
+              *formulas.map {|f| Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}"))}
+            )
           ),
           VStretch(),
         ),
