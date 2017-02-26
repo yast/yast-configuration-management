@@ -24,7 +24,7 @@ module Yast
         end
 
         def load
-          @data = YAML.load_file(path)
+          self.data = File.exist?(path) ? YAML.load_file(path) : {}
         end
 
         def save
@@ -32,6 +32,7 @@ module Yast
         end
 
         def set_file_roots(roots, env = "base")
+          self.data ||= {}
           data["file_roots"] ||= {}
           data["file_roots"][env] = roots.map(&:to_s)
         end
