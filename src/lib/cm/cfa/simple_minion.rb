@@ -28,7 +28,7 @@ module Yast
         end
 
         def save
-          File.open(path, "w+") { |f| f.puts data }
+          File.open(path, "w+") { |f| f.puts YAML.dump(data) }
         end
 
         def set_file_roots(roots, env = "base")
