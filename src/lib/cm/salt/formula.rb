@@ -8,7 +8,7 @@ module Yast
         include Yast::Logger
 
         # Default path to formulas repository
-        FORMULA_BASE_DIR = '/space/git/formulas'.freeze
+        FORMULA_BASE_DIR = "/space/git/formulas".freeze
 
         # @return [String] Formula path
         attr_reader :path
@@ -25,10 +25,10 @@ module Yast
         def initialize(path)
           @path = path
 
-          metadata_filename = File.join(@path, 'metadata.yml')
-          @metadata = YAML::load(File.read(metadata_filename))
-          form_filename = File.join(@path, 'form.yml')
-          @form = YAML::load(File.read(form_filename))
+          metadata_filename = File.join(@path, "metadata.yml")
+          @metadata = YAML.load(File.read(metadata_filename))
+          form_filename = File.join(@path, "form.yml")
+          @form = YAML.load(File.read(form_filename))
           @enabled = false
           @values = default_values
         end
@@ -48,7 +48,7 @@ module Yast
         end
 
         def description
-          metadata['description']
+          metadata["description"]
         end
 
         # retrieves the sub form data for a given form group path
@@ -59,7 +59,7 @@ module Yast
         def set_values_for_group(group, new_values)
           section = find_group(group, values)
           exclude = section.select { |_k, v| v.is_a?(Hash) }
-          filtered_new_values = new_values.reject { |k, v| exclude.include?(k) }
+          filtered_new_values = new_values.reject { |k, _v| exclude.include?(k) }
           section.merge!(filtered_new_values) if section.is_a?(Hash)
         end
 
@@ -74,10 +74,10 @@ module Yast
 
         # Return all the installed formulas
         def self.all(path = FORMULA_BASE_DIR)
-          Dir.glob(path + '/*')
-            .map{|p| Pathname.new(p)}
-            .select { |p| p.directory? }
-            .map{|p| Formula.new(p) }
+          Dir.glob(path + "/*")
+             .map { |p| Pathname.new(p) }
+             .select(&:directory?)
+             .map { |p| Formula.new(p) }
         end
 
       private
@@ -88,7 +88,7 @@ module Yast
             all[key] = values["$default"] if values.is_a?(Hash) && values.key?("$default")
           end
 
-          groups = hash.select { |k, v| v["$type"] == "group" }
+          groups = hash.select { |_k, v| v["$type"] == "group" }
           ret = groups.each_with_object(defaults) do |group, all|
             key, value = group
             subdefaults = _default_values(value)
@@ -98,13 +98,12 @@ module Yast
         end
 
         def find_group(group, hash)
-          groups = group.split('.').drop(1)
+          groups = group.split(".").drop(1)
           groups.inject(hash) do |m, g|
             return nil if m.nil?
             m[g.to_s]
           end
         end
-
       end
     end
   end

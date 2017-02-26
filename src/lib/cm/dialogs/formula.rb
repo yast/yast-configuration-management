@@ -10,7 +10,7 @@ module Yast
         # do not work when passed down to ycp.
         # Use 32 bit min/max, as for a form, should be enough.
         N_BITS = 32
-        MAX = 2 ** (N_BITS - 2) - 1
+        MAX = 2**(N_BITS - 2) - 1
         MIN = -MAX - 1
       end
 
@@ -55,7 +55,7 @@ module Yast
           save(current_group)
         end
 
-        def handle(event)
+        def handle(_event)
           new_group = Yast::UI.QueryWidget(:group_tree, :CurrentItem)
           save(current_group)
           return nil if current_group == new_group
@@ -69,8 +69,8 @@ module Yast
         # Needs a starting path for the ids ('')
         def build_group_tree_widget_items(path, form)
           form.map do |k, v|
-            if v['$type'] == 'group'
-              Item(Id(path + '.' + k), k, true, build_group_tree_widget_items(path + '.' + k, v).compact)
+            if v["$type"] == "group"
+              Item(Id(path + "." + k), k, true, build_group_tree_widget_items(path + "." + k, v).compact)
             end
           end
         end
@@ -88,40 +88,41 @@ module Yast
             Id(:group_tree),
             Opt(:notify, :immediate),
             "Groups",
-            build_group_tree_widget_items('', form)
+            build_group_tree_widget_items("", form)
           )
         end
 
         def build_form_element(name, element, default)
-          return nil if name[0] == '$'
+          return nil if name[0] == "$"
 
           opts = [:hstretch]
           # this does not work at the group level yet
-          case element['$scope']
-          when 'readonly'
+          case element["$scope"]
+          when "readonly"
             opts << :disabled
           end
 
-          widget = case element['$type']
-                   when 'group'
-                     # We don't render the subgroup as it is in the tree
-                   when 'boolean'
-                     Left(CheckBox(Id(name.to_sym), Opt(*opts), _(name), element['$default'] == 'true'))
-                   when 'select'
-                     Left(ComboBox(Id(name.to_sym), Opt(*opts), _(name), element['$values'].map{|x| Item(x)}))
-                   when 'password'
-                     Password(Id(name.to_sym), Opt(*opts), _(name), element.fetch('$default', '').to_s)
-                   when 'number'
-                     IntField(Id(name.to_sym), _(name), IntHelper::MIN, IntHelper::MAX, element.fetch('$default', 0).to_i)
-                   else
-                     InputField(Id(name.to_sym), Opt(*opts), _(name), default.to_s)
-                   end
+          widget =
+            case element["$type"]
+            when "group"
+              # We don't render the subgroup as it is in the tree
+            when "boolean"
+              Left(CheckBox(Id(name.to_sym), Opt(*opts), _(name), element["$default"] == "true"))
+            when "select"
+              Left(ComboBox(Id(name.to_sym), Opt(*opts), _(name), element["$values"].map { |x| Item(x) }))
+            when "password"
+              Password(Id(name.to_sym), Opt(*opts), _(name), element.fetch("$default", "").to_s)
+            when "number"
+              IntField(Id(name.to_sym), _(name), IntHelper::MIN, IntHelper::MAX, element.fetch("$default", 0).to_i)
+            else
+              InputField(Id(name.to_sym), Opt(*opts), _(name), default.to_s)
+            end
           widget
         end
 
         def build_form_widget(form, values)
           form_widgets = form.map do |key, element|
-            default = values ? values.fetch(key, nil) : element.fetch('$default', '')
+            default = values ? values.fetch(key, nil) : element.fetch("$default", "")
             build_form_element(key, element, default)
           end
           form_widgets.compact!

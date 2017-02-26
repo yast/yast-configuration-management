@@ -6,7 +6,6 @@ module Yast
     module Runners
       # Runs Puppet in order to configure the system
       class Puppet < Base
-
         # Try to apply system configuration in client mode
         #
         # @param stdout [IO] Standard output channel used by the configurator

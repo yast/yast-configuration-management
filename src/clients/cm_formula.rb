@@ -1,5 +1,5 @@
-require 'yaml'
-require 'pathname'
+require "yaml"
+require "pathname"
 require "yast"
 require "cm/salt/formula"
 require "cm/dialogs/formula"
@@ -21,7 +21,7 @@ module CM
       @pillar_root = WFM.Args(1)
 
       # widget cache indexed by formula name and group name
-      @widgets = Hash.new { |h, k| h[k] = { } }
+      @widgets = Hash.new { |h, k| h[k] = {} }
 
       @cmdline_description = {
         "id"         => "cm_formulas",
@@ -58,27 +58,27 @@ module CM
 
     def start_workflow
       sequence = {
-        'ws_start' => 'choose_formulas',
-        'choose_formulas' => {
+        "ws_start"        => "choose_formulas",
+        "choose_formulas" => {
           abort: :abort,
-          next: formulas[0].name
+          next:  formulas[0].name
         },
-        'apply_formulas' => {
+        "apply_formulas"  => {
           abort: :abort,
-          next: :next
+          next:  :next
         }
       }
 
       workflow_aliases = {
-        'choose_formulas' => ->() { choose_formulas },
-        'apply_formulas' => ->() { apply_formulas }
+        "choose_formulas" => ->() { choose_formulas },
+        "apply_formulas"  => ->() { apply_formulas }
       }
 
       formulas.each_with_index do |formula, idx|
         sequence[formula.name] = {
           abort:  :abort,
-          cancel: 'choose_formulas',
-          next:   idx < formulas.size - 1 ? formulas[idx + 1].name : 'apply_formulas'
+          cancel: "choose_formulas",
+          next:   idx < formulas.size - 1 ? formulas[idx + 1].name : "apply_formulas"
         }
         workflow_aliases[formula.name] = ->() { parametrize_formula(formula) }
       end
@@ -93,16 +93,16 @@ module CM
     def choose_formulas
       Yast::Wizard.SetContents(
         # dialog title
-        _('Formulas'),
+        _("Formulas"),
         VBox(
           VSpacing(1.0),
           Frame(
-            _('Choose which formulas to apply:'),
+            _("Choose which formulas to apply:"),
             VBox(
-              *formulas.map {|f| Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}"))}
+              *formulas.map { |f| Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}")) }
             )
           ),
-          VStretch(),
+          VStretch()
         ),
         _("Select which formulas you want to apply to this machine. For each selected formula, you will"\
           " be able to customize it with parameters"),
@@ -136,7 +136,7 @@ module CM
     def apply_formulas
       Yast::Wizard.SetContents(
         _("Applying formulas"),
-        Label(formulas.select(&:enabled?).map(&:name).join(', ')),
+        Label(formulas.select(&:enabled?).map(&:name).join(", ")),
         "",
         false,
         false
@@ -157,7 +157,6 @@ module CM
 
       :next
     end
-
   end
 end
 

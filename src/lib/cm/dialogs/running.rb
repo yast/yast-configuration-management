@@ -172,7 +172,7 @@ module Yast
         # one to handler stdout/stderr.
         class OutputHandler
           # String encoding to use in order to avoid problems in the dialog
-          ENCODING = "UTF-8"
+          ENCODING = "UTF-8".freeze
 
           # @return [Yast::CM::Dialogs::Running] Dialog to update
           attr_reader :dialog

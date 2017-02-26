@@ -6,7 +6,6 @@ module Yast
     module Runners
       # Runs Salt in order to configure the system
       class Salt < Base
-
       private
 
         # Try to apply system configuration in client mode

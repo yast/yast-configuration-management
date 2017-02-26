@@ -19,7 +19,7 @@ module Yast
         # Constructor
         #
         # @param file_handler [.read, .write, nil] an object able to read/write a string.
-        def initialize(path: PATH, file_handler: nil)
+        def initialize(path: PATH)
           @path = path
         end
 
