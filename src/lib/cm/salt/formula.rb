@@ -59,13 +59,7 @@ module Yast
         def set_values_for_group(group, new_values)
           section = find_group(group, values)
           exclude = section.select { |_k, v| v.is_a?(Hash) }
-
-          log.info "DEBUG1: WANT TO SET #{group} -> #{new_values.inspect}"
-          log.info "DEBUG1: INTO #{section.inspect}"
-          filtered_new_values = new_values.reject do |k, v|
-            exclude.include?(k)
-          end
-          log.info "DEBUG1: WILL SET #{group} -> #{filtered_new_values} INTO #{section}"
+          filtered_new_values = new_values.reject { |k, v| exclude.include?(k) }
           section.merge!(filtered_new_values) if section.is_a?(Hash)
         end
 
