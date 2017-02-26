@@ -73,8 +73,8 @@ describe Yast::CM::Configurators::Salt do
       before do
         allow(Yast::CM::CFA::SimpleMinion).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:set_file_roots)
-          .with([config.states_root, config.formulas_root])
         allow(configurator).to receive(:fetch_config)
+        allow(Yast::WFM).to receive(:CallFunction)
       end
 
       it "retrieves the Salt states" do
@@ -82,6 +82,18 @@ describe Yast::CM::Configurators::Salt do
           .with(URI(states_url), work_dir)
         expect(configurator).to receive(:fetch_config)
           .with(URI(pillar_url), work_dir.join("pillar"))
+        configurator.prepare
+      end
+
+      it "runs the cm_formula client" do
+        expect(Yast::WFM).to receive(:CallFunction)
+          .with("cm_formula", [config.formulas_root.to_s, config.pillar_root.to_s])
+        configurator.prepare
+      end
+
+      it "sets file_roots in the minion's configuration" do
+        expect(minion_config).to receive(:set_file_roots)
+          .with([config.states_root, config.formulas_root])
         configurator.prepare
       end
     end
