@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 27 17:47:33 UTC 2017 - igonzalezsosa@suse.com
+
+- Add experimental support for SUSE Manager Salt formulas
+- Version 0.2.0
+
+-------------------------------------------------------------------
 Tue Feb 21 16:21:45 UTC 2017 - igonzalezsosa@suse.com
 
 - The provisioner runs after the 2nd stage to avoid interferences
