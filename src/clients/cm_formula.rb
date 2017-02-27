@@ -23,6 +23,9 @@ module CM
       # widget cache indexed by formula name and group name
       @widgets = Hash.new { |h, k| h[k] = {} }
 
+      # Mechanism to detect if we're going back
+      @last_formula_idx = 0
+
       @cmdline_description = {
         "id"         => "cm_formulas",
         "guihandler" => fun_ref(method(:Main), "symbol ()")
@@ -78,7 +81,8 @@ module CM
         sequence[formula.name] = {
           abort:  :abort,
           cancel: "choose_formulas",
-          next:   idx < formulas.size - 1 ? formulas[idx + 1].name : "apply_formulas"
+          next:   idx < formulas.size - 1 ? formulas[idx + 1].name : "apply_formulas",
+          back:   idx > 0 ? formulas[idx - 1].name : "choose_formulas"
         }
         workflow_aliases[formula.name] = ->() { parametrize_formula(formula) }
       end
@@ -99,7 +103,7 @@ module CM
           Frame(
             _("Choose which formulas to apply:"),
             VBox(
-              *formulas.map { |f| Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}")) }
+              *formulas.map { |f| Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}", f.enabled?)) }
             )
           ),
           VStretch()
@@ -114,8 +118,7 @@ module CM
         case Convert.to_symbol(UI.UserInput)
         when :next
           formulas.each do |formula|
-            log.info "#{formula.name}: #{Convert.to_boolean(UI.QueryWidget(formula.name.to_sym, :Value))}"
-            formula.enable! if Convert.to_boolean(UI.QueryWidget(formula.name.to_sym, :Value))
+            formula.enabled = Convert.to_boolean(UI.QueryWidget(formula.name.to_sym, :Value))
           end
           return :next
         else
@@ -125,11 +128,14 @@ module CM
     end
 
     def parametrize_formula(formula)
-      return :next unless formula.enabled?
+      if !formula.enabled?
+        ret = going_back?(formula) ? :back : :next
+        return ret
+      end
+      @last_formula_idx = formulas.index(formula)
 
       widget = Yast::CM::Dialogs::Formula.new(formula)
       CWM.show(HBox(widget), caption: formula.name)
-      :next
     end
 
     # Apply selected formulas
@@ -158,6 +164,14 @@ module CM
       end
 
       :next
+    end
+
+    # Helper method do detect if we're going back
+    def going_back?(formula)
+      idx = formulas.index(formula)
+      ret = idx < @last_formula_idx
+      @last_formula_idx = idx
+      ret
     end
   end
 end

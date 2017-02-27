@@ -38,9 +38,8 @@ module Yast
           @enabled
         end
 
-        # enable/apply this formula
-        def enable!
-          @enabled = true
+        def enabled=(value)
+          @enabled = value
         end
 
         def name
