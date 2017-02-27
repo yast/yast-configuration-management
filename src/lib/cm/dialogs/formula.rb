@@ -3,20 +3,18 @@ Yast.import "CWM"
 module Yast
   module CM
     module Dialogs
-      module IntHelper
+      class Formula < ::CWM::CustomWidget
+        attr_accessor :formula
+        attr_accessor :current_group
+
         # IntField needs limits, and the machine limits
         # N_BYTES = [42].pack('i').size
         # N_BITS = N_BYTES * 16
         # do not work when passed down to ycp.
         # Use 32 bit min/max, as for a form, should be enough.
-        N_BITS = 32
-        MAX = 2**(N_BITS - 2) - 1
-        MIN = -MAX - 1
-      end
-
-      class Formula < ::CWM::CustomWidget
-        attr_accessor :formula
-        attr_accessor :current_group
+        INT_N_BITS = 32
+        INT_MAX = 2**(INT_N_BITS - 2) - 1
+        INT_MIN = -INT_MAX - 1
 
         def initialize(formula)
           self.formula = formula
@@ -93,7 +91,7 @@ module Yast
         end
 
         def build_form_element(name, element, default)
-          return nil if name[0] == "$"
+          return nil if name[0] == "$" || element["$type"] == "group"
 
           opts = [:hstretch]
           # this does not work at the group level yet
@@ -102,22 +100,31 @@ module Yast
             opts << :disabled
           end
 
-          widget =
-            case element["$type"]
-            when "group"
-              # We don't render the subgroup as it is in the tree
-            when "boolean"
-              Left(CheckBox(Id(name.to_sym), Opt(*opts), _(name), element["$default"] == "true"))
-            when "select"
-              Left(ComboBox(Id(name.to_sym), Opt(*opts), _(name), element["$values"].map { |x| Item(x) }))
-            when "password"
-              Password(Id(name.to_sym), Opt(*opts), _(name), element.fetch("$default", "").to_s)
-            when "number"
-              IntField(Id(name.to_sym), _(name), IntHelper::MIN, IntHelper::MAX, element.fetch("$default", 0).to_i)
-            else
-              InputField(Id(name.to_sym), Opt(*opts), _(name), default.to_s)
-            end
-          widget
+          meth = "build_#{element["$type"]}_element"
+          meth = :build_element unless respond_to?(meth)
+          send(meth, name, element, default, opts)
+        end
+
+
+        def build_boolean_element(name, _element, value, opts = [])
+          Left(CheckBox(Id(name.to_sym), Opt(*opts), _(name), value == true))
+        end
+
+        def build_select_element(name, element, value, opts = [])
+          items = element["$values"].map { |i| Item(Id(i), i, i == value) }
+          Left(ComboBox(Id(name.to_sym), Opt(*opts), _(name), items))
+        end
+
+        def build_password_element(name, _element, value, opts = [])
+          Password(Id(name.to_sym), Opt(*opts), _(name), value.to_s)
+        end
+
+        def build_element(name, _element, value, opts = [])
+          InputField(Id(name.to_sym), Opt(*opts), _(name), value.to_s)
+        end
+
+        def build_number_element(name, _element, value, opts = [])
+          IntField(Id(name.to_sym), Opt(*opts), _(name), INT_MIN, INT_MAX, value.to_i)
         end
 
         def build_form_widget(form, values)
