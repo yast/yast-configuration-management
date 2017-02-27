@@ -87,7 +87,8 @@ describe Yast::CM::Configurators::Salt do
 
       it "runs the cm_formula client" do
         expect(Yast::WFM).to receive(:CallFunction)
-          .with("cm_formula", [config.formulas_root.to_s, config.pillar_root.to_s])
+          .with("cm_formula",
+            [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
         configurator.prepare
       end
 

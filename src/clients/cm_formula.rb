@@ -4,6 +4,7 @@ require "yast"
 require "cm/salt/formula"
 require "cm/dialogs/formula"
 require "fileutils"
+require "cm/cfa/salt_top"
 
 module CM
   class CMFormula < Yast::Client
@@ -11,14 +12,13 @@ module CM
     extend Yast::I18n
 
     attr_accessor :formulas
-    attr_reader :formulas_root, :pillar_root
+    attr_reader :states_root, :formulas_root, :pillar_root
 
     def main
       textdomain "cm"
       import_modules
 
-      @formulas_root = WFM.Args(0)
-      @pillar_root = WFM.Args(1)
+      @states_root, @formulas_root, @pillar_root = WFM.Args()
 
       # widget cache indexed by formula name and group name
       @widgets = Hash.new { |h, k| h[k] = {} }
@@ -142,18 +142,20 @@ module CM
         false
       )
 
-      ::FileUtils.mkdir_p(pillar_root) unless File.exist?(pillar_root)
-      pillar_top_path = File.join(pillar_root, "top.sls")
-      pillar_top = File.exist?(pillar_top_path) ? YAML.load_file(pillar_path) : {}
-
-      pillar_top["base"] = {} unless pillar_top["base"]
-      pillar_top["base"]["*"] = pillar_top["base"].fetch("*", []) + ["cm"]
-      File.open(pillar_top_path, "w+") { |f| f.puts YAML.dump(pillar_top) }
-
-      formulas_data = formulas.reduce({}) do |data, formula|
-        data.merge(formula.values)
+      enabled_formulas = formulas.select(&:enabled?)
+      states = enabled_formulas.map(&:name)
+      [pillar_root, states_root].each do |path|
+        ::FileUtils.mkdir_p(path) unless File.exist?(path)
+        top = Yast::CM::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+        top.load
+        top.add_states(states)
+        top.save
       end
-      File.open(File.join(pillar_root, "cm.sls"), "w+") { |f| f.puts YAML.dump(formulas_data) }
+
+      enabled_formulas.each do |formula|
+        pillar_file = File.join(pillar_root, "#{formula.name}.sls")
+        File.open(pillar_file, "w+") { |f| f.puts YAML.dump(formula.values) }
+      end
 
       :next
     end

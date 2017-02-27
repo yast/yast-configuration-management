@@ -20,7 +20,8 @@ module Yast
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
           overwrite_configuration
           Yast.import "WFM"
-          Yast::WFM.CallFunction("cm_formula", [config.formulas_root.to_s, config.pillar_root.to_s])
+          Yast::WFM.CallFunction("cm_formula",
+            [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
         end
 
         mode(:client) do
