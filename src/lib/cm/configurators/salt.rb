@@ -1,7 +1,7 @@
 require "yast"
 require "cheetah"
 require "cm/cfa/minion"
-require "cm/cfa/minion_file_roots_config"
+require "cm/cfa/minion_yast_configuration_management"
 require "cm/configurators/base"
 require "pathname"
 
@@ -61,7 +61,7 @@ module Yast
         # Update the minion's configuration file in
         # /etc/salt/minion.d/file_roots.conf
         def overwrite_configuration
-          config_file = CFA::MinionFileRootsConfig.new
+          config_file = CFA::MinionYastConfigurationManagement.new
           config_file.load
           config_file.set_file_roots([config.states_root, config.formulas_root])
           config_file.save

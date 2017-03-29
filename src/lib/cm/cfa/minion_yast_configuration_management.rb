@@ -3,11 +3,11 @@ require "yaml"
 module Yast
   module CM
     module CFA
-      # Represents a Salt Minion configuration file in /etc/salt/minion.d/
+      # Represents a YaST Salt Minion configuration file in /etc/salt/minion.d/
       #
-      class MinionFileRootsConfig
+      class MinionYastConfigurationManagement
         # Path to configuration file
-        PATH = "/etc/salt/minion.d/file_roots.conf".freeze
+        PATH = "/etc/salt/minion.d/yast-configuration-management.conf".freeze
 
         attr_accessor :path
         attr_accessor :data
