@@ -1,5 +1,5 @@
 #
-# spec file for package yast2-migration
+# spec file for package yast2-configuration-management
 #
 # Copyright (c) 2016 SUSE LLC, Nuernberg, Germany.
 #
@@ -16,7 +16,7 @@
 #
 
 
-Name:           yast2-cm
+Name:           yast2-configuration-management
 Version:        0.2.0
 Release:        0
 
@@ -41,7 +41,7 @@ BuildArch: noarch
 Summary:	YaST2 - YaST CM
 
 %description
-This package contains the YaST2 component for CM provisioning.
+This package contains the YaST2 component for Configuration Management Provisioning.
 
 %prep
 %setup -n %{name}-%{version}

@@ -3,15 +3,11 @@ require "yaml"
 module Yast
   module CM
     module CFA
-      # Represents a Salt Minion configuration file
+      # Represents a Salt Minion configuration file in /etc/salt/minion.d/
       #
-      # FIXME: this class it's not really a "CFA" one. It uses YAML
-      # and it does respect comments and other stuff. It exists because
-      # Augeas support for YAML is limited and it does not handle
-      # multiple nesting levels.
-      class SimpleMinion
+      class MinionFileRootsConfig
         # Path to configuration file
-        PATH = "/etc/salt/minion".freeze
+        PATH = "/etc/salt/minion.d/file_roots.conf".freeze
 
         attr_accessor :path
         attr_accessor :data

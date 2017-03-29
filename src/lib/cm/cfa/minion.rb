@@ -22,6 +22,14 @@ module Yast
         def initialize(file_handler: nil)
           super(PARSER, PATH, file_handler: file_handler)
         end
+
+        def save()
+          # FIXME: the cobblersettings lense does not support dashes in the value
+          # without single quotes, we need to use a custom lense for salt conf.
+          # As Salt can use also 'master' just use in case of dashed.
+          data["master"] = "'#{data["master"]}'" if data["master"].include?("-")
+          super()
+        end
       end
     end
   end

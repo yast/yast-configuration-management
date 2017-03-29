@@ -71,7 +71,7 @@ describe Yast::CM::Configurators::Salt do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::CM::CFA::SimpleMinion).to receive(:new).and_return(minion_config)
+        allow(Yast::CM::CFA::MinionFileRootsConfig).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:set_file_roots)
         allow(configurator).to receive(:fetch_config)
         allow(Yast::WFM).to receive(:CallFunction)

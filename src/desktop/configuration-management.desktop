@@ -6,8 +6,8 @@ X-SuSE-YaST-AutoInst=all
 X-SuSE-YaST-AutoInstClonable=false
 X-SuSE-YaST-AutoInstRequires=lan
 X-SuSE-YaST-AutoInstSchema=cm.rnc
-X-SuSE-YaST-AutoInstResource=cm
-X-SuSE-YaST-AutoInstClient=cm_auto
-X-SuSE-YaST-Keywords=salt,privisioning,cm
+X-SuSE-YaST-AutoInstResource=configuration-management
+X-SuSE-YaST-AutoInstClient=configuration-management_auto
+X-SuSE-YaST-Keywords=salt,privisioning,cm,configuration-management
 
 Name=YaST2 CM

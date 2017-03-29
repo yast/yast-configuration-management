@@ -1,14 +1,13 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/cfa/simple_minion"
+require "cm/cfa/minion_file_roots_config"
 
-describe Yast::CM::CFA::SimpleMinion do
-  subject(:config) { Yast::CM::CFA::SimpleMinion.new(path: path) }
-  let(:path) { FIXTURES_PATH.join("salt", "minion") }
+describe Yast::CM::CFA::MinionFileRootsConfig do
+  subject(:config) { Yast::CM::CFA::MinionFileRootsConfig.new(path: path) }
+  let(:path) { FIXTURES_PATH.join("salt", "file_roots.conf") }
 
   before do
-    stub_const("Yast::CM::CFA::Minion::PATH", FIXTURES_PATH.join("salt", "minion"))
     config.load
   end
 
@@ -20,8 +19,9 @@ describe Yast::CM::CFA::SimpleMinion do
 
     context "when an environment is specified" do
       it "sets file_roots for the given environment" do
+        old = config.file_roots("base")
         config.set_file_roots(["/path1"], "test")
-        expect(config.file_roots("base")).to be_empty
+        expect(config.file_roots("base")).to eq(old)
         expect(config.file_roots("test")).to eq(["/path1"])
       end
     end

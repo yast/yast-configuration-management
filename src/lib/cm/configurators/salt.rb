@@ -1,7 +1,7 @@
 require "yast"
 require "cheetah"
 require "cm/cfa/minion"
-require "cm/cfa/simple_minion"
+require "cm/cfa/minion_file_roots_config"
 require "cm/configurators/base"
 require "pathname"
 
@@ -58,18 +58,10 @@ module Yast
           config_file.save
         end
 
-        # Update the minion's configuration file
-        #
-        # It does not use the CFA::Minion class because YAML
-        # support in Augeas is incomplete. For instance, two
-        # nesting levels are not supported.
-        #
-        # Comments, blank lines and any other option will be
-        # removed.
-        #
-        # The configuration file will be overwritten.
+        # Update the minion's configuration file in
+        # /etc/salt/minion.d/file_roots.conf
         def overwrite_configuration
-          config_file = CFA::SimpleMinion.new
+          config_file = CFA::MinionFileRootsConfig.new
           config_file.load
           config_file.set_file_roots([config.states_root, config.formulas_root])
           config_file.save
