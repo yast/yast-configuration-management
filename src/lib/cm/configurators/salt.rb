@@ -12,14 +12,13 @@ module Yast
       #
       # This class is responsible for configuring Salt before running it.
       class Salt < Base
-        PRIVATE_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pem").freeze
-        PUBLIC_KEY_PATH = Pathname("/etc/salt/pki/minion/minion.pub").freeze
+        PRIVATE_KEY_PATH = "/etc/salt/pki/minion/minion.pem".freeze
+        PUBLIC_KEY_PATH = "/etc/salt/pki/minion/minion.pub".freeze
 
         mode(:masterless) do
           fetch_config(config.states_url, config.work_dir) if config.states_url
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
           overwrite_configuration
-          Yast.import "WFM"
           Yast::WFM.CallFunction("cm_formula",
             [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
         end
@@ -71,14 +70,14 @@ module Yast
         #
         # @return [Pathname] Path to private key
         def private_key_path
-          PRIVATE_KEY_PATH
+          Pathname(::File.join(Yast::Installation.destdir, PRIVATE_KEY_PATH))
         end
 
         # Return path to public key
         #
         # @return [Pathname] Path to public_key
         def public_key_path
-          PUBLIC_KEY_PATH
+          Pathname(::File.join(Yast::Installation.destdir, PUBLIC_KEY_PATH))
         end
       end
     end

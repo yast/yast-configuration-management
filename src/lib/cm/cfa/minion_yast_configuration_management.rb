@@ -16,7 +16,9 @@ module Yast
         #
         # @param file_handler [.read, .write, nil] an object able to read/write a string.
         def initialize(path: PATH)
-          @path = path
+          Yast.import "Installation"
+
+          @path = ::File.join(Yast::Installation.destdir, path)
         end
 
         def load

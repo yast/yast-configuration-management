@@ -82,6 +82,9 @@ module Yast
         #
         # @param config [Configurations::Salt] Configuration object
         def initialize(config)
+          Yast.import "WFM"
+          Yast.import "Installation"
+
           log.info "Initializing configurator #{self.class.name}"
           @config = config
         end

@@ -55,6 +55,8 @@ module Yast
         end
 
         def initialize(options)
+          Yast.import "Installation"
+
           symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
           @master           = symbolized_opts[:master]
           @mode             = @master ? :client : :masterless
@@ -80,7 +82,16 @@ module Yast
         #
         # @param path [Pathname] Path to file
         def save(path = DEFAULT_PATH)
-          File.open(path, "w+") { |f| f.puts to_secure_hash.to_yaml }
+          # The information will be written to inst-sys only. So we do not
+          # have to take care about secure data.
+          File.open(path, "w+") { |f| f.puts to_hash.to_yaml }
+        end
+
+        # Save configuration to target system. Filter out all
+        # sensible data.
+        # @param path [Pathname] Path to file
+        def secure_save(path = DEFAULT_PATH)
+          File.open(::File.join(Yast::Installation.destdir,path), "w+") { |f| f.puts to_secure_hash.to_yaml }
         end
 
         # Return configuration values in a hash

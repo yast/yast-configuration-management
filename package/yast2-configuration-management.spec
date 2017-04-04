@@ -1,7 +1,7 @@
 #
 # spec file for package yast2-configuration-management
 #
-# Copyright (c) 2016 SUSE LLC, Nuernberg, Germany.
+# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -23,22 +23,22 @@ Release:        0
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
-Group:	        System/YaST
-License:        GPL-2.0
 Url:            http://github.com/yast/yast-migration
 
-BuildRequires:	yast2
-BuildRequires:	yast2-devtools
+BuildRequires:  yast2
+BuildRequires:  yast2-devtools
+BuildRequires:  yast2-installation
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(yast-rake)
-BuildRequires:  yast2-installation
 
-Requires:	yast2
+Requires:       yast2
 Requires:       yast2-installation
 
-BuildArch: noarch
+BuildArch:      noarch
 
-Summary:	YaST2 - YaST CM
+Summary:        YaST2 - YaST CM
+License:        GPL-2.0
+Group:          System/YaST
 
 %description
 This package contains the YaST2 component for Configuration Management Provisioning.
