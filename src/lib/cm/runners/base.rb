@@ -1,5 +1,6 @@
 require "yast"
 require "pathname"
+require "yast2/execute"
 
 module Yast
   module CM
@@ -102,10 +103,10 @@ module Yast
         #
         # @return [Boolean] true if command ran successfully; false otherwise.
         def run_cmd(*args)
-          Cheetah.run(*args)
+          Yast::Execute.on_target(*args)
+          # Execute.on_target showing a popup if an error has occured.
+          # We cannot do much more here. So returning true
           true
-        rescue Cheetah::ExecutionFailed
-          false
         end
       end
     end
