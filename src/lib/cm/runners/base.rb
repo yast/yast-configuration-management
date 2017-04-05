@@ -2,6 +2,8 @@ require "yast"
 require "pathname"
 require "cheetah"
 
+Yast.import "Installation"
+
 module Yast
   module CM
     module Runners
@@ -40,8 +42,6 @@ module Yast
         # @option config [Integer] :auth_attempts Number of authentication attempts
         # @option config [Integer] :auth_time_out Authentication time out for each attempt
         def initialize(config)
-          Yast.import "Installation"
-
           log.info "Initializing runner #{self.class.name}"
           @config = config
         end
@@ -101,7 +101,7 @@ module Yast
           false
         end
 
-        # Run a puppet/salt command a return a boolean value (success, failure)
+        # Run a provisioner command a return a boolean value (success, failure)
         #
         # @return [Boolean] true if command ran successfully; false otherwise.
         def run_cmd(*args)

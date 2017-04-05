@@ -1,11 +1,14 @@
 require "yaml"
 
+Yast.import "Installation"
+
 module Yast
   module CM
     module CFA
       # Represents a YaST Salt Minion configuration file in /etc/salt/minion.d/
       #
       class MinionYastConfigurationManagement
+
         # Path to configuration file
         PATH = "/etc/salt/minion.d/yast-configuration-management.conf".freeze
 
@@ -16,8 +19,6 @@ module Yast
         #
         # @param file_handler [.read, .write, nil] an object able to read/write a string.
         def initialize(path: PATH)
-          Yast.import "Installation"
-
           @path = ::File.join(Yast::Installation.destdir, path)
         end
 

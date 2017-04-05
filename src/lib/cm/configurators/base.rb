@@ -6,6 +6,10 @@ require "yast2/execute"
 require "cm/key_finder"
 require "cm/file_from_url_wrapper"
 
+Yast.import "WFM"
+Yast.import "Installation"
+
+
 module Yast
   module CM
     # This class handles the general bit of configuring/running CM systems.
@@ -82,9 +86,6 @@ module Yast
         #
         # @param config [Configurations::Salt] Configuration object
         def initialize(config)
-          Yast.import "WFM"
-          Yast.import "Installation"
-
           log.info "Initializing configurator #{self.class.name}"
           @config = config
         end

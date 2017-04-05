@@ -2,6 +2,8 @@ require "yaml"
 require "pathname"
 require "tmpdir"
 
+Yast.import "Installation"
+
 module Yast
   module CM
     module Configurations
@@ -55,8 +57,6 @@ module Yast
         end
 
         def initialize(options)
-          Yast.import "Installation"
-
           symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
           @master           = symbolized_opts[:master]
           @mode             = @master ? :client : :masterless

@@ -19,7 +19,7 @@ module Yast
       # @return [TrueClass,FalseClass] True if configurations have been written;
       #                                otherwise it returns false.
       def write
-        log.info("Provisioning Configuration Management (salt/puppet)")
+        log.info("Provisioning Configuration Management")
         config = Yast::CM::Configurations::Base.load
         configurator = Yast::CM::Configurators::Base.for(config)
         configurator.prepare if configurator
@@ -34,9 +34,8 @@ module Yast
       end
 
       def title
-        _("Provisioning Configuration Management (salt/puppet)...")
+        _("Provisioning Configuration Management ...")
       end
-
     end
   end
 end

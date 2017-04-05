@@ -16,7 +16,6 @@ describe Yast::CM::Runners::Salt do
   describe "#run" do
     before do
       allow(runner).to receive(:sleep)
-      Yast.import "Installation"
       allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
     end
 
@@ -24,7 +23,7 @@ describe Yast::CM::Runners::Salt do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug", "state.highstate",
-          stdout: $stdout, stderr: $stderr, :chroot=>"/mnt"
+          stdout: $stdout, stderr: $stderr, :chroot=> "/mnt"
         )
         expect(runner.run).to eq(true)
       end
@@ -48,7 +47,7 @@ describe Yast::CM::Runners::Salt do
           "salt-call", "--log-level", "debug",
           "--local", "--pillar-root=#{config.pillar_root}",
           "state.highstate",
-          stdout: $stdout, stderr: $stderr, :chroot=>"/mnt"
+          stdout: $stdout, stderr: $stderr, :chroot=> "/mnt"
         )
         expect(runner.run).to eq(true)
       end
