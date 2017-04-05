@@ -18,23 +18,23 @@ The module will take care of:
 ### Client/master
 
 ```xml
-<configuration-management>
+<configuration_management>
   <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
   <auth_attempts config:type="integer">5</auth_attempts>
   <auth_time_out config:type="integer">10</auth_time_out>
   <keys_url>usb:/</keys_url> <!-- you can use HTTP, FTP... -->
-</configuration-management>
+</configuration_management>
 ```
 
 ### Masterless mode
 
 ```xml
-<configuration-management>
+<configuration_management>
   <type>salt</type> <!-- you can use "puppet" -->
   <states_url>http://myserver.example.net/states.tgz</states_url>
   <pillar_url>http://myserver.example.net/pillar.tgz</pillar_url> <!-- optional -->
-</configuration-management>
+</configuration_management>
 ```
 
 ## Supported systems
