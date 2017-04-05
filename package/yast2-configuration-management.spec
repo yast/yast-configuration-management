@@ -17,7 +17,7 @@
 
 
 Name:           yast2-configuration-management
-Version:        0.2.0
+Version:        0.3.0
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -64,7 +64,5 @@ rake install DESTDIR="%{buildroot}"
 %doc %{yast_docdir}/COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/CONTRIBUTING.md
-
-%{yast_ystartupdir}/startup
 
 %changelog
