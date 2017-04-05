@@ -1,4 +1,4 @@
-require "cm/configurations/base"
+require "configuration_management/configurations/base"
 
 module Yast
   module ConfigurationManagement

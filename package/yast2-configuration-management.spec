@@ -36,7 +36,7 @@ Requires:       yast2-installation
 
 BuildArch:      noarch
 
-Summary:        YaST2 - YaST CM
+Summary:        YaST2 - YaST Configuration Management
 License:        GPL-2.0
 Group:          System/YaST
 
