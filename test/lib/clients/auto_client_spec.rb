@@ -1,29 +1,29 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/clients/auto_client"
-require "cm/configurators/salt"
+require "configuration_management/clients/auto_client"
+require "configuration_management/configurators/salt"
 
-describe Yast::CM::AutoClient do
+describe Yast::ConfigurationManagement::AutoClient do
   subject(:client) { described_class.new }
 
   let(:configurator) { double("configurator", packages: packages) }
   let(:packages) { { "install" => ["pkg1"] } }
   let(:profile) { { "type" => "salt", "master" => "myserver" } }
-  let(:config) { Yast::CM::Configurations::Base.for(profile) }
+  let(:config) { Yast::ConfigurationManagement::Configurations::Base.for(profile) }
 
   before do
-    allow(Yast::CM::Configurations::Base).to receive(:for).with(profile)
+    allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:for).with(profile)
       .and_return(config)
     allow(config).to receive(:save)
   end
 
   describe "#import" do
     it "initializes the current configurator" do
-      expect(Yast::CM::Configurators::Base).to receive(:for)
+      expect(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
         .with(config).and_call_original
       client.import(profile)
-      expect(Yast::CM::Configurators::Base.current).to be_kind_of(Yast::CM::Configurators::Salt)
+      expect(Yast::ConfigurationManagement::Configurators::Base.current).to be_kind_of(Yast::ConfigurationManagement::Configurators::Salt)
     end
 
     it "saves the module configuration to be used after 2nd stage" do
@@ -34,7 +34,7 @@ describe Yast::CM::AutoClient do
 
   describe "#packages" do
     before do
-      expect(Yast::CM::Configurators::Base).to receive(:for)
+      expect(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
         .with(config).and_return(configurator)
       client.import(profile)
     end
@@ -46,7 +46,7 @@ describe Yast::CM::AutoClient do
 
   describe "#write" do
     before do
-      allow(Yast::CM::Configurators::Base).to receive(:for)
+      allow(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
         .with(config).and_return(configurator)
       client.import(profile)
     end

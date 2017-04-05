@@ -1,16 +1,16 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/runners/salt"
-require "cm/configurations/salt"
+require "configuration_management/runners/salt"
+require "configuration_management/configurations/salt"
 
-describe Yast::CM::Runners::Salt do
-  subject(:runner) { Yast::CM::Runners::Salt.new(config) }
+describe Yast::ConfigurationManagement::Runners::Salt do
+  subject(:runner) { Yast::ConfigurationManagement::Runners::Salt.new(config) }
   let(:master) { "salt.suse.de" }
   let(:work_dir) { config.work_dir }
 
   let(:config) do
-    Yast::CM::Configurations::Salt.new(master: master)
+    Yast::ConfigurationManagement::Configurations::Salt.new(master: master)
   end
 
   describe "#run" do

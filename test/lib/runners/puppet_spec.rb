@@ -1,18 +1,18 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/runners/puppet"
-require "cm/configurations/puppet"
+require "configuration_management/runners/puppet"
+require "configuration_management/configurations/puppet"
 
-describe Yast::CM::Runners::Puppet do
-  subject(:runner) { Yast::CM::Runners::Puppet.new(config) }
+describe Yast::ConfigurationManagement::Runners::Puppet do
+  subject(:runner) { Yast::ConfigurationManagement::Runners::Puppet.new(config) }
 
   let(:mode) { :masterless }
   let(:master) { "puppet.suse.de" }
   let(:work_dir) { config.work_dir }
 
   let(:config) do
-    Yast::CM::Configurations::Puppet.new(master: master)
+    Yast::ConfigurationManagement::Configurations::Puppet.new(master: master)
   end
 
   describe "#run" do

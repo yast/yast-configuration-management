@@ -1,13 +1,13 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/cfa/minion"
+require "configuration_management/cfa/minion"
 
-describe Yast::CM::CFA::Minion do
-  subject(:config) { Yast::CM::CFA::Minion.new }
+describe Yast::ConfigurationManagement::CFA::Minion do
+  subject(:config) { Yast::ConfigurationManagement::CFA::Minion.new }
 
   before do
-    stub_const("Yast::CM::CFA::Minion::PATH", FIXTURES_PATH.join("salt", "minion"))
+    stub_const("Yast::ConfigurationManagement::CFA::Minion::PATH", FIXTURES_PATH.join("salt", "minion"))
     config.load
   end
 

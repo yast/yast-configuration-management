@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/configurations/base"
+require "configuration_management/configurations/base"
 require "tmpdir"
 
-describe Yast::CM::Configurations::Base do
-  subject(:config) { Yast::CM::Configurations::Base.new(profile) }
+describe Yast::ConfigurationManagement::Configurations::Base do
+  subject(:config) { Yast::ConfigurationManagement::Configurations::Base.new(profile) }
 
   let(:master) { "some-server.suse.com" }
   let(:auth_attempts) { 3 }
@@ -23,12 +23,12 @@ describe Yast::CM::Configurations::Base do
   end
 
   before do
-    stub_const("Yast::CM::Configurations::Base::DEFAULT_PATH", default_path)
+    stub_const("Yast::ConfigurationManagement::Configurations::Base::DEFAULT_PATH", default_path)
     allow(Dir).to receive(:mktmpdir).and_return(work_dir.to_s)
   end
 
   context "default configuration" do
-    subject(:config) { Yast::CM::Configurations::Base.new({}) }
+    subject(:config) { Yast::ConfigurationManagement::Configurations::Base.new({}) }
 
     let(:attrs) do
       {

@@ -1,7 +1,7 @@
 require_relative "../../spec_helper"
-require "cm/dialogs/running"
+require "configuration_management/dialogs/running"
 
-describe Yast::CM::Dialogs::Running do
+describe Yast::ConfigurationManagement::Dialogs::Running do
   Yast.import "UI"
   include Yast::UIShortcuts
 

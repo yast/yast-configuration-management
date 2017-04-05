@@ -1,10 +1,10 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/cfa/salt_top"
+require "configuration_management/cfa/salt_top"
 
-describe Yast::CM::CFA::SaltTop do
-  subject(:file) { Yast::CM::CFA::SaltTop.new(path: path) }
+describe Yast::ConfigurationManagement::CFA::SaltTop do
+  subject(:file) { Yast::ConfigurationManagement::CFA::SaltTop.new(path: path) }
   let(:path) { FIXTURES_PATH.join("salt", "top.sls") }
 
   describe "#load" do

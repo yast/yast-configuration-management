@@ -1,10 +1,10 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/cfa/minion_yast_configuration_management"
+require "configuration_management/cfa/minion_yast_configuration_management"
 
-describe Yast::CM::CFA::MinionYastConfigurationManagement do
-  subject(:config) { Yast::CM::CFA::MinionYastConfigurationManagement.new(path: path) }
+describe Yast::ConfigurationManagement::CFA::MinionYastConfigurationManagement do
+  subject(:config) { Yast::ConfigurationManagement::CFA::MinionYastConfigurationManagement.new(path: path) }
   let(:path) { FIXTURES_PATH.join("salt", "yast-configuration-management.conf") }
 
   before do
