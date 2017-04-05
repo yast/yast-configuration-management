@@ -2,6 +2,7 @@
 
 require_relative "../../spec_helper"
 require "cm/runners/salt"
+require "cm/configurations/salt"
 
 describe Yast::CM::Runners::Salt do
   subject(:runner) { Yast::CM::Runners::Salt.new(config) }
@@ -15,13 +16,15 @@ describe Yast::CM::Runners::Salt do
   describe "#run" do
     before do
       allow(runner).to receive(:sleep)
+      Yast.import "Installation"
+      allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
     end
 
     context "when running in client mode" do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug", "state.highstate",
-          stdout: $stdout, stderr: $stderr
+          stdout: $stdout, stderr: $stderr, :chroot=>"/mnt"
         )
         expect(runner.run).to eq(true)
       end
@@ -45,7 +48,7 @@ describe Yast::CM::Runners::Salt do
           "salt-call", "--log-level", "debug",
           "--local", "--pillar-root=#{config.pillar_root}",
           "state.highstate",
-          stdout: $stdout, stderr: $stderr
+          stdout: $stdout, stderr: $stderr, :chroot=>"/mnt"
         )
         expect(runner.run).to eq(true)
       end

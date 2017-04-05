@@ -1,5 +1,4 @@
 require "cm/runners/base"
-require "cheetah"
 
 module Yast
   module CM

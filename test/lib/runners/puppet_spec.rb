@@ -18,13 +18,16 @@ describe Yast::CM::Runners::Puppet do
   describe "#run" do
     before do
       allow(runner).to receive(:sleep)
+      Yast.import "Installation"
+      allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
     end
 
     context "when running in client mode" do
       it "runs puppet agent" do
         expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
-            "--waitforcert", config.auth_time_out.to_s, stdout: $stdout, stderr: $stderr)
+            "--waitforcert", config.auth_time_out.to_s, stdout: $stdout,
+            stderr: $stderr, :chroot=>"/mnt")
         expect(runner.run).to eq(true)
       end
 
@@ -46,7 +49,7 @@ describe Yast::CM::Runners::Puppet do
         expect(Cheetah).to receive(:run).with(
           "puppet", "apply", "--modulepath", work_dir.join("modules").to_s,
           work_dir.join("manifests", "site.pp").to_s, "--debug",
-          stdout: $stdout, stderr: $stderr
+          stdout: $stdout, stderr: $stderr, :chroot=>"/mnt"
         )
         expect(runner.run).to eq(true)
       end

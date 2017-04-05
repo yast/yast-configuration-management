@@ -1,6 +1,6 @@
 require "yast"
 require "pathname"
-require "yast2/execute"
+require "cheetah"
 
 module Yast
   module CM
@@ -40,6 +40,8 @@ module Yast
         # @option config [Integer] :auth_attempts Number of authentication attempts
         # @option config [Integer] :auth_time_out Authentication time out for each attempt
         def initialize(config)
+          Yast.import "Installation"
+
           log.info "Initializing runner #{self.class.name}"
           @config = config
         end
@@ -99,14 +101,15 @@ module Yast
           false
         end
 
-        # Run a puppet command a return a boolean value (success, failure)
+        # Run a puppet/salt command a return a boolean value (success, failure)
         #
         # @return [Boolean] true if command ran successfully; false otherwise.
         def run_cmd(*args)
-          Yast::Execute.on_target(*args)
-          # Execute.on_target showing a popup if an error has occured.
-          # We cannot do much more here. So returning true
+          args.last[:chroot] = Yast::Installation.destdir
+          Cheetah.run(*args)
           true
+        rescue Cheetah::ExecutionFailed
+          false
         end
       end
     end
