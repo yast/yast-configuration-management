@@ -7,7 +7,8 @@ describe Yast::ConfigurationManagement::CFA::Puppet do
   subject(:config) { Yast::ConfigurationManagement::CFA::Puppet.new }
 
   before do
-    stub_const("Yast::ConfigurationManagement::CFA::Puppet::PATH", FIXTURES_PATH.join("puppet", "puppet.conf"))
+    stub_const("Yast::ConfigurationManagement::CFA::Puppet::PATH",
+      FIXTURES_PATH.join("puppet", "puppet.conf"))
     config.load
   end
 

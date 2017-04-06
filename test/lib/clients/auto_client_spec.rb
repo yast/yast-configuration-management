@@ -23,7 +23,8 @@ describe Yast::ConfigurationManagement::AutoClient do
       expect(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
         .with(config).and_call_original
       client.import(profile)
-      expect(Yast::ConfigurationManagement::Configurators::Base.current).to be_kind_of(Yast::ConfigurationManagement::Configurators::Salt)
+      expect(Yast::ConfigurationManagement::Configurators::Base.current)
+        .to be_kind_of(Yast::ConfigurationManagement::Configurators::Salt)
     end
 
     it "saves the module configuration to be used after 2nd stage" do

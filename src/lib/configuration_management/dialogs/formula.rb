@@ -3,6 +3,7 @@ Yast.import "CWM"
 module Yast
   module ConfigurationManagement
     module Dialogs
+      # Widget to edit parameters for a given formula
       class Formula < ::CWM::CustomWidget
         attr_accessor :formula
         attr_accessor :current_group
@@ -68,7 +69,8 @@ module Yast
         def build_group_tree_widget_items(path, form)
           form.map do |k, v|
             if v["$type"] == "group"
-              Item(Id(path + "." + k), k, true, build_group_tree_widget_items(path + "." + k, v).compact)
+              Item(Id(path + "." + k), k, true,
+                build_group_tree_widget_items(path + "." + k, v).compact)
             end
           end
         end
@@ -104,7 +106,6 @@ module Yast
           meth = :build_element unless respond_to?(meth)
           send(meth, name, element, default, opts)
         end
-
 
         def build_boolean_element(name, _element, value, opts = [])
           Left(CheckBox(Id(name.to_sym), Opt(*opts), _(name), value == true))

@@ -9,11 +9,10 @@ require "configuration_management/file_from_url_wrapper"
 Yast.import "WFM"
 Yast.import "Installation"
 
-
 module Yast
   module ConfigurationManagement
-    # This class handles the general bit of configuring/running CM systems.
     module Configurators
+      # This class handles the general bit of configuring/running CM systems.
       class Base
         include Yast::Logger
 
@@ -45,23 +44,22 @@ module Yast
           # Current configurator
           #
           # @return [Yast::ConfigurationManagement::Configurators::Base] Current configurator
-          def current
-            @current
-          end
+          attr_reader :current
 
           # Set the configurator to use
           #
-          # @param configurator [Yast::ConfigurationManagement::Configurators::Base] Configurator to be used
-          # @return [Yast::ConfigurationManagement::Configurators::Base] Current configurator
-          def current=(configurator)
-            @current = configurator
-          end
+          # @param configurator [Yast::ConfigurationManagement::Configurators::Base]
+          #   Configurator to be used
+          # @return [Yast::ConfigurationManagement::Configurators::Base]
+          #   Current configurator
+          attr_writer :current
 
           # Return the configurator for a given CM system and a configuration
           #
           # @param type   [String] CM type ("salt", "puppet", etc.)
           # @param config [Hash]   Configurator configuration
-          # @return [Yast::ConfigurationManagement::Configurators::Base] Configurator to handle 'type' configuration
+          # @return [Yast::ConfigurationManagement::Configurators::Base]
+          #   Configurator to handle 'type' configuration
           #
           # @see .class_for
           def for(config)

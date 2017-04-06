@@ -11,7 +11,7 @@ describe Yast::ConfigurationManagement::CFA::SaltTop do
     context "when file exists" do
       it "reads the configuration" do
         file.load
-        expect(file.data).to eq({ "base" => { "*" => ["motd"] }})
+        expect(file.data).to eq("base" => { "*" => ["motd"] })
       end
     end
 

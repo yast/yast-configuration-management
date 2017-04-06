@@ -4,7 +4,7 @@ require_relative "../../spec_helper"
 require "configuration_management/cfa/minion_yast_configuration_management"
 
 describe Yast::ConfigurationManagement::CFA::MinionYastConfigurationManagement do
-  subject(:config) { Yast::ConfigurationManagement::CFA::MinionYastConfigurationManagement.new(path: path) }
+  subject(:config) { described_class.new(path: path) }
   let(:path) { FIXTURES_PATH.join("salt", "yast-configuration-management.conf") }
 
   before do

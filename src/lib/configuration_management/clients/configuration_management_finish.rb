@@ -6,6 +6,9 @@ require "configuration_management/clients/provision"
 
 module Yast
   module ConfigurationManagement
+    # Client to write the provisioner's configuration
+    #
+    # @see Yast::ConfigurationManagement::Configurators
     class ConfigurationManagementFinish < ::Installation::FinishClient
       include Yast::I18n
 

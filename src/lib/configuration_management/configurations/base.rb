@@ -91,7 +91,9 @@ module Yast
         # sensible data.
         # @param path [Pathname] Path to file
         def secure_save(path = DEFAULT_PATH)
-          File.open(::File.join(Yast::Installation.destdir,path), "w+") { |f| f.puts to_secure_hash.to_yaml }
+          File.open(::File.join(Yast::Installation.destdir, path), "w+") do |f|
+            f.puts to_secure_hash.to_yaml
+          end
         end
 
         # Return configuration values in a hash

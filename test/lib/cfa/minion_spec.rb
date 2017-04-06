@@ -7,7 +7,8 @@ describe Yast::ConfigurationManagement::CFA::Minion do
   subject(:config) { Yast::ConfigurationManagement::CFA::Minion.new }
 
   before do
-    stub_const("Yast::ConfigurationManagement::CFA::Minion::PATH", FIXTURES_PATH.join("salt", "minion"))
+    stub_const("Yast::ConfigurationManagement::CFA::Minion::PATH",
+      FIXTURES_PATH.join("salt", "minion"))
     config.load
   end
 

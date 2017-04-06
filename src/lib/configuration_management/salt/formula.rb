@@ -38,9 +38,7 @@ module Yast
           @enabled
         end
 
-        def enabled=(value)
-          @enabled = value
-        end
+        attr_writer :enabled
 
         def name
           path.basename.to_s
