@@ -7,6 +7,7 @@ require "fileutils"
 require "configuration_management/cfa/salt_top"
 
 module ConfigurationManagement
+  # Client to configure formulas
   class ConfigurationManagementFormula < Yast::Client
     include Yast::Logger
     extend Yast::I18n
@@ -28,7 +29,7 @@ module ConfigurationManagement
 
       @cmdline_description = {
         "id"         => "configuration_management_formulas",
-        "guihandler" => fun_ref(method(:Main), "symbol ()")
+        "guihandler" => fun_ref(method(:do_main), "symbol ()")
       }
 
       CommandLine.Run(@cmdline_description)
@@ -47,7 +48,7 @@ module ConfigurationManagement
       Yast.import "Installation"
     end
 
-    def Main
+    def do_main
       Wizard.CreateDialog
       Wizard.SetDesktopIcon("security")
       # dialog caption
@@ -59,6 +60,8 @@ module ConfigurationManagement
       ret
     end
 
+    # This code is still experimental, so let's disable this check.
+    # rubocop:disable Metrics/AbcSize
     def start_workflow
       sequence = {
         "ws_start"        => "choose_formulas",
@@ -94,6 +97,8 @@ module ConfigurationManagement
       Sequencer.Run(workflow_aliases, sequence)
     end
 
+    # This code is still experimental, so let's disable this check.
+    # rubocop:disable Metrics/MethodLength
     def choose_formulas
       Yast::Wizard.SetContents(
         # dialog title
@@ -103,13 +108,16 @@ module ConfigurationManagement
           Frame(
             _("Choose which formulas to apply:"),
             VBox(
-              *formulas.map { |f| Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}", f.enabled?)) }
+              *formulas.map do |f|
+                Left(CheckBox(Id(f.name.to_sym), "#{f.name}: #{f.description}", f.enabled?))
+              end
             )
           ),
           VStretch()
         ),
-        _("Select which formulas you want to apply to this machine. For each selected formula, you will"\
-          " be able to customize it with parameters"),
+        _("Select which formulas you want to apply to this machine. "\
+          "For each selected formula, you will be able to customize it "\
+          "with parameters"),
         false,
         true
       )

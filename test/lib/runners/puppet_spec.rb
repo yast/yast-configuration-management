@@ -26,7 +26,7 @@ describe Yast::ConfigurationManagement::Runners::Puppet do
         expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
             "--waitforcert", config.auth_time_out.to_s, stdout: $stdout,
-            stderr: $stderr, :chroot=> "/mnt")
+            stderr: $stderr, chroot: "/mnt")
         expect(runner.run).to eq(true)
       end
 
@@ -48,7 +48,7 @@ describe Yast::ConfigurationManagement::Runners::Puppet do
         expect(Cheetah).to receive(:run).with(
           "puppet", "apply", "--modulepath", work_dir.join("modules").to_s,
           work_dir.join("manifests", "site.pp").to_s, "--debug",
-          stdout: $stdout, stderr: $stderr, :chroot=> "/mnt"
+          stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)
       end

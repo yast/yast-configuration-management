@@ -8,7 +8,6 @@ module Yast
       # Represents a YaST Salt Minion configuration file in /etc/salt/minion.d/
       #
       class MinionYastConfigurationManagement
-
         # Path to configuration file
         PATH = "/etc/salt/minion.d/yast-configuration-management.conf".freeze
 

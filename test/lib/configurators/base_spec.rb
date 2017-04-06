@@ -70,7 +70,7 @@ describe Yast::ConfigurationManagement::Configurators::Base do
 
     it "downloads and uncompress the configuration to a temporal directory" do
       expect(file_from_url_wrapper).to receive(:get_file)
-        .with(url, target.join(Yast::ConfigurationManagement::Configurators::Base::CONFIG_LOCAL_FILENAME))
+        .with(url, target.join(described_class.const_get("CONFIG_LOCAL_FILENAME")))
         .and_return(true)
       expect(Yast::Execute).to receive(:locally).with("tar", "xf", *any_args)
         .and_return(true)
