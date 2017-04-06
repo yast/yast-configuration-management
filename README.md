@@ -1,13 +1,8 @@
-# YaST CM
+# YaST Configuration Management
 
 This module allows AutoYaST2 to delegate part of the configuration to a
 [Software Configuration Management](https://en.wikipedia.org/wiki/Software_configuration_management)
 system. Salt and Puppet are supported.
-
-At this time, the module is only a simple proof of concept and is not
-ready for prime time.
-
-![Running a provisioner during 2nd stage](screenshot.png "Running provisioner")
 
 ## How it works
 
@@ -23,23 +18,23 @@ The module will take care of:
 ### Client/master
 
 ```xml
-<cm>
+<configuration_management>
   <type>salt</type> <!-- you can use "puppet" -->
   <master>my-salt-server.example.net</master>
   <auth_attempts config:type="integer">5</auth_attempts>
   <auth_time_out config:type="integer">10</auth_time_out>
   <keys_url>usb:/</keys_url> <!-- you can use HTTP, FTP... -->
-</cm>
+</configuration_management>
 ```
 
 ### Masterless mode
 
 ```xml
-<cm>
+<configuration_management>
   <type>salt</type> <!-- you can use "puppet" -->
   <states_url>http://myserver.example.net/states.tgz</states_url>
   <pillar_url>http://myserver.example.net/pillar.tgz</pillar_url> <!-- optional -->
-</cm>
+</configuration_management>
 ```
 
 ## Supported systems

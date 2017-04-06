@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/configurations/salt"
+require "configuration_management/configurations/salt"
 require "tmpdir"
 
-describe Yast::CM::Configurations::Salt do
-  subject(:config) { Yast::CM::Configurations::Salt.new(profile) }
+describe Yast::ConfigurationManagement::Configurations::Salt do
+  subject(:config) { Yast::ConfigurationManagement::Configurations::Salt.new(profile) }
 
   let(:master) { "puppet.suse.de" }
   let(:states_url) { "http://ftp.suse.de/modules.tgz" }

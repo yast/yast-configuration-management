@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/configurations/salt"
-require "cm/configurators/salt"
+require "configuration_management/configurations/salt"
+require "configuration_management/configurators/salt"
 
-describe Yast::CM::Configurators::Salt do
-  subject(:configurator) { Yast::CM::Configurators::Salt.new(config) }
+describe Yast::ConfigurationManagement::Configurators::Salt do
+  subject(:configurator) { Yast::ConfigurationManagement::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
   let(:states_url) { "https://yast.example.net/mystates.tgz" }
@@ -14,7 +14,7 @@ describe Yast::CM::Configurators::Salt do
   let(:keys_url) { "https://yast.example.net/keys" }
 
   let(:config) do
-    Yast::CM::Configurations::Salt.new(
+    Yast::ConfigurationManagement::Configurations::Salt.new(
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
@@ -47,9 +47,9 @@ describe Yast::CM::Configurators::Salt do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::CM::CFA::Minion).to receive(:new).and_return(minion_config)
+        allow(Yast::ConfigurationManagement::CFA::Minion).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:master=)
-        allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::ConfigurationManagement::KeyFinder).to receive(:new).and_return(key_finder)
       end
 
       it "updates the configuration file" do
@@ -71,7 +71,7 @@ describe Yast::CM::Configurators::Salt do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::CM::CFA::SimpleMinion).to receive(:new).and_return(minion_config)
+        allow(Yast::ConfigurationManagement::CFA::MinionYastConfigurationManagement).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:set_file_roots)
         allow(configurator).to receive(:fetch_config)
         allow(Yast::WFM).to receive(:CallFunction)
@@ -85,9 +85,9 @@ describe Yast::CM::Configurators::Salt do
         configurator.prepare
       end
 
-      it "runs the cm_formula client" do
+      it "runs the configuration_management_formula client" do
         expect(Yast::WFM).to receive(:CallFunction)
-          .with("cm_formula",
+          .with("configuration_management_formula",
             [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
         configurator.prepare
       end

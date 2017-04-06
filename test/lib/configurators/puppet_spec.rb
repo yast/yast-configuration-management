@@ -1,13 +1,13 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/configurators/puppet"
-require "cm/configurations/puppet"
+require "configuration_management/configurators/puppet"
+require "configuration_management/configurations/puppet"
 
-describe Yast::CM::Configurators::Puppet do
+describe Yast::ConfigurationManagement::Configurators::Puppet do
   Yast.import "Hostname"
 
-  subject(:configurator) { Yast::CM::Configurators::Puppet.new(config) }
+  subject(:configurator) { Yast::ConfigurationManagement::Configurators::Puppet.new(config) }
 
   let(:master) { "myserver" }
   let(:mode) { :client }
@@ -17,7 +17,7 @@ describe Yast::CM::Configurators::Puppet do
   let(:hostname) { "myclient" }
 
   let(:config) do
-    Yast::CM::Configurations::Puppet.new(
+    Yast::ConfigurationManagement::Configurations::Puppet.new(
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
@@ -38,14 +38,14 @@ describe Yast::CM::Configurators::Puppet do
     let(:key_finder) { double("key_finder", fetch_to: true) }
 
     before do
-      allow(Yast::CM::CFA::Puppet).to receive(:new).and_return(puppet_config)
+      allow(Yast::ConfigurationManagement::CFA::Puppet).to receive(:new).and_return(puppet_config)
       allow(puppet_config).to receive(:server=)
       allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
     end
 
     context "when running in client mode" do
       before do
-        allow(Yast::CM::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Yast::ConfigurationManagement::KeyFinder).to receive(:new).and_return(key_finder)
       end
 
       it "updates the configuration file" do

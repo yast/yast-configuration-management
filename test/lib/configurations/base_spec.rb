@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/configurations/base"
+require "configuration_management/configurations/base"
 require "tmpdir"
 
-describe Yast::CM::Configurations::Base do
-  subject(:config) { Yast::CM::Configurations::Base.new(profile) }
+describe Yast::ConfigurationManagement::Configurations::Base do
+  subject(:config) { Yast::ConfigurationManagement::Configurations::Base.new(profile) }
 
   let(:master) { "some-server.suse.com" }
   let(:auth_attempts) { 3 }
@@ -23,12 +23,12 @@ describe Yast::CM::Configurations::Base do
   end
 
   before do
-    stub_const("Yast::CM::Configurations::Base::DEFAULT_PATH", default_path)
+    stub_const("Yast::ConfigurationManagement::Configurations::Base::DEFAULT_PATH", default_path)
     allow(Dir).to receive(:mktmpdir).and_return(work_dir.to_s)
   end
 
   context "default configuration" do
-    subject(:config) { Yast::CM::Configurations::Base.new({}) }
+    subject(:config) { Yast::ConfigurationManagement::Configurations::Base.new({}) }
 
     let(:attrs) do
       {
@@ -133,18 +133,26 @@ describe Yast::CM::Configurations::Base do
     context "when a path is given" do
       let(:custom_path) { Pathname.new(work_dir).join("custom.yml") }
 
-      it "writes a YAML representation to the given path" do
-        config.save(custom_path)
+      it "writes a secured YAML representation to the given path" do
+        config.secure_save(custom_path)
         expect(default_path).to_not be_file
         expect(custom_path).to be_file
         content = YAML.load_file(custom_path)
         expect(content).to eq(config.to_secure_hash)
       end
+
+      it "writes a YAML representation to the given path" do
+        config.save(custom_path)
+        expect(default_path).to_not be_file
+        expect(custom_path).to be_file
+        content = YAML.load_file(custom_path)
+        expect(content).to eq(config.to_hash)
+      end
     end
 
     context "when a path is not given" do
-      it "writes a YAML representation to the default path" do
-        config.save
+      it "writes a secured YAML representation to the default path" do
+        config.secure_save
         expect(default_path).to be_file
         content = YAML.load_file(default_path)
         expect(content).to eq(config.to_secure_hash)

@@ -1,18 +1,18 @@
 #!/usr/bin/env rspec
 
 require_relative "../spec_helper"
-require "cm/key_finder"
+require "configuration_management/key_finder"
 require "pathname"
 require "fileutils"
 
-describe Yast::CM::KeyFinder do
+describe Yast::ConfigurationManagement::KeyFinder do
   Yast.import "Hostname"
 
   let(:hostname) { "minion" }
   let(:keys_url) { URI("http://keys.example.net/salt") }
-  let(:file_from_url_wrapper) { Yast::CM::FileFromUrlWrapper }
+  let(:file_from_url_wrapper) { Yast::ConfigurationManagement::FileFromUrlWrapper }
 
-  subject(:finder) { Yast::CM::KeyFinder.new(keys_url: keys_url) }
+  subject(:finder) { Yast::ConfigurationManagement::KeyFinder.new(keys_url: keys_url) }
 
   before do
     allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
@@ -44,7 +44,7 @@ describe Yast::CM::KeyFinder do
       end
 
       subject(:finder) do
-        Yast::CM::KeyFinder.new(keys_url: keys_url, id: "someid")
+        Yast::ConfigurationManagement::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       it "copies the pair of keys 'someid'" do
@@ -66,7 +66,7 @@ describe Yast::CM::KeyFinder do
 
     context "when a pair of keys named after the hostname is found" do
       subject(:finder) do
-        Yast::CM::KeyFinder.new(keys_url: keys_url, id: "someid")
+        Yast::ConfigurationManagement::KeyFinder.new(keys_url: keys_url, id: "someid")
       end
 
       before do

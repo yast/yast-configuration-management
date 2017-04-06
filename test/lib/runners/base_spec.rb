@@ -1,10 +1,10 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "cm/runners/base"
+require "configuration_management/runners/base"
 
-describe Yast::CM::Runners::Base do
-  subject(:runner) { Yast::CM::Runners::Base.new(config) }
+describe Yast::ConfigurationManagement::Runners::Base do
+  subject(:runner) { Yast::ConfigurationManagement::Runners::Base.new(config) }
   let(:mode) { :masterless }
 
   let(:config) { double("config", master: "salt.suse.de", mode: mode, type: "salt") }
@@ -12,7 +12,7 @@ describe Yast::CM::Runners::Base do
   describe ".for" do
     it "returns a runner for the given configuration" do
       runner = described_class.for(config)
-      expect(runner).to be_kind_of(Yast::CM::Runners::Salt)
+      expect(runner).to be_kind_of(Yast::ConfigurationManagement::Runners::Salt)
       expect(runner.config).to eq(config)
     end
 
@@ -22,7 +22,7 @@ describe Yast::CM::Runners::Base do
       end
 
       it "raises an error" do
-        expect { Yast::CM::Runners::Base.for(config) }.to raise_error
+        expect { Yast::ConfigurationManagement::Runners::Base.for(config) }.to raise_error
       end
     end
   end

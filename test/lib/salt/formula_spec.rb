@@ -2,9 +2,9 @@
 
 require_relative "../../spec_helper"
 
-require "cm/salt/formula"
+require "configuration_management/salt/formula"
 
-describe Yast::CM::Salt::Formula do
+describe Yast::ConfigurationManagement::Salt::Formula do
   FORMULAS_PATH = FIXTURES_PATH.join("formulas")
 
   subject { described_class.new(formula_path.to_s) }
