@@ -56,7 +56,7 @@ module ConfigurationManagement
       Wizard.SetContents(_("Initializing..."), Empty(), "", false, true)
 
       self.formulas = Yast::ConfigurationManagement::Salt::Formula.all(formulas_root)
-      if self.formulas && !self.formulas.empty?
+      if formulas && !formulas.empty?
         ret = start_workflow
       else
         Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
