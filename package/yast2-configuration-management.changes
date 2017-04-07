@@ -2,7 +2,7 @@
 Fri Apr  7 16:23:08 CEST 2017 - schubi@suse.de
 
 - Moved to official yast2-configuration-management package.
-  (Fate##319830)
+  (Fate#319830)
 - Version 0.2.1
 
 -------------------------------------------------------------------
