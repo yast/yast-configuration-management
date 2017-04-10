@@ -46,6 +46,7 @@ module ConfigurationManagement
       Yast.import "Label"
       Yast.import "Sequencer"
       Yast.import "Installation"
+      Yast.import "Report"
     end
 
     def do_main
@@ -55,7 +56,12 @@ module ConfigurationManagement
       Wizard.SetContents(_("Initializing..."), Empty(), "", false, true)
 
       self.formulas = Yast::ConfigurationManagement::Salt::Formula.all(formulas_root)
-      ret = start_workflow
+      if formulas && !formulas.empty?
+        ret = start_workflow
+      else
+        Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
+        ret = false
+      end
       Wizard.CloseDialog
       ret
     end
