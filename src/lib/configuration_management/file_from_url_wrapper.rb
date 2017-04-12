@@ -14,8 +14,9 @@ module Yast
       #
       # @see Yast::Transfer::FileFromUrl
       def self.get_file(source, target)
+        hostname = source.port ? "#{source.host}:#{source.port}" : source.host.to_s
         get_file_from_url(
-          scheme: source.scheme.to_s, host: source.host.to_s,
+          scheme: source.scheme.to_s, host: hostname,
           urlpath: source.path.to_s, urltok: {}, destdir: "/",
           localfile: target.to_s
         )

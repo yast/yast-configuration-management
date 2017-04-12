@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Apr 12 17:04:38 CEST 2017 - schubi@suse.de
+
+- Enable port support for downloading files (e.g. keys)
+  (Fate#319830)
+- Version 0.3.1
+
+-------------------------------------------------------------------
 Fri Apr  7 16:23:08 CEST 2017 - schubi@suse.de
 
 - Moved to official yast2-configuration-management package.
