@@ -4,6 +4,8 @@ require "configuration_management/configurators/base"
 require "configuration_management/configurations/base"
 require "configuration_management/clients/provision"
 
+Yast.import "Service"
+
 module Yast
   module ConfigurationManagement
     # Client to write the provisioner's configuration
@@ -30,6 +32,12 @@ module Yast
         # saving settings to target system
         config.secure_save
         Yast::ConfigurationManagement::Clients::Provision.new.run
+
+        #enabling services
+        if config.enable_services
+          configurator.services.each { |s| Service.Enable(s) }
+        end
+
         true
       end
 
