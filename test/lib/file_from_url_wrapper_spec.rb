@@ -19,9 +19,9 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "http", host: "yast.example.net",
         urlpath: "/some-file.txt",
-        urltok: {"scheme"=>"http", "path"=>"/some-file.txt", "query"=>"",
-          "fragment"=>"", "user"=>"", "pass"=>"", "port"=>"8888",
-          "host"=>"yast.example.net"},
+        urltok: { "scheme" => "http", "path" => "/some-file.txt", "query" => "",
+          "fragment" => "", "user" => "", "pass" => "", "port" => "8888",
+          "host" => "yast.example.net" },
         destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(uri_port, target)
@@ -31,9 +31,9 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "http", host: "yast.example.net",
         urlpath: "/some-file.txt",
-        urltok: {"scheme"=>"http", "path"=>"/some-file.txt", "query"=>"",
-          "fragment"=>"", "user"=>"", "pass"=>"", "port"=>"",
-          "host"=>"yast.example.net"},
+        urltok: { "scheme" => "http", "path" => "/some-file.txt", "query" => "",
+          "fragment" => "", "user" => "", "pass" => "", "port" => "",
+          "host" => "yast.example.net" },
         destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(uri, target)
@@ -43,8 +43,8 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "usb", host: "",
         urlpath: "/some-file.txt",
-        urltok: {"scheme"=>"usb", "path"=>"", "query"=>"", "fragment"=>"",
-          "user"=>"", "pass"=>"", "port"=>"", "host"=>"some-file.txt"},
+        urltok: { "scheme" => "usb", "path" => "", "query" => "", "fragment" => "",
+          "user" => "", "pass" => "", "port" => "", "host" => "some-file.txt" },
         destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(usb, target)
