@@ -37,7 +37,7 @@ module Yast
 
         # Added needed packages for writing the configuration
         Yast::PackagesProposal.AddResolvables("yast2-configuration-management",
-        :package,  packages["install"])
+          :package, packages["install"])
 
         true
       end
