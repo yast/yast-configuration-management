@@ -4,6 +4,8 @@ require "configuration_management/configurators/base"
 require "configuration_management/configurations/base"
 require "pathname"
 
+Yast.import "PackagesProposal"
+
 module Yast
   module ConfigurationManagement
     # AutoClient implementation
@@ -32,6 +34,11 @@ module Yast
         config = Yast::ConfigurationManagement::Configurations::Base.for(profile)
         config.save
         self.configurator = Configurators::Base.for(config)
+
+        # Added needed packages for writing the configuration
+        Yast::PackagesProposal.AddResolvables("yast2-configuration-management",
+        :package,  packages["install"])
+
         true
       end
 
