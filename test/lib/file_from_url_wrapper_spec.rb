@@ -17,18 +17,24 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
 
     it "decompose URI (with port) and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
-        scheme: "http", host: "yast.example.net:8888",
-        urlpath: "/some-file.txt", urltok: {}, destdir: "/",
-        localfile: "/tmp/local-file.txt"
+        scheme: "http", host: "yast.example.net",
+        urlpath: "/some-file.txt",
+        urltok: {"scheme"=>"http", "path"=>"/some-file.txt", "query"=>"",
+          "fragment"=>"", "user"=>"", "pass"=>"", "port"=>"8888",
+          "host"=>"yast.example.net"},
+        destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(uri_port, target)
     end
 
     it "decompose URI (without port) and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
-        scheme: "http", host: "yast.example.net:80",
-        urlpath: "/some-file.txt", urltok: {}, destdir: "/",
-        localfile: "/tmp/local-file.txt"
+        scheme: "http", host: "yast.example.net",
+        urlpath: "/some-file.txt",
+        urltok: {"scheme"=>"http", "path"=>"/some-file.txt", "query"=>"",
+          "fragment"=>"", "user"=>"", "pass"=>"", "port"=>"",
+          "host"=>"yast.example.net"},
+        destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(uri, target)
     end
@@ -36,8 +42,10 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
     it "decompose USB URI and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "usb", host: "",
-        urlpath: "/some-file.txt", urltok: {}, destdir: "/",
-        localfile: "/tmp/local-file.txt"
+        urlpath: "/some-file.txt",
+        urltok: {"scheme"=>"usb", "path"=>"", "query"=>"", "fragment"=>"",
+          "user"=>"", "pass"=>"", "port"=>"", "host"=>"some-file.txt"},
+        destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(usb, target)
     end
