@@ -33,7 +33,7 @@ module Yast
         config.secure_save
         Yast::ConfigurationManagement::Clients::Provision.new.run
 
-        #enabling services
+        # enabling services
         if config.enable_services
           configurator.services.each { |s| Service.Enable(s) }
         end
