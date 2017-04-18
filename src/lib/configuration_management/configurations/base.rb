@@ -79,7 +79,7 @@ module Yast
         # @return [Array<Symbol>] Attribute names
         def attributes
           @attributes ||= %i(type mode master auth_attempts auth_time_out keys_url work_dir
-            enable_services)
+                             enable_services)
         end
 
         # Save configuration to the given file
