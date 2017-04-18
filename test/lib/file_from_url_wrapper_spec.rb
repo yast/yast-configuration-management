@@ -15,7 +15,7 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
     let(:usb) { URI("usb:///some-file.txt") }
     let(:target) { Pathname("/tmp/local-file.txt") }
 
-    it "decompose URI (with port) and calls original get_file_from_url" do
+    it "decomposes URI (with port) and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "http", host: "yast.example.net",
         urlpath: "/some-file.txt",
@@ -27,7 +27,7 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
       wrapper.get_file(uri_port, target)
     end
 
-    it "decompose URI (without port) and calls original get_file_from_url" do
+    it "decomposes URI (without port) and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "http", host: "yast.example.net",
         urlpath: "/some-file.txt",
@@ -39,7 +39,7 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
       wrapper.get_file(uri, target)
     end
 
-    it "decompose USB URI and calls original get_file_from_url" do
+    it "decomposes USB URI and calls original get_file_from_url" do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "usb", host: "",
         urlpath: "/some-file.txt",
