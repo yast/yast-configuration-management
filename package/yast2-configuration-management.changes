@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Wed Apr 12 17:04:38 CEST 2017 - schubi@suse.de
+
+- Enable port support for downloading files (e.g. keys)
+  Added AY flag "enable_services" for services handling.
+  Install needed packages to target system.
+  (Fate#319830)
+- Version 0.3.1
+
+-------------------------------------------------------------------
 Fri Apr  7 16:23:08 CEST 2017 - schubi@suse.de
 
 - Moved to official yast2-configuration-management package.

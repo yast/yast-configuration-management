@@ -28,6 +28,8 @@ module Yast
         attr_reader :auth_time_out
         # @return [URI,nil] Keys URL
         attr_reader :keys_url
+        # @return [Boolean] CM Services will be enabled on the target system
+        attr_reader :enable_services
 
         class << self
           # Load configuration from a file
@@ -64,6 +66,7 @@ module Yast
           @keys_url         = URI(symbolized_opts[:keys_url]) if symbolized_opts[:keys_url]
           @auth_attempts    = symbolized_opts[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
           @auth_time_out    = symbolized_opts[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
+          @enable_services  = symbolized_opts[:enable_services] || true
           post_initialize(symbolized_opts)
         end
 
@@ -75,7 +78,8 @@ module Yast
         #
         # @return [Array<Symbol>] Attribute names
         def attributes
-          @attributes ||= %i(type mode master auth_attempts auth_time_out keys_url work_dir)
+          @attributes ||= %i(type mode master auth_attempts auth_time_out keys_url work_dir
+                             enable_services)
         end
 
         # Save configuration to the given file

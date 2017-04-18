@@ -90,12 +90,13 @@ describe Yast::ConfigurationManagement::Configurations::Base do
   describe "#to_hash" do
     it "returns configuration values" do
       expect(config.to_hash).to eq(
-        auth_attempts: profile["auth_attempts"],
-        auth_time_out: profile["auth_time_out"],
-        keys_url:      URI(profile["keys_url"]),
-        mode:          :client,
-        master:        profile["master"],
-        work_dir:      work_dir
+        auth_attempts:   profile["auth_attempts"],
+        auth_time_out:   profile["auth_time_out"],
+        enable_services: true,
+        keys_url:        URI(profile["keys_url"]),
+        mode:            :client,
+        master:          profile["master"],
+        work_dir:        work_dir
       )
     end
 
@@ -109,11 +110,12 @@ describe Yast::ConfigurationManagement::Configurations::Base do
   describe "#to_secure_hash" do
     it "returns configuration values filtering sensible information" do
       expect(config.to_secure_hash).to eq(
-        auth_attempts: profile["auth_attempts"],
-        auth_time_out: profile["auth_time_out"],
-        mode:          :client,
-        master:        profile["master"],
-        work_dir:      work_dir
+        auth_attempts:   profile["auth_attempts"],
+        auth_time_out:   profile["auth_time_out"],
+        enable_services: true,
+        mode:            :client,
+        master:          profile["master"],
+        work_dir:        work_dir
       )
     end
   end

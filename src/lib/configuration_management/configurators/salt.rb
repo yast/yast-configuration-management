@@ -40,6 +40,13 @@ module Yast
           { "install" => salt_packages }
         end
 
+        # Return a list of services which have to be enabled
+        #
+        # @return [[Array<String>] List of services
+        def services
+          ["salt-minion"]
+        end
+
       private
 
         # Update the minion's configuration file

@@ -101,6 +101,13 @@ module Yast
           {}
         end
 
+        # Return a list of services which have to be enabled
+        #
+        # @return [[Array<String>] List of services
+        def services
+          []
+        end
+
         # Prepare the system to run the provisioner
         #
         # Configuration is updated and, after that, the work is delegated to methods

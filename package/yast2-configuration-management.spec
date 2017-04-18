@@ -17,7 +17,7 @@
 
 
 Name:           yast2-configuration-management
-Version:        0.3.0
+Version:        0.3.1
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
