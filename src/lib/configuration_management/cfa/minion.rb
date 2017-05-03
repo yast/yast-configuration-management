@@ -33,6 +33,18 @@ module Yast
           data["master"]
         end
 
+        # Set file roots for a given environment
+        def set_file_roots(roots, env = "base")
+          self.data ||= {}
+          data["file_roots"] ||= {}
+          data["file_roots"][env] = roots.map(&:to_s)
+        end
+
+        # Get file roots for a given environment
+        def file_roots(env)
+          data.fetch("file_roots", {}).fetch(env, [])
+        end
+
         # Save the configuration file
         #
         # The directory/file are created if they not exist.
