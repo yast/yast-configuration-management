@@ -1,20 +1,16 @@
 require "cfa/base_model"
-require "cfa/augeas_parser"
 require "cfa/matcher"
+require "configuration_management/cfa/yaml_parser"
 
 module Yast
   module ConfigurationManagement
     module CFA
       # Represents a Salt Minion configuration file.
       class Minion < ::CFA::BaseModel
-        attributes(master: "master")
-
         # Configuration parser
-        # FIXME: At this time, we're using Augeas' cobblersettings lense,
-        # as long as YAML is not supported. We should use another parser.
-        PARSER = ::CFA::AugeasParser.new("cobblersettings.lns")
+        PARSER = Yast::ConfigurationManagement::CFA::YAMLParser.new
         # Path to configuration file
-        PATH = "/etc/salt/minion".freeze
+        PATH = "/etc/salt/minion.d/yast-configuration-management.conf".freeze
 
         # Constructor
         #
@@ -23,11 +19,35 @@ module Yast
           super(PARSER, PATH, file_handler: file_handler)
         end
 
-        def master=(master_name)
-          # FIXME: the cobblersettings lense does not support dashes in the value
-          # without single quotes, we need to use a custom lense for salt conf.
-          # As Salt can use also 'master' just use in case of dashed.
-          data["master"] = master_name.include?("-") ? "'#{master_name}'" : master_name
+        # Set the master hostname
+        #
+        # @param hostname [String] Hostname
+        def master=(hostname)
+          data["master"] = hostname
+        end
+
+        # Return the master hostname if set
+        #
+        # @return [String,nil] Hostname
+        def master
+          data["master"]
+        end
+
+        # Save the configuration file
+        #
+        # The directory/file are created if they not exist.
+        #
+        # @see create_directory_if_needed
+        def save
+          create_directory_if_needed
+          super
+        end
+
+      private
+
+        # Create the parent directory if it does not exist
+        def create_directory_if_needed
+          ::FileUtils.mkdir_p(File.dirname(@file_path))
         end
       end
     end
