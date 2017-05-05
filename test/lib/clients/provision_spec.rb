@@ -6,21 +6,24 @@ require "configuration_management/configurations/base"
 
 describe Yast::ConfigurationManagement::Clients::Provision do
   subject(:client) { described_class.new }
-  let(:dialog) do
-    double("dialog")
-  end
+
+  let(:dialog) { double("dialog") }
+  let(:config) { double("config") }
+  let(:runner) { double("runner") }
 
   describe "#run" do
     before do
-      stub_const("Yast::ConfigurationManagement::Configurations::Base::DEFAULT_PATH",
-        FIXTURES_PATH.join("cm-salt.yml"))
       allow(Yast::ConfigurationManagement::Dialogs::Running).to receive(:new)
         .and_return(dialog)
+      allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:current)
+        .and_return(config)
+      allow(Yast::ConfigurationManagement::Runners::Base).to receive(:for)
+        .and_return(runner)
     end
 
-    it "runs" do
+    it "shows a dialog and runs the runner" do
       expect(dialog).to receive(:run).and_yield($stdout, $stderr)
-      expect_any_instance_of(Yast::ConfigurationManagement::Runners::Salt).to receive(:run)
+      expect(runner).to receive(:run)
       client.run
     end
   end
