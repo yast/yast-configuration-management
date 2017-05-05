@@ -32,6 +32,16 @@ module Yast
         attr_reader :enable_services
 
         class << self
+          # @return [Base] Current configuration
+          attr_accessor :current
+
+          # Import settings from an AutoYaST profile
+          #
+          # @param profile [Hash] Configuration management settings from profile
+          def import(profile)
+            self.current = self.for(profile)
+          end
+
           # Load configuration from a file
           #
           # If not specified, the DEFAULT_PATH is used.

@@ -31,9 +31,8 @@ module Yast
       # @option profile [String] "modules_url"     Location of Puppet modules
       # @option profile [String] "keys_url"        Authentication keys URL
       def import(profile = {})
-        config = Yast::ConfigurationManagement::Configurations::Base.for(profile)
-        config.save
-        self.configurator = Configurators::Base.for(config)
+        Configurations::Base.import(profile)
+        self.configurator = Configurators::Base.for(Configurations::Base.current)
 
         # Added needed packages for writing the configuration
         Yast::PackagesProposal.AddResolvables("yast2-configuration-management",
