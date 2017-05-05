@@ -41,7 +41,7 @@ describe Yast::ConfigurationManagement::CFA::Minion do
       it "updates the file" do
         config.master = "other"
         config.save
-        expect(YAML.load_file(path)).to eq({"master" => "other"})
+        expect(YAML.load_file(path)).to eq("master" => "other")
       end
     end
 
@@ -49,7 +49,7 @@ describe Yast::ConfigurationManagement::CFA::Minion do
       it "creates the file" do
         config.master = "other"
         config.save
-        expect(YAML.load_file(path)).to eq({"master" => "other"})
+        expect(YAML.load_file(path)).to eq("master" => "other")
         expect(File.exist?(path)).to eq(true)
       end
     end
@@ -60,7 +60,7 @@ describe Yast::ConfigurationManagement::CFA::Minion do
       it "creates the directory and the file" do
         config.master = "other"
         config.save
-        expect(YAML.load_file(path)).to eq({"master" => "other"})
+        expect(YAML.load_file(path)).to eq("master" => "other")
         expect(File.exist?(path)).to eq(true)
       end
     end

@@ -43,7 +43,7 @@ describe Yast::ConfigurationManagement::Configurations::Base do
 
   describe "#work_dir" do
     let(:now) { Time.new(2017, 5, 4, 15, 0) }
-    let(:expected) { "#{Yast::Directory.vardir}/cm-201705041500"}
+    let(:expected) { "#{Yast::Directory.vardir}/cm-201705041500" }
 
     before do
       allow(Time).to receive(:now).and_return(now)
