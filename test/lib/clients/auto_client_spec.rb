@@ -39,19 +39,6 @@ describe Yast::ConfigurationManagement::AutoClient do
     end
   end
 
-  describe "#write" do
-    before do
-      allow(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
-        .with(config).and_return(configurator)
-      client.import(profile)
-    end
-
-    it "delegates writing to current configurator" do
-      expect(configurator).to receive(:prepare)
-      client.write
-    end
-  end
-
   describe "#export" do
     it "returns an empty hash" do
       expect(client.export).to eq({})

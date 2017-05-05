@@ -48,14 +48,6 @@ module Yast
         configurator.nil? ? [] : configurator.packages
       end
 
-      # Apply the configuration running the configurator
-      #
-      # @see Configurators::Base#current
-      def write
-        configurator.prepare if configurator
-        true
-      end
-
       # Determines whether the profile data has been modified
       #
       # This method always returns `false` because no information from this
