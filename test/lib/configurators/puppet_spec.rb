@@ -29,7 +29,6 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
 
   before do
     allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
-    allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
   end
 
   describe "#packages" do
@@ -46,6 +45,7 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
       allow(Yast::ConfigurationManagement::CFA::Puppet).to receive(:new).and_return(puppet_config)
       allow(puppet_config).to receive(:server=)
       allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
+      allow(FileUtils).to receive(:mkdir_p)
     end
 
     context "when running in client mode" do

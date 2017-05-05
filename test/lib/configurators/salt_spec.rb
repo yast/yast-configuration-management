@@ -26,7 +26,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
   before do
     allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
-    allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
+    allow(FileUtils).to receive(:mkdir_p).with(config.work_dir)
   end
 
   describe "#packages" do
@@ -54,6 +54,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
         allow(Yast::ConfigurationManagement::CFA::Minion).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:master=)
         allow(Yast::ConfigurationManagement::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(FileUtils).to receive(:mkdir_p)
       end
 
       it "updates the configuration file" do
@@ -84,9 +85,9 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
       it "retrieves the Salt states" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(states_url), config.work_dir)
+          .with(URI(states_url), config.work_dir(:local))
         expect(configurator).to receive(:fetch_config)
-          .with(URI(pillar_url), config.work_dir.join("pillar"))
+          .with(URI(pillar_url), config.work_dir(:local).join("pillar"))
         configurator.prepare
       end
 

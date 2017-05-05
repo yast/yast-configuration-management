@@ -110,12 +110,13 @@ module Yast
 
         # Prepare the system to run the provisioner
         #
-        # Configuration is updated and, after that, the work is delegated to methods
-        # called after the mode: #prepare_masterless_mode and #prepare_client_mode.
+        # Work directory is created (only in :client mode) and, after that, the
+        # control is passed to the required configurator. See mode definitions
+        # in the given configurator.
         #
-        # @see prepare_masterless_mode
-        # @see prepare_client_mode
+        # @see .mode
         def prepare
+          ::FileUtils.mkdir_p(config.work_dir) if mode?(:masterless)
           send("prepare_#{config.mode}")
         end
 
@@ -123,7 +124,7 @@ module Yast
         #
         # @return [Boolean] true if it's operating in the given mode; false otherwise.
         def mode?(value)
-          mode == value
+          config.mode == value
         end
 
         # Local file name of fetched configuration

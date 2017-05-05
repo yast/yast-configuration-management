@@ -1,8 +1,10 @@
 require "yaml"
 require "pathname"
 require "tmpdir"
+require "uri"
 
 Yast.import "Installation"
+Yast.import "Directory"
 
 module Yast
   module ConfigurationManagement
@@ -131,22 +133,19 @@ module Yast
         # @param  [Symbol] Path relative to inst-sys (:local) or the target system (:target)
         # @return [String] Path name to the temporal directory
         def work_dir(scope = :local)
-          return dir_in_scope(@work_dir, scope) if @work_dir
-          @work_dir = create_work_dir
-          dir_in_scope(@work_dir, scope)
+          @work_dir ||= build_work_dir_name
+          prefix = (scope == :target) ? "/" : Installation.destdir
+          Pathname.new(prefix).join(@work_dir)
         end
 
       private
 
-        def dir_in_scope(dir, scope = :local)
-          prefix = scope == :target ? "/" : Installation.destdir
-          Pathname.new(prefix).join(dir)
-        end
-
-        def create_work_dir
-          tmpdir = File.join(Installation.destdir, "var", "tmp")
-          local_tmpdir = Pathname(Dir.mktmpdir("yast_cm_", tmpdir))
-          local_tmpdir.relative_path_from(Pathname.new(Installation.destdir))
+        # Build a path to be used as work_dir
+        #
+        # @return [Pathname] Relative work_dir path
+        def build_work_dir_name
+          path = Pathname.new(Directory.vardir).join("cm-#{Time.now.strftime("%Y%m%d%H%M")}")
+          path.relative_path_from(Pathname.new("/"))
         end
       end
     end

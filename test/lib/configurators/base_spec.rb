@@ -19,12 +19,12 @@ describe Yast::ConfigurationManagement::Configurators::Base do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      work_dir,
       states_url:    states_url,
       keys_url:      keys_url
     )
   end
 
+  # Dummy configurator
   class DummyClass < Yast::ConfigurationManagement::Configurators::Base
     mode(:client) { 1 }
   end
@@ -43,9 +43,35 @@ describe Yast::ConfigurationManagement::Configurators::Base do
   end
 
   describe "#prepare" do
+    before do
+      allow(config).to receive(:work_dir).and_return(work_dir)
+      allow(FileUtils).to receive(:mkdir_p)
+      allow(configurator).to receive(:send).with("prepare_client")
+    end
+
     it "calls to 'prepare_MODE' method" do
       expect(configurator).to receive(:send).with("prepare_client")
       configurator.prepare
+    end
+
+    context "when running in masterless mode" do
+      let(:master) { nil }
+
+      before do
+        allow(configurator).to receive(:send).with("prepare_masterless")
+      end
+
+      it "creates the work_dir" do
+        expect(FileUtils).to receive(:mkdir_p).with(config.work_dir)
+        configurator.prepare
+      end
+    end
+
+    context "when running in client mode" do
+      it "does not create the work_dir" do
+        expect(FileUtils).to_not receive(:mkdir_p)
+        configurator.prepare
+      end
     end
   end
 
