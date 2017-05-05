@@ -44,20 +44,6 @@ module Yast
             self.current = self.for(profile)
           end
 
-          # Load configuration from a file
-          #
-          # If not specified, the DEFAULT_PATH is used.
-          #
-          # @return [Pathname] File path
-          # @return [Config] Configuration
-          #
-          # @see DEFAULT_PATH
-          def load(path = DEFAULT_PATH)
-            return false unless path.exist?
-            content = YAML.load_file(path)
-            class_for(content[:type]).new(content)
-          end
-
           def for(config)
             class_for(config["type"]).new(config)
           end
@@ -83,49 +69,6 @@ module Yast
 
         def post_initialize(_options)
           nil
-        end
-
-        # Return an array of exportable attributes
-        #
-        # @return [Array<Symbol>] Attribute names
-        def attributes
-          @attributes ||= %i(type mode master auth_attempts auth_time_out keys_url work_dir
-                             enable_services)
-        end
-
-        # Save configuration to the given file
-        #
-        # @param path [Pathname] Path to file
-        def save(path = DEFAULT_PATH)
-          # The information will be written to inst-sys only. So we do not
-          # have to take care about secure data.
-          File.open(path, "w+") { |f| f.puts to_hash.to_yaml }
-        end
-
-        # Save configuration to target system. Filter out all
-        # sensible data.
-        # @param path [Pathname] Path to file
-        def secure_save(path = DEFAULT_PATH)
-          File.open(::File.join(Yast::Installation.destdir, path), "w+") do |f|
-            f.puts to_secure_hash.to_yaml
-          end
-        end
-
-        # Return configuration values in a hash
-        #
-        # @return [Hash] Configuration values
-        def to_hash
-          attributes.each_with_object({}) do |key, memo|
-            value = send(key)
-            memo[key] = value unless value.nil?
-          end
-        end
-
-        # Return configuration values in a hash but filtering sensible information
-        #
-        # @return [Hash] Configuration values filtering sensible information.
-        def to_secure_hash
-          to_hash.reject { |k| k.to_s.end_with?("_url") }
         end
 
         # Return a path to a temporal directory to extract states/pillars

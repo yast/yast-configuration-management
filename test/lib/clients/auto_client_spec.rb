@@ -15,7 +15,6 @@ describe Yast::ConfigurationManagement::AutoClient do
   before do
     allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:for).with(profile)
       .and_return(config)
-    allow(config).to receive(:save)
   end
 
   describe "#import" do

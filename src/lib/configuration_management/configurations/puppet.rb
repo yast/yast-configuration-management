@@ -19,13 +19,6 @@ module Yast
           @type        = "puppet"
           @modules_url = URI(options[:modules_url]) if options[:modules_url]
         end
-
-        # Return an array of exportable attributes
-        #
-        # @return [Array<Symbol>] Attribute names
-        def attributes
-          @attributes ||= super + [:modules_url]
-        end
       end
     end
   end

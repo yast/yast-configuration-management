@@ -22,24 +22,4 @@ describe Yast::ConfigurationManagement::Configurations::Puppet do
       expect(config.type).to eq("puppet")
     end
   end
-
-  describe "given a configuration" do
-    it { is_expected.to have_attributes(modules_url: URI(modules_url)) }
-  end
-
-  describe "#to_hash" do
-    it "returns configuration values" do
-      expect(config.to_hash).to include(
-        master: master, modules_url: URI(modules_url)
-      )
-    end
-
-    context "when some values are nil" do
-      let(:master) { nil }
-
-      it "those values are not included" do
-        expect(config.to_hash.keys).to_not include(:master)
-      end
-    end
-  end
 end

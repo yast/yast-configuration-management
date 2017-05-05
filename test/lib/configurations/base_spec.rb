@@ -25,22 +25,6 @@ describe Yast::ConfigurationManagement::Configurations::Base do
     stub_const("Yast::ConfigurationManagement::Configurations::Base::DEFAULT_PATH", default_path)
   end
 
-  context "default configuration" do
-    subject(:config) { Yast::ConfigurationManagement::Configurations::Base.new({}) }
-
-    let(:attrs) do
-      {
-        auth_attempts: 3,
-        auth_time_out: 15,
-        type:          nil,
-        mode:          :masterless,
-        keys_url:      nil
-      }
-    end
-
-    it { is_expected.to have_attributes(attrs) }
-  end
-
   describe "#mode" do
     context "when a master server is not specified" do
       let(:master) { nil }
