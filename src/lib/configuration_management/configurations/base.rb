@@ -72,7 +72,6 @@ module Yast
           symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
           @master           = symbolized_opts[:master]
           @mode             = @master ? :client : :masterless
-          @work_dir         = symbolized_opts[:work_dir]
           @keys_url         = URI(symbolized_opts[:keys_url]) if symbolized_opts[:keys_url]
           @auth_attempts    = symbolized_opts[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
           @auth_time_out    = symbolized_opts[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
@@ -129,9 +128,25 @@ module Yast
 
         # Return a path to a temporal directory to extract states/pillars
         #
+        # @param  [Symbol] Path relative to inst-sys (:local) or the target system (:target)
         # @return [String] Path name to the temporal directory
-        def work_dir
-          @work_dir ||= Pathname(Dir.mktmpdir)
+        def work_dir(scope = :local)
+          return dir_in_scope(@work_dir, scope) if @work_dir
+          @work_dir = create_work_dir
+          dir_in_scope(@work_dir, scope)
+        end
+
+      private
+
+        def dir_in_scope(dir, scope = :local)
+          prefix = scope == :target ? "/" : Installation.destdir
+          Pathname.new(prefix).join(dir)
+        end
+
+        def create_work_dir
+          tmpdir = File.join(Installation.destdir, "var", "tmp")
+          local_tmpdir = Pathname(Dir.mktmpdir("yast_cm_", tmpdir))
+          local_tmpdir.relative_path_from(Pathname.new(Installation.destdir))
         end
       end
     end

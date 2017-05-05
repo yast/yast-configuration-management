@@ -10,7 +10,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
   let(:master) { "myserver" }
   let(:states_url) { "https://yast.example.net/mystates.tgz" }
   let(:pillar_url) { "https://yast.example.net/mypillar.tgz" }
-  let(:work_dir) { Pathname("/tmp/config") }
+  let(:tmpdir) { "/mnt/var/tmp/workdir" }
   let(:keys_url) { "https://yast.example.net/keys" }
 
   let(:config) do
@@ -18,11 +18,15 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      work_dir,
       states_url:    states_url,
       pillar_url:    pillar_url,
       keys_url:      keys_url
     )
+  end
+
+  before do
+    allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
+    allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
   end
 
   describe "#packages" do
@@ -59,8 +63,8 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
       it "retrieves authentication keys" do
         expect(key_finder).to receive(:fetch_to)
-          .with(Pathname("/etc/salt/pki/minion/minion.pem"),
-            Pathname("/etc/salt/pki/minion/minion.pub"))
+          .with(Pathname("/mnt/etc/salt/pki/minion/minion.pem"),
+            Pathname("/mnt/etc/salt/pki/minion/minion.pub"))
         configurator.prepare
       end
     end
@@ -80,9 +84,9 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
       it "retrieves the Salt states" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(states_url), work_dir)
+          .with(URI(states_url), config.work_dir)
         expect(configurator).to receive(:fetch_config)
-          .with(URI(pillar_url), work_dir.join("pillar"))
+          .with(URI(pillar_url), config.work_dir.join("pillar"))
         configurator.prepare
       end
 
@@ -95,7 +99,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
       it "sets file_roots in the minion's configuration" do
         expect(minion_config).to receive(:set_file_roots)
-          .with([config.states_root, config.formulas_root])
+          .with([config.states_root(:target), config.formulas_root(:target)])
         configurator.prepare
       end
     end

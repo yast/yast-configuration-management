@@ -33,22 +33,22 @@ module Yast
         # Return path to the Salt states directory
         #
         # @return [Pathname] Path to Salt states
-        def states_root
-          work_dir.join("salt")
+        def states_root(scope = :local)
+          work_dir(scope).join("salt")
         end
 
         # Return path to the Salt pillar directory
         #
         # @return [Pathname] Path to Salt pillars
-        def pillar_root
-          work_dir.join("pillar")
+        def pillar_root(scope = :local)
+          work_dir(scope).join("pillar")
         end
 
         # Return path to the Salt pillar directory
         #
         # @return [Pathname] Path to Salt pillars
-        def formulas_root
-          work_dir.join("formulas")
+        def formulas_root(scope = :local)
+          work_dir(scope).join("formulas")
         end
       end
     end

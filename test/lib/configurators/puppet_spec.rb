@@ -13,6 +13,7 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
   let(:mode) { :client }
   let(:keys_url) { "https://yast.example.net/keys" }
   let(:modules_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:tmpdir) { "/mnt/var/tmp/workdir" }
   let(:work_dir) { "/tmp/config" }
   let(:hostname) { "myclient" }
 
@@ -21,10 +22,14 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      work_dir,
       modules_url:   modules_url,
       keys_url:      keys_url
     )
+  end
+
+  before do
+    allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
+    allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
   end
 
   describe "#packages" do
@@ -70,7 +75,7 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
 
       it "retrieves the Puppet modules" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(modules_url), work_dir)
+          .with(URI(modules_url), config.work_dir(:local))
         configurator.prepare
       end
     end

@@ -62,7 +62,7 @@ module Yast
           if config.master.is_a?(::String)
             config_file.master = config.master
           else
-            config_file.set_file_roots([config.states_root, config.formulas_root])
+            config_file.set_file_roots([config.states_root(:target), config.formulas_root(:target)])
           end
           config_file.save
         end
