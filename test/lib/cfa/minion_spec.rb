@@ -80,5 +80,23 @@ describe Yast::ConfigurationManagement::CFA::Minion do
         end
       end
     end
+
+    describe "#exist?" do
+      context "when the file exists" do
+        let(:path) { EXAMPLE_PATH }
+
+        it "returns true" do
+          expect(config.exist?).to eq(true)
+        end
+      end
+
+      context "when the file exists" do
+        let(:path) { FIXTURES_PATH.join("non-existent") }
+
+        it "returns false" do
+          expect(config.exist?).to eq(false)
+        end
+      end
+    end
   end
 end

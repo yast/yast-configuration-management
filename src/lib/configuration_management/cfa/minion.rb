@@ -55,11 +55,20 @@ module Yast
           super
         end
 
+        # Determine whether the configuration file exists or not
+        #
+        # @return [Boolean] true if the file exists; false otherwise.
+        def exist?
+          File.exist?(@file_path)
+        end
+
       private
 
         # Create the parent directory if it does not exist
         def create_directory_if_needed
-          ::FileUtils.mkdir_p(File.dirname(@file_path))
+          dirname = File.dirname(@file_path)
+          return if Yast::FileUtils.Exists(dirname)
+          SCR.Execute(Yast::Path.new(".target.mkdir"), dirname)
         end
       end
     end

@@ -17,7 +17,7 @@ module Yast
         mode(:masterless) do
           fetch_config(config.states_url, config.work_dir) if config.states_url
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
-          overwrite_configuration
+          update_configuration
           Yast::WFM.CallFunction("configuration_management_formula",
             [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
         end
@@ -50,25 +50,20 @@ module Yast
 
         # Update the minion's configuration file
         #
-        # At this time, only the master server is handled.
+        # When running in master/client mode, sets the master hostname.
+        # Otherwise, sets the file_roots.
         #
         # @see Yast::ConfigurationManagement::Configurators::Base#update_configuration
         # @see #master
         def update_configuration
-          return unless config.master.is_a?(::String)
           log.info "Updating minion configuration file"
           config_file = CFA::Minion.new
-          config_file.load
-          config_file.master = config.master
-          config_file.save
-        end
-
-        # Update the minion's configuration file in
-        # /etc/salt/minion.d/yast-configuration-management.conf
-        def overwrite_configuration
-          config_file = CFA::Minion.new
-          config_file.load
-          config_file.set_file_roots([config.states_root, config.formulas_root])
+          config_file.load if config_file.exist?
+          if config.master.is_a?(::String)
+            config_file.master = config.master
+          else
+            config_file.set_file_roots([config.states_root, config.formulas_root])
+          end
           config_file.save
         end
 

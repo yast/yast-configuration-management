@@ -43,7 +43,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
   describe "#prepare" do
     context "when running in client mode" do
-      let(:minion_config) { double("minion", load: true, save: true) }
+      let(:minion_config) { double("minion", load: true, save: true, exist?: false) }
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
@@ -67,7 +67,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
 
     context "when running in masterless" do
       let(:master) { nil }
-      let(:minion_config) { double("minion", load: true, save: true) }
+      let(:minion_config) { double("minion", load: true, save: true, exist?: false) }
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
