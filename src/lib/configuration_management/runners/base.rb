@@ -59,7 +59,9 @@ module Yast
         def run(stdout = nil, stderr = nil)
           stdout ||= $stdout
           stderr ||= $stderr
-          send("run_#{config.mode}_mode", stdout, stderr)
+          without_zypp_lock do
+            send("run_#{config.mode}_mode", stdout, stderr)
+          end
         end
 
       protected
@@ -110,6 +112,21 @@ module Yast
           true
         rescue Cheetah::ExecutionFailed
           false
+        end
+
+        # zypp lock file
+        ZYPP_PID = Pathname("/mnt/var/run/zypp.pid")
+        # zypp lock backup file
+        ZYPP_PID_BACKUP = ZYPP_PID.sub_ext(".save")
+
+        # Run a block without the zypp lock
+        #
+        # @param [Proc] Block to run
+        def without_zypp_lock(&block)
+          ::FileUtils.mv(ZYPP_PID, ZYPP_PID_BACKUP) if ZYPP_PID.exist?
+          block.call
+        ensure
+          ::FileUtils.mv(ZYPP_PID_BACKUP, ZYPP_PID) if ZYPP_PID_BACKUP.exist?
         end
       end
     end

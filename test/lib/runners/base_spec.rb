@@ -28,6 +28,9 @@ describe Yast::ConfigurationManagement::Runners::Base do
   end
 
   describe "#run" do
+    let(:zypp_pid) { described_class.const_get("ZYPP_PID") }
+    let(:zypp_pid_backup) { described_class.const_get("ZYPP_PID_BACKUP") }
+
     context "when a known mode is specified" do
       let(:mode) { :masterless }
 
@@ -41,6 +44,20 @@ describe Yast::ConfigurationManagement::Runners::Base do
 
       it "raises a" do
         expect { runner.run }.to raise_error(NoMethodError)
+      end
+    end
+
+    context "when zypp is locked" do
+      before do
+        allow(zypp_pid).to receive(:exist?).and_return(true)
+        allow(zypp_pid_backup).to receive(:exist?).and_return(true)
+        allow(runner).to receive(:run_masterless_mode)
+      end
+
+      it "moves and restores the zypp lock" do
+        expect(::FileUtils).to receive(:mv).with(zypp_pid, zypp_pid_backup)
+        expect(::FileUtils).to receive(:mv).with(zypp_pid_backup, zypp_pid)
+        runner.run
       end
     end
   end
