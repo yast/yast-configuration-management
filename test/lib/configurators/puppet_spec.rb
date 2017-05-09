@@ -77,8 +77,8 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
 
       it "retrieves the authentication keys" do
         expect(key_finder).to receive(:fetch_to)
-          .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
-            Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
+          .with(Pathname("/mnt/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
+            Pathname("/mnt/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
         configurator.prepare
       end
     end

@@ -15,8 +15,8 @@ module Yast
       class Puppet < Base
         include Yast::Logger
 
-        PRIVATE_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/private_keys").freeze
-        PUBLIC_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/public_keys").freeze
+        PRIVATE_KEY_BASE_PATH = "/var/lib/puppet/ssl/private_keys".freeze
+        PUBLIC_KEY_BASE_PATH = "/var/lib/puppet/ssl/public_keys".freeze
 
         mode(:masterless) do
           update_configuration
@@ -63,14 +63,16 @@ module Yast
         #
         # @return [Pathname] Path to private key
         def private_key_path
-          PRIVATE_KEY_BASE_PATH.join("#{hostname}.pem")
+          Pathname(::File.join(Yast::Installation.destdir, PRIVATE_KEY_BASE_PATH))
+            .join("#{hostname}.pem")
         end
 
         # Return path to public key
         #
         # @return [Pathname] Path to public_key
         def public_key_path
-          PUBLIC_KEY_BASE_PATH.join("#{hostname}.pem")
+          Pathname(File.join(Yast::Installation.destdir, PUBLIC_KEY_BASE_PATH))
+            .join("#{hostname}.pem")
         end
 
         # Return FQDN
