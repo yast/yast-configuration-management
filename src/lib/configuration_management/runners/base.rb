@@ -7,6 +7,8 @@ Yast.import "Installation"
 module Yast
   module ConfigurationManagement
     module Runners
+      class UnknownRunner < StandardError; end
+
       # A runner is a class which takes care of using a provisioner (Salt, Puppet, etc.)
       # to configure the system.
       class Base
@@ -31,7 +33,7 @@ module Yast
             require "configuration_management/runners/#{type}"
             Yast::ConfigurationManagement::Runners.const_get type.capitalize
           rescue NameError, LoadError
-            raise "Runner for '#{type}' not found"
+            raise UnknownRunner, "Runner for '#{type}' not found"
           end
         end
 

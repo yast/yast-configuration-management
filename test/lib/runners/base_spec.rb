@@ -22,7 +22,8 @@ describe Yast::ConfigurationManagement::Runners::Base do
       end
 
       it "raises an error" do
-        expect { Yast::ConfigurationManagement::Runners::Base.for(config) }.to raise_error
+        expect { Yast::ConfigurationManagement::Runners::Base.for(config) }
+          .to raise_error(Yast::ConfigurationManagement::Runners::UnknownRunner)
       end
     end
   end
