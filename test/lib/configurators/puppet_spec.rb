@@ -32,8 +32,25 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
   end
 
   describe "#packages" do
-    it "returns a hash containing only the 'puppet' package" do
-      expect(configurator.packages).to eq("install" => ["puppet"])
+    before do
+      allow(Yast::Pkg).to receive(:PkgQueryProvides).with("puppet")
+        .and_return(candidates)
+    end
+
+    context "when a package which provides 'puppet' is found" do
+      let(:candidates) { [["puppet-package", :CAND, :NONE]] }
+
+      it "returns a hash containing the package" do
+        expect(configurator.packages).to eq("install" => ["puppet-package"])
+      end
+    end
+
+    context "when a package which provides 'puppet' is not found" do
+      let(:candidates) { [] }
+
+      it "returns an empty hash" do
+        expect(configurator.packages).to eq({})
+      end
     end
   end
 

@@ -4,6 +4,8 @@ require "configuration_management/cfa/puppet"
 require "configuration_management/configurators/base"
 require "pathname"
 
+Yast.import "Pkg"
+
 module Yast
   module ConfigurationManagement
     module Configurators
@@ -11,6 +13,8 @@ module Yast
       #
       # This class is responsible for configuring Pupppet before running it.
       class Puppet < Base
+        include Yast::Logger
+
         PRIVATE_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/private_keys").freeze
         PUBLIC_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/public_keys").freeze
 
@@ -30,7 +34,12 @@ module Yast
         #
         # @return [Hash] Packages to install/remove
         def packages
-          { "install" => ["puppet"] }
+          candidates = Yast::Pkg.PkgQueryProvides("puppet")
+          if candidates.empty?
+            log.warn "A package providing 'puppet' was not found"
+            return {}
+          end
+          { "install" => Array(candidates[0][0]) }
         end
 
       private
