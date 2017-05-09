@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Tue May  9 14:07:13 UTC 2017 - igonzalezsosa@suse.com
+
+- Fix masterless mode (bsc#1038290)
+- Fix Puppet package installation
+- Handle libzypp's lock to allow installation of packages
+  through Salt/Puppet
+- Do not write configuration to disk as it is not needed anymore
+- Version 0.3.2
+
+-------------------------------------------------------------------
 Wed Apr 12 17:04:38 CEST 2017 - schubi@suse.de
 
 - Enable port support for downloading files (e.g. keys)
