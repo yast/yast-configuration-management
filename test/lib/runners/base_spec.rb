@@ -22,14 +22,28 @@ describe Yast::ConfigurationManagement::Runners::Base do
       end
 
       it "raises an error" do
-        expect { Yast::ConfigurationManagement::Runners::Base.for(config) }.to raise_error
+        expect { Yast::ConfigurationManagement::Runners::Base.for(config) }
+          .to raise_error(Yast::ConfigurationManagement::Runners::UnknownRunner)
       end
     end
   end
 
   describe "#run" do
+    let(:zypp_pid) { Pathname.new("/mnt/var/run/zypp.pid") }
+    let(:zypp_pid_backup) { Pathname.new("/mnt/var/run/zypp.save") }
+
+    before do
+      allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
+      allow(File).to receive(:exist?).and_call_original
+    end
+
     context "when a known mode is specified" do
       let(:mode) { :masterless }
+
+      it "tries to run the mode" do
+        expect(runner).to receive(:run_masterless_mode)
+        runner.run
+      end
 
       it "raises a NotImplementedError error" do
         expect { runner.run }.to raise_error(NotImplementedError)
@@ -39,8 +53,58 @@ describe Yast::ConfigurationManagement::Runners::Base do
     context "when a unknown mode is specified" do
       let(:mode) { :unknown }
 
-      it "raises a" do
+      it "raises a NotMethodError" do
         expect { runner.run }.to raise_error(NoMethodError)
+      end
+    end
+
+    context "when zypp is locked" do
+      before do
+        allow(File).to receive(:exist?).with(zypp_pid).and_return(true)
+        allow(File).to receive(:exist?).with(zypp_pid_backup).and_return(false, true)
+        allow(runner).to receive(:run_masterless_mode)
+      end
+
+      it "backups/restores the zypp lock" do
+        expect(FileUtils).to receive(:mv).with(zypp_pid, zypp_pid_backup)
+        expect(FileUtils).to receive(:mv).with(zypp_pid_backup, zypp_pid)
+        runner.run
+      end
+
+      it "tries to run the mode" do
+        allow(FileUtils).to receive(:mv)
+        expect(runner).to receive(:run_masterless_mode)
+        runner.run
+      end
+    end
+
+    context "when zypp is already temporarily unlocked" do
+      before do
+        allow(File).to receive(:exist?).with(zypp_pid_backup).and_return(true)
+      end
+
+      it "raises an exception" do
+        expect { runner.run }
+          .to raise_error(Yast::ConfigurationManagement::Runners::Base::WithoutZyppLockNotAllowed)
+      end
+    end
+
+    context "when zypp is not locked" do
+      before do
+        allow(File).to receive(:exist?).with(zypp_pid).and_return(false)
+        allow(File).to receive(:exist?).with(zypp_pid_backup).and_return(false)
+        allow(runner).to receive(:run_masterless_mode)
+      end
+
+      it "does not try to backup/restore the zypp lock" do
+        expect(FileUtils).to_not receive(:mv)
+        runner.run
+      end
+
+      it "tries to run the mode" do
+        allow(FileUtils).to receive(:mv)
+        expect(runner).to receive(:run_masterless_mode)
+        runner.run
       end
     end
   end

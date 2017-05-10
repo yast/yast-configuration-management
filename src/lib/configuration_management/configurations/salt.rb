@@ -7,7 +7,7 @@ module Yast
       # using Salt.
       #
       # It extends the Configurations::Base class with some
-      # custom attributes (@see #states_url).
+      # custom attributes (@see #states_url and #pillar_url).
       class Salt < Base
         # @return [URI,nil] Location of Salt states
         attr_reader :states_url
@@ -23,32 +23,25 @@ module Yast
           @pillar_url = URI(options[:pillar_url]) if options[:pillar_url]
         end
 
-        # Return an array of exportable attributes
-        #
-        # @return [Array<Symbol>] Attribute names
-        def attributes
-          @attributes ||= super + [:states_url, :pillar_url]
-        end
-
         # Return path to the Salt states directory
         #
         # @return [Pathname] Path to Salt states
-        def states_root
-          work_dir.join("salt")
+        def states_root(scope = :local)
+          work_dir(scope).join("salt")
         end
 
         # Return path to the Salt pillar directory
         #
         # @return [Pathname] Path to Salt pillars
-        def pillar_root
-          work_dir.join("pillar")
+        def pillar_root(scope = :local)
+          work_dir(scope).join("pillar")
         end
 
         # Return path to the Salt pillar directory
         #
         # @return [Pathname] Path to Salt pillars
-        def formulas_root
-          work_dir.join("formulas")
+        def formulas_root(scope = :local)
+          work_dir(scope).join("formulas")
         end
       end
     end

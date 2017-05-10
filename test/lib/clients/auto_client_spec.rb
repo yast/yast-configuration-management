@@ -15,7 +15,6 @@ describe Yast::ConfigurationManagement::AutoClient do
   before do
     allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:for).with(profile)
       .and_return(config)
-    allow(config).to receive(:save)
   end
 
   describe "#import" do
@@ -25,11 +24,6 @@ describe Yast::ConfigurationManagement::AutoClient do
       client.import(profile)
       expect(Yast::ConfigurationManagement::Configurators::Base.current)
         .to be_kind_of(Yast::ConfigurationManagement::Configurators::Salt)
-    end
-
-    it "saves the module configuration to be used after 2nd stage" do
-      expect(config).to receive(:save)
-      client.import(profile)
     end
   end
 
@@ -42,19 +36,6 @@ describe Yast::ConfigurationManagement::AutoClient do
 
     it "returns provider list of packages" do
       expect(client.packages).to eq(packages)
-    end
-  end
-
-  describe "#write" do
-    before do
-      allow(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
-        .with(config).and_return(configurator)
-      client.import(profile)
-    end
-
-    it "delegates writing to current configurator" do
-      expect(configurator).to receive(:prepare)
-      client.write
     end
   end
 

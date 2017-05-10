@@ -33,7 +33,7 @@ module Yast
         def run_masterless_mode(stdout, stderr)
           with_retries(config.auth_attempts, config.auth_time_out) do
             run_cmd("salt-call", "--log-level", "debug", "--local",
-              "--pillar-root=#{config.pillar_root}", "state.highstate",
+              "--pillar-root=#{config.pillar_root(:target)}", "state.highstate",
               stdout: stdout, stderr: stderr)
           end
         end

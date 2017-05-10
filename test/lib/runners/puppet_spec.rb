@@ -9,10 +9,14 @@ describe Yast::ConfigurationManagement::Runners::Puppet do
 
   let(:mode) { :masterless }
   let(:master) { "puppet.suse.de" }
-  let(:work_dir) { config.work_dir }
+  let(:tmpdir) { "/mnt/tmp/yast_cm" }
 
   let(:config) do
     Yast::ConfigurationManagement::Configurations::Puppet.new(master: master)
+  end
+
+  before do
+    allow(Dir).to receive(:mktmpdir).and_return(tmpdir)
   end
 
   describe "#run" do
@@ -46,8 +50,8 @@ describe Yast::ConfigurationManagement::Runners::Puppet do
 
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "puppet", "apply", "--modulepath", work_dir.join("modules").to_s,
-          work_dir.join("manifests", "site.pp").to_s, "--debug",
+          "puppet", "apply", "--modulepath", config.work_dir(:target).join("modules").to_s,
+          config.work_dir(:target).join("manifests", "site.pp").to_s, "--debug",
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)

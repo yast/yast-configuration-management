@@ -13,6 +13,7 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
   let(:mode) { :client }
   let(:keys_url) { "https://yast.example.net/keys" }
   let(:modules_url) { "https://yast.example.net/myconfig.tgz" }
+  let(:tmpdir) { "/mnt/var/tmp/workdir" }
   let(:work_dir) { "/tmp/config" }
   let(:hostname) { "myclient" }
 
@@ -21,15 +22,35 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
-      work_dir:      work_dir,
       modules_url:   modules_url,
       keys_url:      keys_url
     )
   end
 
+  before do
+    allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
+  end
+
   describe "#packages" do
-    it "returns a hash containing only the 'puppet' package" do
-      expect(configurator.packages).to eq("install" => ["puppet"])
+    before do
+      allow(Yast::Pkg).to receive(:PkgQueryProvides).with("puppet")
+        .and_return(candidates)
+    end
+
+    context "when a package which provides 'puppet' is found" do
+      let(:candidates) { [["puppet-package", :CAND, :NONE]] }
+
+      it "returns a hash containing the package" do
+        expect(configurator.packages).to eq("install" => ["puppet-package"])
+      end
+    end
+
+    context "when a package which provides 'puppet' is not found" do
+      let(:candidates) { [] }
+
+      it "returns an empty hash" do
+        expect(configurator.packages).to eq({})
+      end
     end
   end
 
@@ -41,6 +62,7 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
       allow(Yast::ConfigurationManagement::CFA::Puppet).to receive(:new).and_return(puppet_config)
       allow(puppet_config).to receive(:server=)
       allow(Yast::Hostname).to receive(:CurrentFQ).and_return(hostname)
+      allow(FileUtils).to receive(:mkdir_p)
     end
 
     context "when running in client mode" do
@@ -55,8 +77,8 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
 
       it "retrieves the authentication keys" do
         expect(key_finder).to receive(:fetch_to)
-          .with(Pathname("/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
-            Pathname("/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
+          .with(Pathname("/mnt/var/lib/puppet/ssl/private_keys/#{hostname}.pem"),
+            Pathname("/mnt/var/lib/puppet/ssl/public_keys/#{hostname}.pem"))
         configurator.prepare
       end
     end
@@ -70,7 +92,7 @@ describe Yast::ConfigurationManagement::Configurators::Puppet do
 
       it "retrieves the Puppet modules" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(modules_url), work_dir)
+          .with(URI(modules_url), config.work_dir(:local))
         configurator.prepare
       end
     end

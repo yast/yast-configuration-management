@@ -4,6 +4,8 @@ require "configuration_management/cfa/puppet"
 require "configuration_management/configurators/base"
 require "pathname"
 
+Yast.import "Pkg"
+
 module Yast
   module ConfigurationManagement
     module Configurators
@@ -11,8 +13,10 @@ module Yast
       #
       # This class is responsible for configuring Pupppet before running it.
       class Puppet < Base
-        PRIVATE_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/private_keys").freeze
-        PUBLIC_KEY_BASE_PATH = Pathname("/var/lib/puppet/ssl/public_keys").freeze
+        include Yast::Logger
+
+        PRIVATE_KEY_BASE_PATH = "/var/lib/puppet/ssl/private_keys".freeze
+        PUBLIC_KEY_BASE_PATH = "/var/lib/puppet/ssl/public_keys".freeze
 
         mode(:masterless) do
           update_configuration
@@ -30,7 +34,12 @@ module Yast
         #
         # @return [Hash] Packages to install/remove
         def packages
-          { "install" => ["puppet"] }
+          candidates = Yast::Pkg.PkgQueryProvides("puppet")
+          if candidates.empty?
+            log.warn "A package providing 'puppet' was not found"
+            return {}
+          end
+          { "install" => Array(candidates[0][0]) }
         end
 
       private
@@ -54,14 +63,16 @@ module Yast
         #
         # @return [Pathname] Path to private key
         def private_key_path
-          PRIVATE_KEY_BASE_PATH.join("#{hostname}.pem")
+          Pathname(::File.join(Yast::Installation.destdir, PRIVATE_KEY_BASE_PATH))
+            .join("#{hostname}.pem")
         end
 
         # Return path to public key
         #
         # @return [Pathname] Path to public_key
         def public_key_path
-          PUBLIC_KEY_BASE_PATH.join("#{hostname}.pem")
+          Pathname(File.join(Yast::Installation.destdir, PUBLIC_KEY_BASE_PATH))
+            .join("#{hostname}.pem")
         end
 
         # Return FQDN

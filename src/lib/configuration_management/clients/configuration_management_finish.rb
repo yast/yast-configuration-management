@@ -25,12 +25,8 @@ module Yast
       #                                otherwise it returns false.
       def write
         log.info("Provisioning Configuration Management")
-        config = Yast::ConfigurationManagement::Configurations::Base.load
-        return true unless config # No configuration has been done
-        configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
         configurator.prepare if configurator
         # saving settings to target system
-        config.secure_save
         Yast::ConfigurationManagement::Clients::Provision.new.run
 
         # enabling services
@@ -47,6 +43,16 @@ module Yast
 
       def title
         _("Provisioning Configuration Management ...")
+      end
+
+    private
+
+      def configurator
+        @configurator ||= Yast::ConfigurationManagement::Configurators::Base.current
+      end
+
+      def config
+        @config ||= Yast::ConfigurationManagement::Configurations::Base.current
       end
     end
   end

@@ -7,6 +7,8 @@ Yast.import "Installation"
 module Yast
   module ConfigurationManagement
     module Runners
+      class UnknownRunner < StandardError; end
+
       # A runner is a class which takes care of using a provisioner (Salt, Puppet, etc.)
       # to configure the system.
       class Base
@@ -31,7 +33,7 @@ module Yast
             require "configuration_management/runners/#{type}"
             Yast::ConfigurationManagement::Runners.const_get type.capitalize
           rescue NameError, LoadError
-            raise "Runner for '#{type}' not found"
+            raise UnknownRunner, "Runner for '#{type}' not found"
           end
         end
 
@@ -59,7 +61,9 @@ module Yast
         def run(stdout = nil, stderr = nil)
           stdout ||= $stdout
           stderr ||= $stderr
-          send("run_#{config.mode}_mode", stdout, stderr)
+          without_zypp_lock do
+            send("run_#{config.mode}_mode", stdout, stderr)
+          end
         end
 
       protected
@@ -110,6 +114,50 @@ module Yast
           true
         rescue Cheetah::ExecutionFailed
           false
+        end
+
+        # We're not supposed to call without_zypp_lock recursively.
+        # In that case, we raise an exception to be safe.
+        class WithoutZyppLockNotAllowed < StandardError; end
+
+        # Run a block without the zypp lock
+        #
+        # You could consider this a hack and it should be used carefully.
+        #
+        # In this case, this behaviour is needed in order to be able to install
+        # packages using a provisioner (Salt, Puppet, etc.). The reason is that
+        # libzypp is locked and it won't be released until YaST finishes (too late).
+        #
+        # @param [Proc] Block to run
+        # @see WithouthZyppLockNotAllowed
+        def without_zypp_lock(&block)
+          raise WithoutZyppLockNotAllowed if File.exist?(zypp_pid_backup)
+          begin
+            if File.exist?(zypp_pid)
+              log.info "Backing up #{zypp_pid} into #{zypp_pid_backup}"
+              ::FileUtils.mv(zypp_pid, zypp_pid_backup) if File.exist?(zypp_pid)
+            end
+            block.call
+          ensure
+            if File.exist?(zypp_pid_backup)
+              log.info "Restoring #{zypp_pid} from #{zypp_pid_backup}"
+              ::FileUtils.mv(zypp_pid_backup, zypp_pid)
+            end
+          end
+        end
+
+        # Return the libzypp lock file
+        #
+        # @return [Pathname] Absolute path to zypp.pid
+        def zypp_pid
+          @zypp_pid ||= Pathname.new(Installation.destdir).join("var", "run", "zypp.pid")
+        end
+
+        # Return the libzypp backup lock file
+        #
+        # @return [Pathname] Absolute path to zypp.pid backup file
+        def zypp_pid_backup
+          @zypp_pid_backup ||= zypp_pid.sub_ext(".save")
         end
       end
     end

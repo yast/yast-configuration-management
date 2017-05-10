@@ -1,8 +1,10 @@
 require "yaml"
 require "pathname"
 require "tmpdir"
+require "uri"
 
 Yast.import "Installation"
+Yast.import "Directory"
 
 module Yast
   module ConfigurationManagement
@@ -32,18 +34,14 @@ module Yast
         attr_reader :enable_services
 
         class << self
-          # Load configuration from a file
+          # @return [Base] Current configuration
+          attr_accessor :current
+
+          # Import settings from an AutoYaST profile
           #
-          # If not specified, the DEFAULT_PATH is used.
-          #
-          # @return [Pathname] File path
-          # @return [Config] Configuration
-          #
-          # @see DEFAULT_PATH
-          def load(path = DEFAULT_PATH)
-            return false unless path.exist?
-            content = YAML.load_file(path)
-            class_for(content[:type]).new(content)
+          # @param profile [Hash] Configuration management settings from profile
+          def import(profile)
+            self.current = self.for(profile)
           end
 
           def for(config)
@@ -62,7 +60,6 @@ module Yast
           symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
           @master           = symbolized_opts[:master]
           @mode             = @master ? :client : :masterless
-          @work_dir         = symbolized_opts[:work_dir]
           @keys_url         = URI(symbolized_opts[:keys_url]) if symbolized_opts[:keys_url]
           @auth_attempts    = symbolized_opts[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
           @auth_time_out    = symbolized_opts[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
@@ -74,54 +71,24 @@ module Yast
           nil
         end
 
-        # Return an array of exportable attributes
-        #
-        # @return [Array<Symbol>] Attribute names
-        def attributes
-          @attributes ||= %i(type mode master auth_attempts auth_time_out keys_url work_dir
-                             enable_services)
-        end
-
-        # Save configuration to the given file
-        #
-        # @param path [Pathname] Path to file
-        def save(path = DEFAULT_PATH)
-          # The information will be written to inst-sys only. So we do not
-          # have to take care about secure data.
-          File.open(path, "w+") { |f| f.puts to_hash.to_yaml }
-        end
-
-        # Save configuration to target system. Filter out all
-        # sensible data.
-        # @param path [Pathname] Path to file
-        def secure_save(path = DEFAULT_PATH)
-          File.open(::File.join(Yast::Installation.destdir, path), "w+") do |f|
-            f.puts to_secure_hash.to_yaml
-          end
-        end
-
-        # Return configuration values in a hash
-        #
-        # @return [Hash] Configuration values
-        def to_hash
-          attributes.each_with_object({}) do |key, memo|
-            value = send(key)
-            memo[key] = value unless value.nil?
-          end
-        end
-
-        # Return configuration values in a hash but filtering sensible information
-        #
-        # @return [Hash] Configuration values filtering sensible information.
-        def to_secure_hash
-          to_hash.reject { |k| k.to_s.end_with?("_url") }
-        end
-
         # Return a path to a temporal directory to extract states/pillars
         #
+        # @param  [Symbol] Path relative to inst-sys (:local) or the target system (:target)
         # @return [String] Path name to the temporal directory
-        def work_dir
-          @work_dir ||= Pathname(Dir.mktmpdir)
+        def work_dir(scope = :local)
+          @work_dir ||= build_work_dir_name
+          prefix = (scope == :target) ? "/" : Installation.destdir
+          Pathname.new(prefix).join(@work_dir)
+        end
+
+      private
+
+        # Build a path to be used as work_dir
+        #
+        # @return [Pathname] Relative work_dir path
+        def build_work_dir_name
+          path = Pathname.new(Directory.vardir).join("cm-#{Time.now.strftime("%Y%m%d%H%M")}")
+          path.relative_path_from(Pathname.new("/"))
         end
       end
     end

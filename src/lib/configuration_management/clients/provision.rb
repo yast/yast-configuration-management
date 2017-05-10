@@ -6,6 +6,8 @@ require "configuration_management/configurations/base"
 module Yast
   module ConfigurationManagement
     module Clients
+      # TODO: move this code to the finish client
+
       # This client takes care of running the provisioning in order to configure the system.
       # The real work is implemented by runners.
       #
@@ -36,7 +38,7 @@ module Yast
         #
         # @return [Yast::ConfigurationManagement::Config] Module configuration
         def config
-          @config ||= Yast::ConfigurationManagement::Configurations::Base.load
+          @config ||= Yast::ConfigurationManagement::Configurations::Base.current
         end
       end
     end
