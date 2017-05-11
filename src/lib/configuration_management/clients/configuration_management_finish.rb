@@ -24,8 +24,9 @@ module Yast
       # @return [TrueClass,FalseClass] True if configurations have been written;
       #                                otherwise it returns false.
       def write
+        return if config.nil?
         log.info("Provisioning Configuration Management")
-        configurator.prepare if configurator
+        configurator.prepare
         # saving settings to target system
         Yast::ConfigurationManagement::Clients::Provision.new.run
 
