@@ -43,6 +43,10 @@ describe Yast::ConfigurationManagement::ConfigurationManagementFinish do
         expect(provision_client).to receive(:run)
         client.write
       end
+
+      it "returns true" do
+        expect(client.write).to eq(true)
+      end
     end
 
     context "when 'enable_services' option is set to true" do
