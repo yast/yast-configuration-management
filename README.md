@@ -1,5 +1,14 @@
 # YaST Configuration Management
 
+[![Build Status](https://travis-ci.org/yast/yast-configuration-management.svg?branch=master)](
+  https://travis-ci.org/yast/yast-configuration-management)
+[![Coverage Status](https://coveralls.io/repos/github/yast/yast-configuration-management/badge.svg?branch=master)](
+  https://coveralls.io/github/yast/yast-configuration-management?branch=master)
+[![Code Climate](https://codeclimate.com/github/yast/yast-configuration-management/badges/gpa.svg)](
+  https://codeclimate.com/github/yast/yast-configuration-management)
+[![Issue Count](https://codeclimate.com/github/yast/yast-configuration-management/badges/issue_count.svg)](
+  https://codeclimate.com/github/yast/yast-configuration-management/issues)
+
 This module allows AutoYaST2 to delegate part of the configuration to a
 [Software Configuration Management](https://en.wikipedia.org/wiki/Software_configuration_management)
 system. Salt and Puppet are supported.
