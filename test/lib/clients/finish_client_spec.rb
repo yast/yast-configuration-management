@@ -26,8 +26,8 @@ describe Yast::ConfigurationManagement::ConfigurationManagementFinish do
         expect(provision_client).to_not receive(:run)
       end
 
-      it "returns nil" do
-        expect(client.write).to be_nil
+      it "returns false" do
+        expect(client.write).to eq(false)
       end
     end
 
