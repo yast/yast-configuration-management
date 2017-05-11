@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu May 11 14:46:33 UTC 2017 - igonzalezsosa@suse.com
+
+- Do not try to run the provisioner if no configuration was
+  specified (bsc#1038630)
+- Version 0.3.3
+
+-------------------------------------------------------------------
 Tue May  9 14:07:13 UTC 2017 - igonzalezsosa@suse.com
 
 - Fix masterless mode (bsc#1038290)
