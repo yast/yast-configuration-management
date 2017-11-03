@@ -2,6 +2,8 @@ require "cfa/base_model"
 require "cfa/matcher"
 require "configuration_management/cfa/yaml_parser"
 
+Yast.import "FileUtils"
+
 module Yast
   module ConfigurationManagement
     module CFA

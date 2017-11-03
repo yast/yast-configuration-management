@@ -1,4 +1,5 @@
 Yast.import "CWM"
+require "cwm/custom_widget"
 
 module Yast
   module ConfigurationManagement
