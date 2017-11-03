@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Nov  3 14:22:39 UTC 2017 - igonzalezsosa@suse.com
+
+- Fix textdomain on ConfigurationManagementFinish client
+  (bsc#1066427)
+- Version 4.0.0
+
+-------------------------------------------------------------------
 Thu May 11 14:46:33 UTC 2017 - igonzalezsosa@suse.com
 
 - Do not try to run the provisioner if no configuration was
