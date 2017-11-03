@@ -15,7 +15,7 @@ module Yast
       include Yast::I18n
 
       def initialize
-        textdomain "installation"
+        textdomain "configuration_management"
       end
 
       # Writes configuration
