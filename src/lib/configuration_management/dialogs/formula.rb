@@ -18,6 +18,7 @@ module Yast
         INT_MIN = -INT_MAX - 1
 
         def initialize(formula)
+          textdomain "configuration_management"
           self.formula = formula
           self.current_group = ".#{formula.form.keys.first}"
         end
