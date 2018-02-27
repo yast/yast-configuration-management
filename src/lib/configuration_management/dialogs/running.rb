@@ -125,6 +125,7 @@ module Yast
         #
         # @return [Yast::Term] Content
         def dialog_content
+          textdomain "configuration_management"
           Yast.import "Label"
           HBox(
             VSpacing(20),
