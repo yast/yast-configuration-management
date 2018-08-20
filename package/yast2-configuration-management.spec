@@ -37,7 +37,7 @@ Requires:       yast2-installation
 BuildArch:      noarch
 
 Summary:        YaST2 - YaST Configuration Management
-License:        GPL-2.0
+License:        GPL-2.0-only
 Group:          System/YaST
 
 %description
@@ -61,7 +61,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/*.desktop
 
 %dir %{yast_docdir}
-%doc %{yast_docdir}/COPYING
+%license %{yast_docdir}/COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/CONTRIBUTING.md
 
