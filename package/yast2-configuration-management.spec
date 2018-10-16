@@ -61,7 +61,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/*.desktop
 
 %dir %{yast_docdir}
-%license %{yast_docdir}/COPYING
+%license COPYING
 %doc %{yast_docdir}/README.md
 %doc %{yast_docdir}/CONTRIBUTING.md
 
