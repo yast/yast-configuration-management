@@ -2,6 +2,7 @@
 Tue Oct 16 14:01:15 CEST 2018 - schubi@suse.de
 
 - Fixed path to license file.
+  Needed to build fix for bsc#1083015 again.
 - 4.0.3
 
 -------------------------------------------------------------------
