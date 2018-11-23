@@ -1,0 +1,107 @@
+---
+# JSON Schema[1] for Salt Forms[2]
+# 1: http://json-schema.org/
+# 2: https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html#best.practice.salt.formulas.pillar
+#
+# (The schema is named JSON but it really only cares about structure,
+# so we write both this schema and the validated instances (form.yml) in YAML)
+#
+# The purpose of this schema is to formalize the specification and discover
+# any inconsistencies between the existing documentation and implementations
+#
+# Note about dollars($):
+# JSON schema uses these keywords starting with $:
+# $schema, $id, $ref, $comment.
+# The others (such as $type) are part of the Salt Form vocabulary
+#
+"$schema": "http://json-schema.org/draft-07/schema#"
+"$id": http://yast.opensuse.org/salt-form-01.schema.json
+title: SaltStack Form
+description: Form UI for SaltStack Formulas
+type: object
+
+patternProperties:
+  # any properties not starting with a dollar"
+  "^[^$].*":
+    "$ref": "#" # "recurse, use the top element"
+
+# No other properties allowed other than listed here.
+additionalProperties: false
+
+properties:
+  "$type":
+    description: The type of the pillar value and of the form field
+    enum:
+    # Wiki says these 13
+    - text
+    - password
+    - number
+    - url
+    - email
+    - date
+    - time
+    - datetime
+    - boolean
+    - color
+    - select
+    - group
+    - hidden-group
+    # Best Practices adds these
+    - "namespace" # an alias for "hidden-group"
+    - edit-group
+  "$name":
+    description: the name of a value that is shown in the form.
+    type: string
+  "$help":
+    # FIXME: 'hovering' is too web-specific
+    description: defines the message a user sees when hovering over a field
+    type: string
+  "$placeholder":
+    # $placeholder may only be used with text fields
+    # like text, password, email or date.
+    # It does not make sense to add a placeholder if you also use
+    # $default as this will hide the placeholder.
+    description: displays a gray placeholder text in the field
+    type: string
+  "$default":
+    # FIXME: any value for the above mentioned data types
+    # type: string
+    description: a default value that is displayed and used, if no other value
+      is entered
+  # FIXME: not specified in Wiki or BP!
+  "$optional":
+    type: boolean
+  "$minItems":
+    description: In an edit-group, $minItems and $maxItems allow you
+      to specify the lowest and highest number the group can occur.
+    type: integer
+  "$maxItems":
+    description: In an edit-group, $minItems and $maxItems allow you
+      to specify the lowest and highest number the group can occur.
+    type: integer
+  "$itemName":
+    description: In an edit-group, $itemName allows to define a template
+      for the name to be used for the members of the group.
+    # FIXME: template format? example?
+    type: string
+  "$prototype":
+    description: In an edit-group, $prototype allows to define default
+      (or pre-filled) values for newly added members in the group.
+    "$ref": "#"
+  "$values":
+    description: 'can only be used together with $type: select
+      to specify the different options in the select-field'
+    type: array
+  "$scope":
+    description: allows you to specify a hierarchy level
+      at which a value may be edited
+    # IIUC, "system" is "1 computer", "group" is "many computers"
+    enum:
+    - system
+    - group
+    - readonly
+  "$visibleIf":
+    description: allows you to show a field or group if a simple
+      condition is met
+    # FIXME: specify the mini language
+    type: string
