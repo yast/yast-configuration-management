@@ -23,14 +23,13 @@ module Y2ConfigurationManagement
   module Salt
     # Class that represents a form for Salt Formulas
     class Form
+      # @return [Array<FormElement>]
       attr_reader :elements
-      attr_reader :name
-      attr_reader :type
+      # @return [Hash]
       attr_reader :spec
 
       # Constructor
       #
-      # @param name [String]
       # @param spec [Hash]
       def initialize(spec)
         @elements = []
@@ -38,7 +37,7 @@ module Y2ConfigurationManagement
         build_elements
       end
 
-      # Instantiate a new form reading the definition from a YAML file
+      # Creates a new Form object reading the definition from a YAML file
       #
       # param path [String] file path to read the form YAML definition
       def self.from_file(path)
@@ -70,10 +69,18 @@ module Y2ConfigurationManagement
 
     # It builds new Form Elements depending on its specification type
     class FactoryFormElement
-      def self.build(name, spec, parent:)
+      # Builds a new FormElement object based on the element specification and
+      # maintaining a reference to its parent
+      #
+      # @param name [String]
+      # @param spec [Hash]
+      # @param parent [Form, FormElement]
+      def self.build(name, spec, parent: )
         class_for(spec["$type"]).new(name, spec, parent: parent)
       end
 
+      # @param type [String]
+      # @return [FormElement]
       def self.class_for(type)
         case type
         when "namespace", "hidden-group", "group"
@@ -90,14 +97,23 @@ module Y2ConfigurationManagement
     #
     # scalar values, groups and collections
     class FormElement
+      # @return [Form, FormElement]
       attr_reader :parent
-      attr_reader :name, :help, :scope, :optional
+      # @return  [String]
+      attr_reader :name
+      # @return [String]
+      attr_reader :help
+      # @return scope [String] specify the level in which the value can be
+      #   edited. Possible values are: system, group and readonly
+      attr_reader :scope
+      # @return optional [Boolean]
+      attr_reader :optional
 
       # Constructor
       #
       # @param name [String]
       # @param spec [Hash] form element specification
-      def initialize(name, spec, parent:)
+      def initialize(name, spec, parent: nil)
         @name = name
         @type = spec["$type"] || "text"
         @help = spec["$help"] if spec ["$help"]
@@ -109,14 +125,21 @@ module Y2ConfigurationManagement
 
     # Scalar value FormElement
     class FormInput < FormElement
-      attr_reader :type, :placeholder
-      attr_reader :default, :values
+      # @return [String]
+      attr_reader :type
+      # @return [String] help text usually displayed in the input field
+      attr_reader :placeholder
+      # @return [Boolean, Integer, String, nil] default input value
+      attr_reader :default
+      # @return [Array<String>] a list of possible values for a select input
+      attr_reader :values
 
       # Constructor
       #
       # @param name [String]
       # @param spec [Hash] form element specification
-      def initialize(name, spec, parent:)
+      # @param parent [FormElement]
+      def initialize(name, spec, parent: nil)
         @values = spec["$values"] if spec["$values"]
         @placeholder = spec["$placeholder"] if spec["$placeholder"]
         super
@@ -125,9 +148,15 @@ module Y2ConfigurationManagement
 
     # Container Element
     class Container < FormElement
+      # @return elements [Array<FormElement>]
       attr_reader :elements
 
-      def initialize(name, spec, parent:)
+      # Constructor
+      #
+      # @param name [String]
+      # @param spec [Hash] form element specification
+      # @param parent [FormElement]
+      def initialize(name, spec, parent: nil)
         super
         @elements = []
         build_elements(spec)
@@ -135,6 +164,7 @@ module Y2ConfigurationManagement
 
     private
 
+      # @param spec [Hash] form element specification
       def build_elements(spec)
         spec.select { |k, v| !k.start_with?("$") }.map do |name, spec|
           @elements << FactoryFormElement.build(name, spec, parent: self)
@@ -142,15 +172,28 @@ module Y2ConfigurationManagement
       end
     end
 
+    # Defines a collection of FormElements or Containers all of them based in
+    # the same prototype.
     class Collection < FormElement
+      # @return [Integer] lowest number of elements that needs to be defined
       attr_reader :min_items
+      # @return [Integer] highest number of elements that needs to be defined
       attr_reader :max_items
+      # @return [String] name for the members of the collection
       attr_reader :item_name
       # list of elements (let's see if we promote it to a class)
       # or children or whatever:xs:xa
-      attr_reader :prototype, :default
+      attr_reader :prototype
 
-      def initialize(name, spec, parent:)
+      # Default collection values
+      attr_reader :default
+
+      # Constructor
+      #
+      # @param name [String]
+      # @param spec [Hash] form element specification
+      # @param parent [FormElement]
+      def initialize(name, spec, parent: nil)
         super
         @item_name = spec["item_name"] if spec["item_name"]
         @min_items = spec["$minItems"] if spec["$minItems"]
@@ -161,6 +204,11 @@ module Y2ConfigurationManagement
 
     private
 
+      # Return a single or group of FormElements based on the prototype given
+      # in the form specification
+      #
+      # @param name [String]
+      # @param spec [Hash]
       def prototype_for(name, spec)
         return unless spec["$prototype"]
 
