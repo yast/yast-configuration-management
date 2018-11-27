@@ -173,6 +173,8 @@ module Y2ConfigurationManagement
       # @param arg [Hash]
       # @return [FormElement, nil]
       def find_element_by(arg)
+        return self if arg.any? { |k, v| public_send(k) == v }
+
         elements.each do |element|
           return element if arg.any? { |k, v| element.public_send(k) == v }
 
@@ -240,8 +242,8 @@ module Y2ConfigurationManagement
           return form_element if [FormInput, Container].include?(form_element.class)
         end
 
-        spec["$prototype"].select { |k, v| !k.start_with?("$") }.map do |name, spec|
-          FormElementFactory.build(name, spec, parent: self)
+        spec["$prototype"].select { |k, _v| !k.start_with?("$") }.map do |element_id, element_spec|
+          FormElementFactory.build(element_id, element_spec, parent: self)
         end
       end
     end

@@ -46,6 +46,8 @@ describe Y2ConfigurationManagement::Salt::Form do
       number = form.find_element_by(name: "number")
       expect(number).to be_a(Y2ConfigurationManagement::Salt::FormInput)
       expect(number.path).to eql(".root.demo.number")
+      expect(form.find_element_by(id: "root"))
+        .to be_a(Y2ConfigurationManagement::Salt::Container)
     end
 
     it "returns nil if no FormElement match the given attribute" do
