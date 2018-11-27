@@ -26,14 +26,16 @@ module Y2ConfigurationManagement
     # [1]: https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html#best.practice.salt.formulas.pillar
     # [2]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
     class Form
-      # @return Container
+      # @return [Container]
       attr_reader :root
-      # The original specification (deserialized form.yml).
+      # @return [Hash] The original specification (deserialized form.yml).
       attr_reader :spec
 
       # Constructor
       #
       # The original specification (deserialized form.yml).
+      #
+      # @param spec [Hash] The original specification (deserialized form.yml).
       def initialize(spec)
         @root = Container.new("root", spec, parent: nil)
         @spec = spec
@@ -41,9 +43,10 @@ module Y2ConfigurationManagement
 
       # Creates a new Form object reading the definition from a YAML file
       #
-      # param path [String] file path to read the form YAML definition
+      # @param path [String] file path to read the form YAML definition
+      # @return [Form]
       def self.from_file(path)
-        definition = YAML.load(File.read(path))
+        definition = YAML.safe_load(File.read(path))
         new(definition)
       end
 
@@ -53,14 +56,14 @@ module Y2ConfigurationManagement
       end
     end
 
-    # It builds new Form Elements depending on its specification type
+    # It builds new {FormElement}s depending on its specification type
     class FormElementFactory
       # Builds a new FormElement object based on the element specification and
       # maintaining a reference to its parent
       #
       # @param id [String]
       # @param spec [Hash]
-      # @param parent [Form, FormElement]
+      # @param parent [FormElement]
       def self.build(id, spec, parent:)
         class_for(spec["$type"]).new(id, spec, parent: parent)
       end
@@ -84,13 +87,13 @@ module Y2ConfigurationManagement
     # scalar values, groups and collections
     class FormElement
       PATH_DELIMITER = ".".freeze
-      # @return [String]
+      # @return [String] the key for the pillar
       attr_reader :id
       # @return [Symbol]
       attr_reader :type
       # @return [FormElement]
       attr_reader :parent
-      # @return  [String]
+      # @return [String] The user visible name ($name)
       attr_reader :name
       # @return [String]
       attr_reader :help
@@ -197,7 +200,7 @@ module Y2ConfigurationManagement
       end
     end
 
-    # Defines a collection of FormElements or Containers all of them based in
+    # Defines a collection of {FormElement}s or {Container}s all of them based in
     # the same prototype.
     class Collection < FormElement
       # @return [Integer] lowest number of elements that needs to be defined
@@ -207,7 +210,7 @@ module Y2ConfigurationManagement
       # @return [String] name for the members of the collection
       attr_reader :item_name
       # list of elements (let's see if we promote it to a class)
-      # or children or whatever:xs:xa
+      # or children or whatever
       attr_reader :prototype
 
       # Default collection values
