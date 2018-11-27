@@ -28,7 +28,7 @@ module Y2ConfigurationManagement
     class Form
       # @return Container
       attr_reader :root
-       # The original specification (deserialized form.yml).
+      # The original specification (deserialized form.yml).
       attr_reader :spec
 
       # Constructor
@@ -58,11 +58,11 @@ module Y2ConfigurationManagement
       # Builds a new FormElement object based on the element specification and
       # maintaining a reference to its parent
       #
-      # @param name [String]
+      # @param id [String]
       # @param spec [Hash]
       # @param parent [Form, FormElement]
-      def self.build(name, spec, parent: )
-        class_for(spec["$type"]).new(name, spec, parent: parent)
+      def self.build(id, spec, parent:)
+        class_for(spec["$type"]).new(id, spec, parent: parent)
       end
 
       # @param type [String]
@@ -102,11 +102,11 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param name [String]
+      # @param id [String]
       # @param spec [Hash] form element specification
-      def initialize(name, spec, parent:)
-        @id = name
-        @name = spec.fetch("$name", name)
+      def initialize(id, spec, parent:)
+        @id = id
+        @name = spec.fetch("$name", id)
         @type = spec.fetch("$type", "text").to_sym
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
@@ -121,7 +121,7 @@ module Y2ConfigurationManagement
       # @return [String]
       def path
         prefix = parent ? parent.path : ""
-        return "#{prefix}#{PATH_DELIMITER}#{id}"
+        "#{prefix}#{PATH_DELIMITER}#{id}"
       end
     end
 
@@ -136,10 +136,10 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param name [String]
+      # @param id [String]
       # @param spec [Hash] form element specification
       # @param parent [FormElement]
-      def initialize(name, spec, parent:)
+      def initialize(id, spec, parent:)
         @values = spec["$values"] if spec["$values"]
         @placeholder = spec["$placeholder"] if spec["$placeholder"]
         super
@@ -153,10 +153,10 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param name [String]
+      # @param id [String]
       # @param spec [Hash] form element specification
       # @param parent [FormElement]
-      def initialize(name, spec, parent:)
+      def initialize(id, spec, parent:)
         super
         @elements = []
         build_elements(spec)
@@ -164,11 +164,12 @@ module Y2ConfigurationManagement
 
       # Recursively looks for a particular FormElement
       #
-      # @example look for a FormElement by a specific name
+      # @example look for a FormElement by a specific name, path or id
       #
       #   f = Y2ConfigurationManagemenet.from_file("form.yml")
       #   f.find_element_by(name: "subnets") #=> <Collection @name="subnets"
       #   f.find_element_by(path: ".root.dhcpd") #=> <Container @name="dhcpd"
+      #   f.find_element_by(id: "hosts") #=> <Container @id="hosts"
       #
       # @param arg [Hash]
       # @return [FormElement, nil]
@@ -177,7 +178,6 @@ module Y2ConfigurationManagement
 
         elements.each do |element|
           return element if arg.any? { |k, v| element.public_send(k) == v }
-
           if element.respond_to?(:find_element_by)
             nested_element = element.find_element_by(arg)
             return nested_element if nested_element
@@ -191,8 +191,8 @@ module Y2ConfigurationManagement
 
       # @param spec [Hash] form element specification
       def build_elements(spec)
-        spec.select { |k, v| !k.start_with?("$") }.each do |name, spec|
-          @elements << FormElementFactory.build(name, spec, parent: self)
+        spec.select { |k, _v| !k.start_with?("$") }.each do |id, nested_spec|
+          @elements << FormElementFactory.build(id, nested_spec, parent: self)
         end
       end
     end
@@ -215,10 +215,10 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param name [String]
+      # @param id [String]
       # @param spec [Hash] form element specification
       # @param parent [FormElement]
-      def initialize(name, spec, parent:)
+      def initialize(id, spec, parent:)
         super
         @item_name = spec["item_name"] if spec["item_name"]
         @min_items = spec["$minItems"] if spec["$minItems"]
@@ -232,13 +232,13 @@ module Y2ConfigurationManagement
       # Return a single or group of FormElements based on the prototype given
       # in the form specification
       #
-      # @param name [String]
+      # @param id [String]
       # @param spec [Hash] form element specification
-      def prototype_for(name, spec)
+      def prototype_for(id, spec)
         return unless spec["$prototype"]
 
-        if spec["$prototype"]["$type"] || spec["$prototype"].any? { |k, v| !k.start_with?("$") }
-          form_element = FormElementFactory.build(name, spec["$prototype"], parent: self)
+        if spec["$prototype"]["$type"] || spec["$prototype"].any? { |k, _v| !k.start_with?("$") }
+          form_element = FormElementFactory.build(id, spec["$prototype"], parent: self)
           return form_element if [FormInput, Container].include?(form_element.class)
         end
 

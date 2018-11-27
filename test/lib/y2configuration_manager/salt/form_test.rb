@@ -3,7 +3,6 @@
 require_relative "../../../spec_helper"
 require "y2configuration_management/salt/form"
 
-
 describe Y2ConfigurationManagement::Salt::Form do
   FORMULAS_PATH = FIXTURES_PATH.join("formulas")
 
