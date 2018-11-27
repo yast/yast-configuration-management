@@ -1,0 +1,25 @@
+---
+person:
+  "$type": namespace
+  name:
+    "$type": text
+    "$default": Text
+  email:
+    "$type": email
+  computers:
+    "$type": edit-group
+    "$minItems": 1
+    "$maxItems": 4
+    "$prototype":
+      $type: group
+      brand:
+        "$default": Dell
+        "$type": select
+        "$values":
+          - ACME
+          - Acer
+          - Dell
+          - Lenovo
+      disks:
+        "$type": number
+        "$default": 1
