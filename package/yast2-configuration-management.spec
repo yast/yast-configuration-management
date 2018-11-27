@@ -58,6 +58,7 @@ rake install DESTDIR="%{buildroot}"
 %defattr(-,root,root)
 %{yast_clientdir}/*.rb
 %{yast_libdir}/configuration_management
+%{yast_libdir}/y2configuration_management
 %{yast_desktopdir}/*.desktop
 
 %dir %{yast_docdir}
