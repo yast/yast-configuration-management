@@ -81,6 +81,17 @@ shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
       end
     end
   end
+
+  describe "#path" do
+    let(:formula_path) { FORMULAS_PATH.join("test-formula") }
+    let(:form_path) { formula_path.join("form.yml") }
+    let(:form) { Y2ConfigurationManagement::Salt::Form.from_file(form_path) }
+
+    it "returns the absolute form element path in the Form" do
+      number = form.find_element_by(name: "number")
+      expect(number.path).to eql(".root.demo.number")
+    end
+  end
 end
 
 describe Y2ConfigurationManagement::Salt::FormElement do
@@ -113,5 +124,3 @@ end
 describe Y2ConfigurationManagement::Salt::Collection do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
 end
-
-

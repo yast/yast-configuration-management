@@ -121,7 +121,7 @@ module Y2ConfigurationManagement
       # @return [String]
       def path
         prefix = parent ? parent.path : ""
-        return "#{prefix}#{PATH_DELIMITER}#{name}"
+        return "#{prefix}#{PATH_DELIMITER}#{id}"
       end
     end
 
