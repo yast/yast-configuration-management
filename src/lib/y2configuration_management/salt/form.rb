@@ -145,6 +145,7 @@ module Y2ConfigurationManagement
       def initialize(id, spec, parent:)
         @values = spec["$values"] if spec["$values"]
         @placeholder = spec["$placeholder"] if spec["$placeholder"]
+        @default = spec["$default"]
         super
       end
     end

@@ -57,43 +57,6 @@
          end
        end
 
-       # This class represents a select widget
-       class Select < ::CWM::ComboBox
-         # @return [String] Widget name
-         attr_reader :name
-         # @return [String] Widget items
-         attr_reader :items
-
-         class << self
-           # Builds a selector widget from a FormElement specification.
-           #
-           # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-           # @return [Select] New select widget
-           def from_spec(spec, controller)
-             items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
-             new(spec.name, items, controller, spec.path)
-           end
-         end
-
-         # Constructor
-         #
-         # @param name  [String] Widget name
-         # @param items [Array<Array<String,Symbol>>] List of options
-         def initialize(name, items, controller, path)
-           @name = name
-           @items = items
-           self.widget_id = "select:#{name}"
-         end
-
-         # Widget label
-         #
-         # @return [String]
-         # @see CWM::AbstractWidget
-         def label
-           widget_id.to_s
-         end
-       end
-
        # Represents a group of elements
        class Group < ::CWM::CustomWidget
          attr_reader :name, :spec, :children

@@ -6,6 +6,13 @@ person:
     "$default": Text
   email:
     "$type": email
+  country:
+    "$type": select
+    "$default": Czech Republic
+    "$values":
+      - Czech Republic
+      - Germany
+      - Spain
   computers:
     "$type": edit-group
     "$minItems": 1
