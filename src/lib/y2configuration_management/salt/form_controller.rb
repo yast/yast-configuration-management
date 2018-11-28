@@ -30,11 +30,7 @@ module Y2ConfigurationManagement
     # @example Rendering a form
     #   form_spec = Form.from_file("test/fixtures/form.yml")
     #   controller = FormController.new(form_spec)
-    #   controller.render
-    #
-    # @example Rendering a subform
-    #   controller.render("dhcp.ranges")
-
+    #   controller.show_main_dialog
     class FormController
       include Yast::I18n
       include Yast::UIShortcuts
@@ -55,18 +51,23 @@ module Y2ConfigurationManagement
       end
 
       # Opens a new dialog in order to add a new element to a collection
+      # @todo
       def add(path)
         element = spec.find_element_by(path: path).prototype
         show_popup(element.name, form_builder.build(element, self))
       end
 
       # Opens a new dialog in order to edit a new element in a collection
-      def edit(path, index)
+      # @todo
+      def add(path)
+      def edit(_path, index)
         log.info "Editing element #{index}"
       end
 
       # Removes an element from a collection
-      def remove(path, index)
+      # @todo
+      def add(path)
+      def remove(_path, index)
         log.info "Removing element #{index}"
       end
 
