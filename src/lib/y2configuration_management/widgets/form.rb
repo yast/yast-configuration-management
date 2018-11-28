@@ -23,40 +23,6 @@
    module ConfigurationManagement
      # This module contains the widgets which are used to display forms for Salt formulas
      module Widgets
-       # This class represents a simple text field
-       class Text < ::CWM::InputField
-         class << self
-           # Builds a widget from a FormElement specification.
-           #
-           # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-           # @return [Text] New text widget
-           def from_spec(spec, controller)
-             new(spec.name, controller, spec.path)
-           end
-         end
-
-         # @return [String] Widget name
-         attr_reader :name
-
-         # Constructor
-         #
-         # @param name  [String] Widget name
-         def initialize(name, controller, path)
-           @name = name
-           @controller = controller
-           @path = path
-           self.widget_id = "text:#{name}"
-         end
-
-         # Widget label
-         #
-         # @return [String]
-         # @see CWM::AbstractWidget
-         def label
-           widget_id.to_s
-         end
-       end
-
        # Represents a group of elements
        class Group < ::CWM::CustomWidget
          attr_reader :name, :spec, :children

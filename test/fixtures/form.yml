@@ -3,7 +3,7 @@ person:
   "$type": namespace
   name:
     "$type": text
-    "$default": Text
+    "$default": "John Doe"
   email:
     "$type": email
   country:
