@@ -105,3 +105,14 @@ properties:
       condition is met
     # FIXME: specify the mini language
     type: string
+  # FIXME: not specified!
+  "$key":
+    description: This transforms an edit-group from an array collection
+      to a dictionary collection, and the value specifies a scalar widget
+      that is used as the dictionary key.
+    type: object
+  # FIXME: not specified!
+  "$ifEmpty":
+    description: WTF, how is this different from $default?!
+    # FIXME: any value for the above mentioned data types
+    # type: string
