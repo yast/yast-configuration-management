@@ -18,6 +18,10 @@ def load(filename)
   end
 end
 
+def symbolize_hash(h)
+  h.map { |k, v| [k.to_sym, v] }.to_h
+end
+
 schema = load(ARGV[0] || usage!)
 schemer = JSONSchemer.schema(schema)
 
@@ -27,12 +31,13 @@ ARGV[1..-1].each do |fname|
   errors.each do |e|
     fmt = <<~EOS
       Validation error:
+        file:             %{file}
         type:             %{type}
         data:             %{data}
           data pointer:   %{data_pointer}
         schema:           %{schema}
           schema pointer: %{schema_pointer}
       EOS
-    print format(fmt, e.map { |k, v| [k.to_sym, v] }.to_h)
+    print format(fmt, symbolize_hash(e.merge("file" => fname)))
   end
 end
