@@ -17,7 +17,23 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "yast"
-require "y2configuration_management/clients/test_formula"
+require "y2configuration_management/salt/form"
+require "y2configuration_management/salt/form_controller"
 
-Y2ConfigurationManagement::Clients::TestFormula.new.run
+module Y2ConfigurationManagement
+  module Clients
+    # Sample client to try the new Salt formulas implementation
+    class TestFormula
+      include Yast::I18n
+      include Yast::UIShortcuts
+
+      def run
+        textdomain "configuration_management"
+
+        form_spec = Y2ConfigurationManagement::Salt::Form.from_file("test/fixtures/form.yml")
+        controller = Y2ConfigurationManagement::Salt::FormController.new(form_spec)
+        controller.show_main_dialog
+      end
+    end
+  end
+end
