@@ -6,13 +6,17 @@ person:
     "$default": "John Doe"
   email:
     "$type": email
-  country:
-    "$type": select
-    "$default": Czech Republic
-    "$values":
-      - Czech Republic
-      - Germany
-      - Spain
+  address:
+    "$type": group
+    street:
+        "$type": text
+    country:
+        "$type": select
+        "$default": Czech Republic
+        "$values":
+        - Czech Republic
+        - Germany
+        - Spain
   computers:
     "$type": edit-group
     "$minItems": 1

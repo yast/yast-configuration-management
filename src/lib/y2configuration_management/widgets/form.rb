@@ -23,45 +23,6 @@
    module ConfigurationManagement
      # This module contains the widgets which are used to display forms for Salt formulas
      module Widgets
-       # Represents a group of elements
-       class Group < ::CWM::CustomWidget
-         attr_reader :name, :spec, :children
-
-         class << self
-           def from_spec(spec, children, controller)
-             new(spec.name, children, controller, spec.path)
-           end
-         end
-
-         # Constructor
-         #
-         # @param name     [String] Widget name
-         # @param children [Array<AbstractWidget>] Children widgets
-         def initialize(name, children, controller, path)
-           textdomain "configuration_management"
-           @name = name
-           @children = children
-           @controller = controller
-           @path = path
-           self.widget_id = "group:#{name}"
-         end
-
-         # Widget label
-         #
-         # @return [String]
-         # @see CWM::AbstractWidget
-         def label
-           name
-         end
-
-         # Widget contents
-         #
-         # @return [Yast::Term]
-         def contents
-           VBox(*children)
-         end
-       end
-
        # Represents a collection of elements
        class Collection < ::CWM::CustomWidget
          attr_reader :name, :min_items, :max_items, :controller, :path

@@ -21,43 +21,35 @@ require "cwm"
 
 module Y2ConfigurationManagement
   module Widgets
-    # This class represents a select widget
-    class Select < ::CWM::ComboBox
+    # Represents a group of elements
+    class Group < ::CWM::CustomWidget
       # @return [String] Widget name
       attr_reader :name
-      # @return [Array<String>] Widget items
-      attr_reader :items
-      # @return [String,nil] Default value
-      attr_reader :default
       # @return [String] Form element path
       attr_reader :path
 
       class << self
-        # Builds a selector widget from a FormElement specification.
-        #
         # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
+        # @param children   [Array<AbstractWidget>] Widgets which are included in the group
         # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-        # @return [Select] New select widget
-        def from_spec(spec, controller)
-          items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
-          new(spec.name, items, spec.default, controller, spec.path)
+        def from_spec(spec, children, controller)
+          new(spec.name, children, controller, spec.path)
         end
       end
 
       # Constructor
       #
       # @param name       [String] Widget name
-      # @param items      [Array<String>] Selectable values
-      # @param default    [String,nil] Default value
+      # @param children   [Array<AbstractWidget>] Widgets which are included in the group
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
       # @param path       [String] Form element path
-      def initialize(name, items, default, controller, path)
+      def initialize(name, children, controller, path)
+        textdomain "configuration_management"
         @name = name
-        @items = items
-        @default = default
+        @children = children
         @controller = controller
         @path = path
-        self.widget_id = "select:#{name}"
+        self.widget_id = "group:#{name}"
       end
 
       # Widget label
@@ -65,19 +57,20 @@ module Y2ConfigurationManagement
       # @return [String]
       # @see CWM::AbstractWidget
       def label
-        widget_id.to_s
+        name
       end
 
-      # @see CWM::AbstractWidget
-      def init
-        return if default.nil?
-        item = items.find { |_i, v| v == default }
-        self.value = item.first if item
+      # Widget contents
+      #
+      # @return [Yast::Term]
+      def contents
+        VBox(*children)
       end
 
     private
 
-      attr_reader :controller
+      # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
+      attr_reader :children
     end
   end
 end

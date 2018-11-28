@@ -18,45 +18,29 @@
 # find current contact information at www.suse.com.
 
 require_relative "../../spec_helper"
-require "y2configuration_management/widgets/select"
+require "y2configuration_management/widgets/text"
+require "y2configuration_management/widgets/group"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
-describe Y2ConfigurationManagement::Widgets::Select do
-  subject(:selector) { described_class.from_spec(spec, controller) }
+describe Y2ConfigurationManagement::Widgets::Group do
+  subject(:group) { described_class.from_spec(spec, [widget1], controller) }
 
-  include_examples "CWM::ComboBox"
+  include_examples "CWM::CustomWidget"
 
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
   let(:spec) { form_spec.find_element_by(path: path) }
-  let(:path) { ".root.person.address.country" }
+  let(:path) { ".root.person.address" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
+  let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text) }
 
   describe ".from_spec" do
     it "instantiates a new widget according to the spec" do
-      selector = described_class.from_spec(spec, controller)
-      expect(selector.path).to eq(path)
-      expect(selector.items).to eq([["0", "Czech Republic"], ["1", "Germany"], ["2", "Spain"]])
-      expect(selector.default).to eq("Czech Republic")
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(selector).to receive(:value=).with("0")
-      selector.init
-    end
-
-    context "when no default value was given" do
-      subject(:selector) { described_class.new("country", [], nil, controller, path) }
-
-      it "does not initializes the current value" do
-        expect(selector).to_not receive(:value=)
-        selector.init
-      end
+      group = described_class.from_spec(spec, [widget1], controller)
+      expect(group.path).to eq(path)
     end
   end
 end
