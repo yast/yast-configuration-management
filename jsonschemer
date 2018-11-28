@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 require "json_schemer"
 require "json"
-require "yaml"
 
 def usage!
   puts "Usage: jsonschemer SCHEMA FILE..."
@@ -11,6 +10,7 @@ end
 def load(filename)
   File.open(filename) do |f|
     if filename =~ /\.ya?ml$/
+      require "yaml"
       YAML.load(f, filename)
     else
       JSON.load(f)
