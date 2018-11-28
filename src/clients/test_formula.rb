@@ -17,7 +17,7 @@ module Yast
 
       form_spec = Y2ConfigurationManagement::Salt::Form.from_file("test/fixtures/form.yml")
       controller = Y2ConfigurationManagement::Salt::FormController.new(form_spec)
-      controller.render
+      controller.show_main_dialog
     end
   end
 end

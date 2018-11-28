@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/form_builder"
+require "y2configuration_management/widgets/form_popup"
 
 Yast.import "CWM"
 Yast.import "Wizard"
@@ -33,6 +34,7 @@ module Y2ConfigurationManagement
     #
     # @example Rendering a subform
     #   controller.render("dhcp.ranges")
+
     class FormController
       include Yast::I18n
       include Yast::UIShortcuts
@@ -46,18 +48,16 @@ module Y2ConfigurationManagement
         @spec = spec
       end
 
-      # Renders a form
-      #
-      # @param path [String] Path to the root element to show
-      def render(path = nil)
-        element = path ? spec.find_element_by(path: path) : spec.root
-        show_dialog(form_builder.build(element, self))
+      # Renders the main form's dialog
+      def show_main_dialog
+        element = spec.root
+        show_dialog(element.name, form_builder.build(element, self))
       end
 
       # Opens a new dialog in order to add a new element to a collection
       def add(path)
         element = spec.find_element_by(path: path).prototype
-        show_dialog(form_builder.build(element, self), create_dialog: false)
+        show_popup(element.name, form_builder.build(element, self))
       end
 
       # Opens a new dialog in order to edit a new element in a collection
@@ -79,13 +79,25 @@ module Y2ConfigurationManagement
         @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new
       end
 
-      def show_dialog(contents, create_dialog: true)
+      # Displays a form dialog
+      #
+      # @param title    [String] Popup title
+      # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
+      def show_dialog(title, contents)
         next_handler = proc { Yast::Popup.YesNo("Exit?") }
-        Yast::Wizard.CreateDialog if create_dialog
+        Yast::Wizard.CreateDialog
         Yast::CWM.show(
-          HBox(*contents), caption: _("Test formula"), next_handler: next_handler
+          VBox(*contents), caption: title, next_handler: next_handler
         )
-        Yast::Wizard.CloseDialog if create_dialog
+        Yast::Wizard.CloseDialog
+      end
+
+      # Displays a popup
+      #
+      # @param title    [String] Popup title
+      # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
+      def show_popup(title, contents)
+        Widgets::FormPopup.new(title, contents).run
       end
     end
   end
