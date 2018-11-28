@@ -206,6 +206,7 @@
            when :remove
              controller.remove(path, selected_row) if selected_row
            end
+           nil
          end
 
          def selected_row
