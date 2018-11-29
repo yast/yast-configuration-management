@@ -23,8 +23,8 @@ module Y2ConfigurationManagement
   module Widgets
     # This class represents a select widget
     class Select < ::CWM::ComboBox
-      # @return [String] Widget name
-      attr_reader :name
+      # @return [String] Widget label
+      attr_reader :label
       # @return [Array<String>] Widget items
       attr_reader :items
       # @return [String,nil] Default value
@@ -40,32 +40,25 @@ module Y2ConfigurationManagement
         # @return [Select] New select widget
         def from_spec(spec, controller)
           items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
-          new(spec.name, items, spec.default, controller, spec.path)
+          new(spec.id, spec.label, items, spec.default, controller, spec.path)
         end
       end
 
       # Constructor
       #
-      # @param name       [String] Widget name
+      # @param id         [String] Widget id
+      # @param label      [String] Widget label
       # @param items      [Array<String>] Selectable values
       # @param default    [String,nil] Default value
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
       # @param path       [String] Form element path
-      def initialize(name, items, default, controller, path)
-        @name = name
+      def initialize(id, label, items, default, controller, path)
+        @label = label
         @items = items
         @default = default
         @controller = controller
         @path = path
-        self.widget_id = "select:#{name}"
-      end
-
-      # Widget label
-      #
-      # @return [String]
-      # @see CWM::AbstractWidget
-      def label
-        widget_id.to_s
+        self.widget_id = "select:#{id}"
       end
 
       # @see CWM::AbstractWidget

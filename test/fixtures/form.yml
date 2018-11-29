@@ -5,6 +5,7 @@ person:
     "$type": text
     "$default": "John Doe"
   email:
+    "$name": "E-mail"
     "$type": email
   address:
     "$type": group
@@ -32,5 +33,6 @@ person:
           - Dell
           - Lenovo
       disks:
+        "$name": Number of Disks
         "$type": number
         "$default": 1

@@ -95,6 +95,7 @@ module Y2ConfigurationManagement
       attr_reader :parent
       # @return [String] The user visible name ($name)
       attr_reader :name
+      alias_method :label, :name
       # @return [String]
       attr_reader :help
       # @return [Symbol] specify the level in which the value can be edited.
@@ -109,7 +110,7 @@ module Y2ConfigurationManagement
       # @param spec [Hash] form element specification
       def initialize(id, spec, parent:)
         @id = id
-        @name = spec.fetch("$name", id)
+        @name = spec.fetch("$name", humanize(id))
         @type = spec.fetch("$type", "text").to_sym
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
@@ -125,6 +126,14 @@ module Y2ConfigurationManagement
       def path
         prefix = parent ? parent.path : ""
         "#{prefix}#{PATH_DELIMITER}#{id}"
+      end
+
+    private
+
+      # "foo" -> "Foo"
+      # "suse--fancy_salt_test" -> "Suse Fancy Salt Test"
+      def humanize(s)
+        s.split(/[-_]/).reject(&:empty?).map(&:capitalize).join(" ")
       end
     end
 

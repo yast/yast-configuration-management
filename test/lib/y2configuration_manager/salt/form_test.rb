@@ -33,7 +33,7 @@ describe Y2ConfigurationManagement::Salt::Form do
   describe "#root" do
     it "returns the form root Y2ConfigurationManagement::Salt::Container" do
       expect(form.root).to be_a(Y2ConfigurationManagement::Salt::Container)
-      expect(form.root.name).to eql("root")
+      expect(form.root.name).to eql("Root")
     end
   end
 
@@ -42,7 +42,7 @@ describe Y2ConfigurationManagement::Salt::Form do
       expect(form.find_element_by(path: ".root.demo.system.text"))
         .to be_a(Y2ConfigurationManagement::Salt::FormInput)
 
-      number = form.find_element_by(name: "number")
+      number = form.find_element_by(name: "Number")
       expect(number).to be_a(Y2ConfigurationManagement::Salt::FormInput)
       expect(number.path).to eql(".root.demo.number")
       expect(form.find_element_by(id: "root"))
@@ -56,10 +56,10 @@ describe Y2ConfigurationManagement::Salt::Form do
 end
 
 shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
-  let(:name) { "test" }
-  let(:spec) { { name => { "$type" => "text", "$name" => "my_element" } } }
+  let(:id) { "test" }
+  let(:spec) { { id => { "$type" => "text", "$name" => "My Element" } } }
 
-  let(:form_element) { described_class.new(name, spec, parent: nil) }
+  let(:form_element) { described_class.new(id, spec, parent: nil) }
 
   describe ".new" do
     it "creates a new #{described_class} instance from the given specification" do
@@ -67,15 +67,23 @@ shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
     end
 
     context "when a name is not given in the specification" do
-      let(:spec) { { name => { "$type" => "text" } } }
+      let(:spec) { { id => { "$type" => "text" } } }
 
-      it "uses the 'id' as the default 'name'" do
-        expect(form_element.name).to eql(name)
+      it "uses the humanized 'id' as the default 'label'" do
+        expect(form_element.label).to eql("Test")
+      end
+
+      context "when the id contains dashes and/or underscores" do
+        let(:id) { "suse--fancy_salt_test" }
+
+        it "capitalizes words" do
+          expect(form_element.name).to eql("Suse Fancy Salt Test")
+        end
       end
     end
 
     context "when a 'scope' is not given in the specification" do
-      let(:spec) { { name => { "$type" => "text" } } }
+      let(:spec) { { id => { "$type" => "text" } } }
 
       it "uses :system as the default 'scope'" do
         expect(form_element.scope).to eql(:system)
@@ -89,7 +97,7 @@ shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
     let(:form) { Y2ConfigurationManagement::Salt::Form.from_file(form_path) }
 
     it "returns the absolute form element path in the Form" do
-      number = form.find_element_by(name: "number")
+      number = form.find_element_by(id: "number")
       expect(number.path).to eql(".root.demo.number")
     end
   end
@@ -116,7 +124,7 @@ describe Y2ConfigurationManagement::Salt::Container do
       container = form.root
       expect(container.elements.size).to eql(1)
       expect(container.elements[0]).to be_a(Y2ConfigurationManagement::Salt::Container)
-      expect(container.elements[0].name).to eql("demo")
+      expect(container.elements[0].id).to eql("demo")
     end
   end
 end

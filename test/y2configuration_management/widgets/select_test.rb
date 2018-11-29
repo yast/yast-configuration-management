@@ -51,7 +51,7 @@ describe Y2ConfigurationManagement::Widgets::Select do
     end
 
     context "when no default value was given" do
-      subject(:selector) { described_class.new("country", [], nil, controller, path) }
+      subject(:selector) { described_class.new("country", "Country", [], nil, controller, path) }
 
       it "does not initializes the current value" do
         expect(selector).to_not receive(:value=)

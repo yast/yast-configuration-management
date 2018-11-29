@@ -50,7 +50,7 @@ describe Y2ConfigurationManagement::Widgets::Text do
     end
 
     context "when no default value was given" do
-      subject(:text) { described_class.new("name", nil, controller, path) }
+      subject(:text) { described_class.new("id", "label", nil, controller, path) }
 
       it "initializes the current value to the empty string" do
         expect(text).to receive(:value=).with("")

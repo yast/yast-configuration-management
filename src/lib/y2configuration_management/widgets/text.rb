@@ -30,12 +30,12 @@ module Y2ConfigurationManagement
         # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
         # @return [Text] New text widget
         def from_spec(spec, controller)
-          new(spec.name, spec.default, controller, spec.path)
+          new(spec.id, spec.label, spec.default, controller, spec.path)
         end
       end
 
-      # @return [String] Widget name
-      attr_reader :name
+      # @return [String] Widget label
+      attr_reader :label
       # @return [String] Default value
       attr_reader :default
       # @return [String] Form path
@@ -43,24 +43,17 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param name       [String] Widget name
+      # @param id         [String] Widget id
+      # @param label      [String] Widget label
       # @param default    [String,nil] Default value
       # @param controller [FormController] Form controller
       # @param path       [String] Form path
-      def initialize(name, default, controller, path)
-        @name = name
+      def initialize(id, label, default, controller, path)
+        @label = label
         @default = default.to_s
         @controller = controller
         @path = path
-        self.widget_id = "text:#{name}"
-      end
-
-      # Widget label
-      #
-      # @return [String]
-      # @see CWM::AbstractWidget
-      def label
-        widget_id.to_s
+        self.widget_id = "text:#{id}"
       end
 
       # @see CWM::AbstractWidget

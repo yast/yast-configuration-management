@@ -27,40 +27,33 @@ module Y2ConfigurationManagement
     # This widget uses a table to display a collection of elements and offers
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
-      attr_reader :name, :min_items, :max_items, :controller, :path
+      attr_reader :label, :min_items, :max_items, :controller, :path
 
       class << self
         # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
         # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
         # @return [Collection] New select widget
         def from_spec(spec, controller)
-          new(spec.name, spec.min_items, spec.max_items, controller, spec.path)
+          new(spec.id, spec.label, spec.min_items, spec.max_items, controller, spec.path)
         end
       end
 
       # Constructor
       #
-      # @param name       [String] Widget name
+      # @param id         [String] Widget id
+      # @param label      [String] Widget label
       # @param min_items  [Integer] Minimum amount of items
       # @param max_items  [Integer] Maximum amount of items
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
       # @param path       [String] Form element path
-      def initialize(name, min_items, max_items, controller, path)
+      def initialize(id, label, min_items, max_items, controller, path)
         textdomain "configuration_management"
-        @name = name
+        @label = label
         @min_items = min_items
         @max_items = max_items
         @controller = controller
         @path = path # form element path
-        self.widget_id = "collection:#{name}"
-      end
-
-      # Widget label
-      #
-      # @return [String]
-      # @see CWM::AbstractWidget
-      def label
-        name
+        self.widget_id = "collection:#{id}"
       end
 
       # Widget contents
@@ -69,9 +62,9 @@ module Y2ConfigurationManagement
       def contents
         VBox(
           Table(
-            Id("table_#{name}"),
+            Id("table_#{widget_id}"),
             Opt(:notify, :immediate),
-            Header("name"),
+            Header(label),
             []
           ),
           HBox(
