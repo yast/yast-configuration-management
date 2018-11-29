@@ -32,33 +32,17 @@ module Y2ConfigurationManagement
       # @return [String] Form element path
       attr_reader :path
 
-      class << self
-        # Builds a selector widget from a FormElement specification.
-        #
-        # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-        # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-        # @return [Select] New select widget
-        def from_spec(spec, controller)
-          items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
-          new(spec.id, spec.label, items, spec.default, controller, spec.path)
-        end
-      end
-
       # Constructor
       #
-      # @param id         [String] Widget id
-      # @param label      [String] Widget label
-      # @param items      [Array<String>] Selectable values
-      # @param default    [String,nil] Default value
+      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      # @param path       [String] Form element path
-      def initialize(id, label, items, default, controller, path)
-        @label = label
-        @items = items
-        @default = default
+      def initialize(spec, controller)
+        @label = spec.label
+        @items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
+        @default = spec.default
+        @path = spec.path
         @controller = controller
-        @path = path
-        self.widget_id = "select:#{id}"
+        self.widget_id = "select:#{spec.id}"
       end
 
       # @see CWM::AbstractWidget

@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Collection do
-  subject(:collection) { described_class.from_spec(spec, controller) }
+  subject(:collection) { described_class.new(spec, controller) }
 
   include_examples "CWM::CustomWidget"
 
@@ -35,9 +35,9 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   let(:path) { ".root.person.computers" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
-  describe ".from_spec" do
+  describe ".new" do
     it "instantiates a new widget according to the spec" do
-      collection = described_class.from_spec(spec, controller)
+      collection = described_class.new(spec, controller)
       expect(collection.path).to eq(path)
       expect(collection.min_items).to eq(1)
       expect(collection.max_items).to eq(4)

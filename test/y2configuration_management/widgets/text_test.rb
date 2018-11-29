@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Text do
-  subject(:text) { described_class.from_spec(spec, controller) }
+  subject(:text) { described_class.new(spec, controller) }
 
   include_examples "CWM::AbstractWidget"
 
@@ -35,9 +35,9 @@ describe Y2ConfigurationManagement::Widgets::Text do
   let(:path) { ".root.person.name" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
-  describe ".from_spec" do
+  describe ".new" do
     it "instantiates a new widget according to the spec" do
-      text = described_class.from_spec(spec, controller)
+      text = described_class.new(spec, controller)
       expect(text.path).to eq(path)
       expect(text.default).to eq("John Doe")
     end
@@ -50,7 +50,11 @@ describe Y2ConfigurationManagement::Widgets::Text do
     end
 
     context "when no default value was given" do
-      subject(:text) { described_class.new("id", "label", nil, controller, path) }
+      let(:spec) do
+        sp = form_spec.find_element_by(path: path)
+        sp.instance_variable_set(:@default, nil)
+        sp
+      end
 
       it "initializes the current value to the empty string" do
         expect(text).to receive(:value=).with("")

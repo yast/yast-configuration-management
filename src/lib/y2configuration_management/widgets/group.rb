@@ -30,29 +30,18 @@ module Y2ConfigurationManagement
       # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
       attr_reader :children
 
-      class << self
-        # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-        # @param children   [Array<AbstractWidget>] Widgets which are included in the group
-        # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-        def from_spec(spec, children, controller)
-          new(spec.id, spec.label, children, controller, spec.path)
-        end
-      end
-
       # Constructor
       #
-      # @param id         [String] Widget id
-      # @param label      [String] Widget label
+      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
       # @param children   [Array<AbstractWidget>] Widgets which are included in the group
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      # @param path       [String] Form element path
-      def initialize(id, label, children, controller, path)
+      def initialize(spec, children, controller)
         textdomain "configuration_management"
-        @label = label
+        @label = spec.label
         @children = children
         @controller = controller
-        @path = path
-        self.widget_id = "group:#{id}"
+        @path = spec.path
+        self.widget_id = "group:#{spec.id}"
       end
 
       # Widget contents

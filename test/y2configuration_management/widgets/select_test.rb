@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Select do
-  subject(:selector) { described_class.from_spec(spec, controller) }
+  subject(:selector) { described_class.new(spec, controller) }
 
   include_examples "CWM::ComboBox"
 
@@ -35,9 +35,9 @@ describe Y2ConfigurationManagement::Widgets::Select do
   let(:path) { ".root.person.address.country" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
-  describe ".from_spec" do
+  describe ".new" do
     it "instantiates a new widget according to the spec" do
-      selector = described_class.from_spec(spec, controller)
+      selector = described_class.new(spec, controller)
       expect(selector.path).to eq(path)
       expect(selector.items).to eq([["0", "Czech Republic"], ["1", "Germany"], ["2", "Spain"]])
       expect(selector.default).to eq("Czech Republic")
@@ -51,7 +51,11 @@ describe Y2ConfigurationManagement::Widgets::Select do
     end
 
     context "when no default value was given" do
-      subject(:selector) { described_class.new("country", "Country", [], nil, controller, path) }
+      let(:spec) do
+        sp = form_spec.find_element_by(path: path)
+        sp.instance_variable_set(:@default, nil)
+        sp
+      end
 
       it "does not initializes the current value" do
         expect(selector).to_not receive(:value=)

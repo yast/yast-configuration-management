@@ -29,31 +29,18 @@ module Y2ConfigurationManagement
     class Collection < ::CWM::CustomWidget
       attr_reader :label, :min_items, :max_items, :controller, :path
 
-      class << self
-        # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-        # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-        # @return [Collection] New select widget
-        def from_spec(spec, controller)
-          new(spec.id, spec.label, spec.min_items, spec.max_items, controller, spec.path)
-        end
-      end
-
       # Constructor
       #
-      # @param id         [String] Widget id
-      # @param label      [String] Widget label
-      # @param min_items  [Integer] Minimum amount of items
-      # @param max_items  [Integer] Maximum amount of items
+      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      # @param path       [String] Form element path
-      def initialize(id, label, min_items, max_items, controller, path)
+      def initialize(spec, controller)
         textdomain "configuration_management"
-        @label = label
-        @min_items = min_items
-        @max_items = max_items
+        @label = spec.label
+        @min_items = spec.min_items
+        @max_items = spec.max_items
         @controller = controller
-        @path = path # form element path
-        self.widget_id = "collection:#{id}"
+        @path = spec.path # form element path
+        self.widget_id = "collection:#{spec.id}"
       end
 
       # Widget contents

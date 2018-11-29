@@ -25,7 +25,7 @@ require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Group do
-  subject(:group) { described_class.from_spec(spec, [widget1], controller) }
+  subject(:group) { described_class.new(spec, [widget1], controller) }
 
   include_examples "CWM::CustomWidget"
 
@@ -37,9 +37,9 @@ describe Y2ConfigurationManagement::Widgets::Group do
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text) }
 
-  describe ".from_spec" do
+  describe ".new" do
     it "instantiates a new widget according to the spec" do
-      group = described_class.from_spec(spec, [widget1], controller)
+      group = described_class.new(spec, [widget1], controller)
       expect(group.path).to eq(path)
     end
   end
