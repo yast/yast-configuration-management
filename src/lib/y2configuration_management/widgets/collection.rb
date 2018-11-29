@@ -56,9 +56,9 @@ module Y2ConfigurationManagement
           ),
           HBox(
             HStretch(),
-            PushButton(Id(:add), Yast::Label.AddButton),
-            PushButton(Id(:edit), Yast::Label.EditButton),
-            PushButton(Id(:remove), Yast::Label.RemoveButton)
+            PushButton(Id("#{widget_id}_add".to_sym), Yast::Label.AddButton),
+            PushButton(Id("#{widget_id}_edit".to_sym), Yast::Label.EditButton),
+            PushButton(Id("#{widget_id}_remove".to_sym), Yast::Label.RemoveButton)
           )
         )
       end
@@ -77,15 +77,16 @@ module Y2ConfigurationManagement
       # @param event [Hash] Event specification
       def handle(event)
         case event["ID"]
-        when :add
+        when "#{widget_id}_add".to_sym
           controller.add(path)
-        when :edit
+        when "#{widget_id}_edit".to_sym
           # TODO
           # controller.edit(path, selected_row) if selected_row
-        when :remove
+        when "#{widget_id}_remove".to_sym
           # TODO
           # controller.remove(path, selected_row) if selected_row
         end
+
         nil
       end
 
@@ -95,7 +96,7 @@ module Y2ConfigurationManagement
       #
       # @return [Integer,nil] Index of the selected row or nil if no row is selected
       def selected_row
-        row_id = UI.QueryWidget(Id("table_#{name}"), :CurrentItem)
+        row_id = UI.QueryWidget(Id("table_#{widget_id}"), :CurrentItem)
         row_id ? row_id.to_i : nil
       end
     end
