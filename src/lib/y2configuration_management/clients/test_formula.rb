@@ -30,8 +30,8 @@ module Y2ConfigurationManagement
       def run
         textdomain "configuration_management"
 
-        form_spec = Y2ConfigurationManagement::Salt::Form.from_file("test/fixtures/form.yml")
-        controller = Y2ConfigurationManagement::Salt::FormController.new(form_spec)
+        form = Y2ConfigurationManagement::Salt::Form.from_file("test/fixtures/form.yml")
+        controller = Y2ConfigurationManagement::Salt::FormController.new(form)
         controller.show_main_dialog
       end
     end

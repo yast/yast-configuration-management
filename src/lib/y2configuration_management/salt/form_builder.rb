@@ -24,7 +24,7 @@ module Y2ConfigurationManagement
     # This class builds a form according to a given specification
     #
     # For further information, see the forms specification at
-    # https://github.com/SUSE/spacewalk/wiki/Writing-Salt-Formulas-for-SUSE-Manager
+    # https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html
     class FormBuilder
       # Constructor
       #
