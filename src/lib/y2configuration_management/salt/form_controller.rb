@@ -28,8 +28,8 @@ module Y2ConfigurationManagement
     # This class takes care of driving the form for a Salt Formula.
     #
     # @example Rendering a form
-    #   form_spec = Form.from_file("test/fixtures/form.yml")
-    #   controller = FormController.new(form_spec)
+    #   form_form = Form.from_file("test/fixtures/form.yml")
+    #   controller = FormController.new(form_form)
     #   controller.show_main_dialog
     class FormController
       include Yast::I18n
@@ -37,50 +37,39 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::Form] Form specification
+      # @param form [Y2ConfigurationManagement::Salt::Form] Form
       # @param state [Hash] Current state (TODO)
-      def initialize(spec, state = {})
+      def initialize(form, state = {})
         @state = state # TODO
-        @spec = spec
+        @form = form
       end
 
       # Renders the main form's dialog
       def show_main_dialog
-        element = spec.root
-        show_dialog(element.name, form_builder.build(element, self))
+        show_dialog(form.root.name, form_builder.build(form.root.elements))
       end
 
       # Opens a new dialog in order to add a new element to a collection
       # @todo
       def add(path)
-        element = spec.find_element_by(path: path).prototype
-        show_popup(element.name, form_builder.build(element, self))
-      end
-
-      # Opens a new dialog in order to edit a new element in a collection
-      # @todo
-      def edit(_path, index)
-        log.info "Editing element #{index}"
-      end
-
-      # Removes an element from a collection
-      # @todo
-      def remove(_path, index)
-        log.info "Removing element #{index}"
+        element = form.find_element_by(path: path).prototype
+        show_popup(element.name, form_builder.build(element))
       end
 
     private
 
-      attr_reader :spec, :state
+      attr_reader :form, :state
 
+      # Returns the form builder
+      #
+      # @return [Y2ConfigurationManagement::Salt::FormBuilder]
       def form_builder
-        # TODO: the FormBuilder could receive the controller in the constructor
-        @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new
+        @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new(self)
       end
 
       # Displays a form dialog
       #
-      # @param title    [String] Popup title
+      # @param title    [String] Dialog title
       # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
       def show_dialog(title, contents)
         next_handler = proc { Yast::Popup.YesNo("Exit?") }
