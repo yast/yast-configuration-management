@@ -1,0 +1,38 @@
+---
+person:
+  "$type": namespace
+  name:
+    "$type": text
+    "$default": "John Doe"
+  email:
+    "$name": "E-mail"
+    "$type": email
+  address:
+    "$type": group
+    street:
+        "$type": text
+    country:
+        "$type": select
+        "$default": Czech Republic
+        "$values":
+        - Czech Republic
+        - Germany
+        - Spain
+  computers:
+    "$type": edit-group
+    "$minItems": 1
+    "$maxItems": 4
+    "$prototype":
+      $type: group
+      brand:
+        "$default": Dell
+        "$type": select
+        "$values":
+          - ACME
+          - Acer
+          - Dell
+          - Lenovo
+      disks:
+        "$name": Number of Disks
+        "$type": number
+        "$default": 1

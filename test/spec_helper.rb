@@ -1,4 +1,6 @@
-ENV["Y2DIR"] = File.expand_path("../../src", __FILE__)
+srcdir = File.expand_path("../../src", __FILE__)
+y2dirs = ENV.fetch("Y2DIR", "").split(":")
+ENV["Y2DIR"] = y2dirs.unshift(srcdir).join(":")
 
 require "yast"
 require "pathname"
@@ -9,7 +11,7 @@ FIXTURES_PATH = TESTS_PATH.join("fixtures")
 if ENV["COVERAGE"]
   require "simplecov"
   SimpleCov.start do
-    add_filter "/spec/"
+    add_filter "/test/"
   end
 
   # for coverage we need to load all ruby files
