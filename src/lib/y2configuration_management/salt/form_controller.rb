@@ -59,14 +59,12 @@ module Y2ConfigurationManagement
 
       # Opens a new dialog in order to edit a new element in a collection
       # @todo
-      def add(path)
       def edit(_path, index)
         log.info "Editing element #{index}"
       end
 
       # Removes an element from a collection
       # @todo
-      def add(path)
       def remove(_path, index)
         log.info "Removing element #{index}"
       end
