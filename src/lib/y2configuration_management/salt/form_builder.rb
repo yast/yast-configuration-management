@@ -26,18 +26,26 @@ module Y2ConfigurationManagement
     # For further information, see the forms specification at
     # https://github.com/SUSE/spacewalk/wiki/Writing-Salt-Formulas-for-SUSE-Manager
     class FormBuilder
-      # Build the form
+      # Constructor
       #
-      # @param form_spec  [Y2ConfigurationManagement::Salt::Form] Form specification
-      # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      # @return [Array<Y2ConfigurationManagement::Widgets::Form>]
-      def build(form_spec, controller = nil)
-        form_spec.elements.map do |element_spec|
-          build_element(element_spec, controller)
-        end
+      # @param controller [FormController] Controller to inject in widgets
+      def initialize(controller)
+        @controller = controller
+      end
+
+      # Returns the list of widgets to be included in the form
+      #
+      # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
+      # @param controller   [Y2ConfigurationManagement::Salt::FormController] Form controller
+      # @return [Array<Y2ConfigurationManagement::Widgets::AbstractWidget>] List of widgets
+      def build(form_element)
+        Array(form_element).map { |e| build_element(e) }
       end
 
     private
+
+      # @return [FormController] Controller to inject in widgets
+      attr_reader :controller
 
       # Build a form element
       #
@@ -45,30 +53,29 @@ module Y2ConfigurationManagement
       # The type is determined by the `$type` key which should be included in the element
       # specification.
       #
-      # @param element_spec [Hash]
+      # @param element [Y2ConfigurationManagement::Salt::FormElement] Form element
       # @return [Y2ConfigurationManagement::Widgets::Group,
       #          Y2ConfigurationManagement::Widgets::Text,
       #          Y2ConfigurationManagement::Widgets::Collection]
-      def build_element(element_spec, controller)
-        if [:group, :namespace].include?(element_spec.type)
-          build_group(element_spec, controller)
-        elsif element_spec.type == :"edit-group"
-          build_collection(element_spec, controller)
+      def build_element(element)
+        if [:group, :namespace].include?(element.type)
+          build_group(element)
+        elsif element.type == :"edit-group"
+          build_collection(element)
         else
-          build_input(element_spec, controller)
+          build_input(element)
         end
       end
 
-      # Build a form group
+      # Builds a form group
       #
-      # @param group_spec [Hash] Group specification
-      # @param controller [Controller]
+      # @param group [Y2ConfigurationManagement::Salt::Group] Group specification
       # @return [Y2ConfigurationManagement::Widgets::Group]
-      def build_group(group_spec, controller)
-        children = group_spec.elements.map do |element_spec|
-          build_element(element_spec, controller)
+      def build_group(group)
+        children = group.elements.map do |element_spec|
+          build_element(element_spec)
         end
-        Y2ConfigurationManagement::Widgets::Group.from_spec(group_spec, children, controller)
+        Y2ConfigurationManagement::Widgets::Group.from_spec(group, children, controller)
       end
 
       # Builds a simple input element
@@ -77,7 +84,7 @@ module Y2ConfigurationManagement
       #
       # @param input_spec [Hash] Group specification
       # @return [Y2ConfigurationManagement::Widgets::Text]
-      def build_input(input_spec, controller)
+      def build_input(input_spec)
         klass =
           case input_spec.type
           when :text, :email, :number
@@ -92,7 +99,7 @@ module Y2ConfigurationManagement
       #
       # @param collection_spec [Hash] Collection specification
       # @return [Y2ConfigurationManagement::Widgets::Collection]
-      def build_collection(collection_spec, controller)
+      def build_collection(collection_spec)
         Y2ConfigurationManagement::Widgets::Collection.from_spec(collection_spec, controller)
       end
     end

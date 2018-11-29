@@ -27,6 +27,8 @@ module Y2ConfigurationManagement
       attr_reader :name
       # @return [String] Form element path
       attr_reader :path
+      # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
+      attr_reader :children
 
       class << self
         # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
@@ -66,11 +68,6 @@ module Y2ConfigurationManagement
       def contents
         VBox(*children)
       end
-
-    private
-
-      # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
-      attr_reader :children
     end
   end
 end
