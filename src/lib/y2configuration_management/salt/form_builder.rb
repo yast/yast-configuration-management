@@ -58,12 +58,17 @@ module Y2ConfigurationManagement
       #          Y2ConfigurationManagement::Widgets::Text,
       #          Y2ConfigurationManagement::Widgets::Collection]
       def build_element(element)
-        if [:group, :namespace].include?(element.type)
+        case element.type
+        when :group, :namespace, :"hidden-group"
           build_group(element)
-        elsif element.type == :"edit-group"
+        when :"edit-group"
           build_collection(element)
-        else
+        when :text, :email, :number, :select
           build_input(element)
+        when :password, :url, :date, :time, :datetime, :boolean, :color
+          raise "Known but unimplemented $type: #{element.type}, sorry"
+        else
+          raise "Unknown $type: #{element.type}"
         end
       end
 
@@ -75,6 +80,7 @@ module Y2ConfigurationManagement
         children = group.elements.map do |element_spec|
           build_element(element_spec)
         end
+        _visible = group.type == :group # FIXME: use this
         Y2ConfigurationManagement::Widgets::Group.from_spec(group, children, controller)
       end
 
