@@ -1,6 +1,6 @@
 #!/usr/bin/env rspec
 
-require_relative "../../../spec_helper"
+require_relative "../../spec_helper"
 require "y2configuration_management/salt/form"
 
 FORMULAS_PATH = FIXTURES_PATH.join("formulas")
@@ -90,21 +90,22 @@ shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
       end
     end
   end
-
-  describe "#path" do
-    let(:formula_path) { FORMULAS_PATH.join("test-formula") }
-    let(:form_path) { formula_path.join("form.yml") }
-    let(:form) { Y2ConfigurationManagement::Salt::Form.from_file(form_path) }
-
-    it "returns the absolute form element path in the Form" do
-      number = form.find_element_by(id: "number")
-      expect(number.path).to eql(".root.demo.number")
-    end
-  end
 end
 
 describe Y2ConfigurationManagement::Salt::FormElement do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
+
+  describe "#path" do
+    let(:file_path) { FIXTURES_PATH.join("form.yml") }
+    let(:path_form) { Y2ConfigurationManagement::Salt::Form.from_file(file_path) }
+
+    it "returns the absolute form element path in the Form" do
+      computers_collection = path_form.find_element_by(id: "computers")
+      expect(computers_collection.path).to eql(".root.person.computers")
+      brand = computers_collection.prototype.find_element_by(id: "brand")
+      expect(brand.path).to eql(".root.person.computers.computers.brand")
+    end
+  end
 end
 
 describe Y2ConfigurationManagement::Salt::FormInput do
