@@ -21,12 +21,7 @@ module Y2ConfigurationManagement
         # Mechanism to detect if we're going back
         @last_formula_idx = 0
 
-        @cmdline_description = {
-          "id"         => "configuration_management_formulas",
-          "guihandler" => fun_ref(method(:do_main), "symbol ()")
-        }
-
-        CommandLine.Run(@cmdline_description)
+        do_main
       end
 
       def do_main
@@ -48,8 +43,6 @@ module Y2ConfigurationManagement
 
     private
 
-      # This code is still experimental, so let's disable this check.
-      # rubocop:disable Metrics/AbcSize
       def start_workflow
         sequence = {
           "ws_start"        => "choose_formulas",
@@ -141,16 +134,10 @@ module Y2ConfigurationManagement
       end
 
       def import_modules
-        Yast.import "CommandLine"
-        Yast.import "UI"
-        Yast.import "Popup"
-        Yast.import "GetInstArgs"
         Yast.import "Wizard"
         Yast.import "Mode"
-        Yast.import "Stage"
         Yast.import "Label"
         Yast.import "Sequencer"
-        Yast.import "Installation"
         Yast.import "Report"
       end
     end
