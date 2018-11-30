@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/form_builder"
+require "y2configuration_management/salt/form_data"
 require "y2configuration_management/widgets/form_popup"
 
 Yast.import "CWM"
@@ -38,17 +39,19 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      # @param state [Hash] Current state (TODO)
-      def initialize(form, state = {})
-        textdomain "configuration_management"
 
-        @state = state # TODO
+      def initialize(form)
+        @data = FormData.new(form)
         @form = form
       end
 
       # Renders the main form's dialog
       def show_main_dialog
         show_dialog(form.root.name, form_builder.build(form.root.elements))
+      end
+
+      def get(path)
+        @data.get(path)
       end
 
       # Opens a new dialog in order to add a new element to a collection
@@ -60,7 +63,7 @@ module Y2ConfigurationManagement
 
     private
 
-      attr_reader :form, :state
+      attr_reader :form, :data
 
       # Returns the form builder
       #
