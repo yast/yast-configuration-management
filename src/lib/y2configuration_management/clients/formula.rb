@@ -17,38 +17,24 @@ module Y2ConfigurationManagement
         textdomain "configuration_management"
         import_modules
         configure_directories
+        read_formulas
 
         # Mechanism to detect if we're going back
         @last_formula_idx = 0
 
-        do_main
-      end
-
-      def do_main
-        Wizard.CreateDialog
-        Wizard.SetDesktopIcon("security")
-        # dialog caption
-        Wizard.SetContents(_("Initializing..."), Empty(), "", false, true)
-
-        self.formulas = Y2ConfigurationManagement::Salt::Formula.all(formulas_root)
-        unless formulas && !formulas.empty?
-          Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
-          return false
-        end
-
         start_workflow
-      ensure
-        Wizard.CloseDialog
       end
 
     private
 
+      # This code is still experimental, so let's disable this check.
+      # rubocop:disable Metrics/AbcSize
       def start_workflow
         sequence = {
           "ws_start"        => "choose_formulas",
           "choose_formulas" => {
             abort: :abort,
-            next:  formulas[0].name
+            next:  formulas.empty? ? :next : formulas[0].name
           },
           "apply_formulas"  => {
             abort: :abort,
@@ -79,8 +65,12 @@ module Y2ConfigurationManagement
       end
 
       # This code is still experimental, so let's disable this check.
-      # rubocop:disable Metrics/MethodLength
       def choose_formulas
+        unless formulas && !formulas.empty?
+          Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
+          return :abort
+        end
+
         Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
       end
 
@@ -119,6 +109,10 @@ module Y2ConfigurationManagement
         @formulas_root ||= Y2ConfigurationManagement::Salt::Formula::FORMULA_BASE_DIR
         @states_root ||= formulas_root + "/states"
         @pillar_root ||= Y2ConfigurationManagement::Salt::Formula::FORMULA_DATA + "/pillar"
+      end
+
+      def read_formulas
+        self.formulas = Y2ConfigurationManagement::Salt::Formula.all(formulas_root)
       end
 
       def enabled_formulas
