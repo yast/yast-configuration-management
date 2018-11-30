@@ -3,11 +3,9 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form"
 
-FORMULAS_PATH = FIXTURES_PATH.join("formulas")
-
 describe Y2ConfigurationManagement::Salt::Form do
   subject { described_class.new(formula_path.to_s) }
-  let(:formula_path) { FORMULAS_PATH.join("test-formula") }
+  let(:formula_path) { FIXTURES_PATH.join("formulas").join("test-formula") }
   let(:form_path) { formula_path.join("form.yml") }
   let(:form) { described_class.from_file(form_path) }
 
@@ -116,7 +114,7 @@ describe Y2ConfigurationManagement::Salt::Container do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
 
   subject { described_class.new(formula_path.to_s) }
-  let(:formula_path) { FORMULAS_PATH.join("test-formula") }
+  let(:formula_path) { FIXTURES_PATH.join("formulas").join("test-formula") }
   let(:form_path) { formula_path.join("form.yml") }
   let(:form) { Y2ConfigurationManagement::Salt::Form.from_file(form_path) }
 

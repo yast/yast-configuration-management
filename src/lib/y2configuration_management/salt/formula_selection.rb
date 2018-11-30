@@ -49,7 +49,7 @@ module Y2ConfigurationManagement
       # @macro seeDialog
       def contents
         VBox(
-          HelpWidget.new,
+          FormulaSelectionHelp.new,
           VSpacing(1.0),
           Frame(
             _("Choose which formulas to apply:"),
@@ -65,53 +65,55 @@ module Y2ConfigurationManagement
       def disable_buttons
         ["back_button"]
       end
+    end
 
-      # Class for adding a help text to the dialog
-      class HelpWidget < CWM::CustomWidget
-        # @macro seeAbstractWidget
-        def help
-          _("Select which formulas you want to apply to this machine. "\
-            "For each selected formula, you will be able to customize it "\
-            "with parameters")
-        end
-
-        # @macro seeAbstractWidget
-        def contents
-          Empty()
-        end
+    # Class for adding a help text to the Formula Selection dialog
+    #
+    # @see FormulaSelection
+    class FormulaSelectionHelp < CWM::CustomWidget
+      # @macro seeAbstractWidget
+      def help
+        _("Select which formulas you want to apply to this machine. "\
+          "For each selected formula, you will be able to customize it "\
+          "with parameters")
       end
 
-      # This class represents a CheckBox for enabling a specific Salt Formula
-      class FormulaSelect < CWM::CheckBox
-        attr_reader :formula
+      # @macro seeAbstractWidget
+      def contents
+        Empty()
+      end
+    end
 
-        # Constructor
-        #
-        # @param [Formula]
-        # @macro seeAbstractWidget
-        def initialize(formula)
-          textdomain "configuration_management"
+    # This class represents a CheckBox for enabling a specific Salt Formula
+    class FormulaSelect < CWM::CheckBox
+      attr_reader :formula
 
-          @formula = formula
-          self.widget_id = "formula_select:#{formula.name}"
-        end
+      # Constructor
+      #
+      # @param [Formula]
+      # @macro seeAbstractWidget
+      def initialize(formula)
+        textdomain "configuration_management"
 
-        # @macro seeAbstractWidget
-        def label
-          "#{formula.name}: #{formula.description}"
-        end
+        @formula = formula
+        self.widget_id = "formula_select:#{formula.name}"
+      end
 
-        # @macro seeAbstractWidget
-        def init
-          self.value = !!formula.enabled?
-        end
+      # @macro seeAbstractWidget
+      def label
+        "#{formula.name}: #{formula.description}"
+      end
 
-        # Enable or disable depending on the CheckBox value
-        #
-        # @macro seeAbstractWidget
-        def store
-          formula.enabled = value
-        end
+      # @macro seeAbstractWidget
+      def init
+        self.value = !!formula.enabled?
+      end
+
+      # Enable or disable depending on the CheckBox value
+      #
+      # @macro seeAbstractWidget
+      def store
+        formula.enabled = value
       end
     end
   end
