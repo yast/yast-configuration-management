@@ -62,9 +62,9 @@ module Y2ConfigurationManagement
           build_group(element)
         when :"edit-group"
           build_collection(element)
-        when :text, :email, :number, :select
+        when :text, :email, :number, :select, :boolean
           build_input(element)
-        when :password, :url, :date, :time, :datetime, :boolean, :color
+        when :password, :url, :date, :time, :datetime, :color
           raise "Known but unimplemented $type: #{element.type}, sorry"
         else
           raise "Unknown $type: #{element.type}"
@@ -96,6 +96,8 @@ module Y2ConfigurationManagement
             Y2ConfigurationManagement::Widgets::Text
           when :select
             Y2ConfigurationManagement::Widgets::Select
+          when :boolean
+            Y2ConfigurationManagement::Widgets::Boolean
           end
         klass.new(input_spec, controller)
       end

@@ -7,6 +7,9 @@ person:
   email:
     "$name": "E-mail"
     "$type": email
+  wants_newsletter:
+    "$type": boolean
+    "$default": true
   address:
     "$type": group
     street:
