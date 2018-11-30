@@ -1,4 +1,5 @@
 require "yaml"
+require "pathname"
 require "y2configuration_management/salt/form"
 
 module Y2ConfigurationManagement

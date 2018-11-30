@@ -29,7 +29,7 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param title [String] Popup title
-      # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
+      # @param content [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
       def initialize(title, content)
         @inner_content = content
         @title = title

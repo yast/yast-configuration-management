@@ -101,7 +101,7 @@ module Y2ConfigurationManagement
       # @return [Symbol] specify the level in which the value can be edited.
       #   Possible values are: system, group and readonly
       attr_reader :scope
-      # @return optional [Boolean]
+      # @return [Boolean]
       attr_reader :optional
 
       # Constructor
@@ -161,7 +161,7 @@ module Y2ConfigurationManagement
 
     # Container Element
     class Container < FormElement
-      # @return elements [Array<FormElement>]
+      # @return [Array<FormElement>]
       attr_reader :elements
 
       # Constructor

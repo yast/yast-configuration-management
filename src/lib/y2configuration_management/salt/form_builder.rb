@@ -36,7 +36,6 @@ module Y2ConfigurationManagement
       # Returns the list of widgets to be included in the form
       #
       # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
-      # @param controller   [Y2ConfigurationManagement::Salt::FormController] Form controller
       # @return [Array<Y2ConfigurationManagement::Widgets::AbstractWidget>] List of widgets
       def build(form_element)
         Array(form_element).map { |e| build_element(e) }

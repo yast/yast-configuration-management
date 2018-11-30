@@ -48,15 +48,12 @@ module Yast
 
           # Set the configurator to use
           #
-          # @param configurator [Yast::ConfigurationManagement::Configurators::Base]
-          #   Configurator to be used
           # @return [Yast::ConfigurationManagement::Configurators::Base]
           #   Current configurator
           attr_writer :current
 
           # Return the configurator for a given CM system and a configuration
           #
-          # @param type   [String] CM type ("salt", "puppet", etc.)
           # @param config [Hash]   Configurator configuration
           # @return [Yast::ConfigurationManagement::Configurators::Base]
           #   Configurator to handle 'type' configuration

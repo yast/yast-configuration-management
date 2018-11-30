@@ -72,8 +72,8 @@ module Yast
         #
         # To be redefined by inheriting classes.
         #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
+        # @param _stdout [IO] Standard output channel used by the configurator
+        # @param _stderr [IO] Standard error channel used by the configurator
         #
         # @return [Boolean] true if the configuration was applied; false otherwise.
         def run_client_mode(_stdout, _stderr)
@@ -84,8 +84,8 @@ module Yast
         #
         # Configuration is available at #config_tmpdir
         #
-        # @param stdout [IO] Standard output channel used by the configurator
-        # @param stderr [IO] Standard error channel used by the configurator
+        # @param _stdout [IO] Standard output channel used by the configurator
+        # @param _stderr [IO] Standard error channel used by the configurator
         #
         # @return [Boolean] true if the configuration was applied; false otherwise.
         #
@@ -128,7 +128,7 @@ module Yast
         # packages using a provisioner (Salt, Puppet, etc.). The reason is that
         # libzypp is locked and it won't be released until YaST finishes (too late).
         #
-        # @param [Proc] Block to run
+        # @param block [Proc] Block to run
         # @see WithouthZyppLockNotAllowed
         def without_zypp_lock(&block)
           raise WithoutZyppLockNotAllowed if File.exist?(zypp_pid_backup)

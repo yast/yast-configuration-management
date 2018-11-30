@@ -14,7 +14,7 @@ module Yast
 
         # Custom initialization code
         #
-        # @return options [Hash] Constructor options
+        # @param options [Hash] Constructor options
         def post_initialize(options)
           @type        = "puppet"
           @modules_url = URI(options[:modules_url]) if options[:modules_url]

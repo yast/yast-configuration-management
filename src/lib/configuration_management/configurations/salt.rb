@@ -16,7 +16,7 @@ module Yast
 
         # Custom initialization code
         #
-        # @return options [Hash] Constructor options
+        # @param options [Hash] Constructor options
         def post_initialize(options)
           @type       = "salt"
           @states_url = URI(options[:states_url]) if options[:states_url]
