@@ -54,7 +54,7 @@ module Y2ConfigurationManagement
           Frame(
             _("Choose which formulas to apply:"),
             VBox(
-              *formulas.map { |f| Left(FormulaSelect.new(f)) }
+              *formulas.map { |f| Left(FormulaCheckBox.new(f)) }
             )
           ),
           VStretch()
@@ -85,7 +85,7 @@ module Y2ConfigurationManagement
     end
 
     # This class represents a CheckBox for enabling a specific Salt Formula
-    class FormulaSelect < CWM::CheckBox
+    class FormulaCheckBox < CWM::CheckBox
       attr_reader :formula
 
       # Constructor

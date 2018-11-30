@@ -15,7 +15,7 @@ module Y2ConfigurationManagement
       # @return [String] Formula path
       attr_reader :path
 
-      # @return [String] Formula metadata
+      # @return [Hash] Formula metadata, FIXME: make it a class with #description, #group, #after
       attr_reader :metadata
 
       # @return [Form] Formula form

@@ -10,7 +10,9 @@ module Y2ConfigurationManagement
       include Yast::Logger
       extend Yast::I18n
 
+      # @return [Array<Y2ConfigurationManagement::Salt::Formula>]
       attr_accessor :formulas
+      # @return [String]
       attr_reader :states_root, :formulas_root, :pillar_root
 
       def main
@@ -66,7 +68,7 @@ module Y2ConfigurationManagement
 
       # This code is still experimental, so let's disable this check.
       def choose_formulas
-        unless formulas && !formulas.empty?
+        if Array(formulas).empty?
           Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
           return :abort
         end
