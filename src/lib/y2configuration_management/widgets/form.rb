@@ -73,7 +73,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget
       def store
-        @result = children.reduce({}) { |h, w| h.merge(w.id => w.value) }
+        @result = children.reduce({}) { |a, e| a.merge(e.id => e.value) }
       end
     end
   end

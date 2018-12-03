@@ -77,7 +77,7 @@ module Y2ConfigurationManagement
       # @return value [Hash] New value
       # @see #value=
       def value
-        children.reduce({}) { |h, w| h.merge(w.id => w.value) }
+        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
       end
     end
   end

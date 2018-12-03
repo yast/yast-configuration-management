@@ -39,14 +39,15 @@ describe Y2ConfigurationManagement::Widgets::Select do
     it "instantiates a new widget according to the spec" do
       selector = described_class.new(spec, controller)
       expect(selector.path).to eq(path)
-      expect(selector.items).to eq([["0", "Czech Republic"], ["1", "Germany"], ["2", "Spain"]])
+      expect(selector.items)
+        .to eq([["Czech Republic", "Czech Republic"], ["Germany", "Germany"], ["Spain", "Spain"]])
       expect(selector.default).to eq("Czech Republic")
     end
   end
 
   describe "#init" do
     it "initializes the current value to the default one" do
-      expect(selector).to receive(:value=).with("0")
+      expect(selector).to receive(:value=).with("Czech Republic")
       selector.init
     end
 

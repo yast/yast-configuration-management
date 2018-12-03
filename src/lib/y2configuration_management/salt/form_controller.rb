@@ -64,7 +64,6 @@ module Y2ConfigurationManagement
       # @param path [String] Collection's path
       def add(path)
         element = form.find_element_by(path: path).prototype
-        widget_form = form_builder.build(element)
         result = show_popup(element.name, form_builder.build(element))
         return if result.nil?
         @data.add(path, result.values.first)
@@ -89,17 +88,6 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Salt::FormBuilder]
       def form_builder
         @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new(self)
-      end
-
-      # Displays a form dialog
-      #
-      # @param title       [String] Dialog title
-      # @param widget_form [Y2ConfigurationManagement::Widgets:Form] Form to show
-      def show_dialog(widget_form)
-        Yast::CWM.show(
-          HBox(replace_point),
-          caption: form.root.name, next_handler: method(:next_handler)
-        )
       end
 
       # Renders the main form's dialog

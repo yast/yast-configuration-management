@@ -30,8 +30,11 @@ describe Y2ConfigurationManagement::Salt::FormController do
   end
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
+  let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form) }
 
   before do
+    allow(Y2ConfigurationManagement::Salt::FormData).to receive(:new)
+      .and_return(data)
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller).and_return(builder)
   end
@@ -46,5 +49,12 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   describe "#add" do
     it "opens the dialog using the collections's prototype"
+  end
+
+  describe "#remove" do
+    it "removes an element" do
+      expect(data).to receive(:remove).with(".root.person.computers", 1)
+      controller.remove(".root.person.computers", 1)
+    end
   end
 end

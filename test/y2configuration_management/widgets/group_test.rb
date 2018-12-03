@@ -46,8 +46,8 @@ describe Y2ConfigurationManagement::Widgets::Group do
 
   describe "#value=" do
     it "sets values of underlying widgets" do
-      expect(widget).to receive(:value=).with("foobar")
-      widget.value = { "widget1" => "foobar" }
+      expect(widget1).to receive(:value=).with("foobar")
+      group.value = { "widget1" => "foobar" }
     end
   end
 end

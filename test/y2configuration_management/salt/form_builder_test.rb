@@ -34,10 +34,10 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
     context "when an input form element is given" do
       let(:path) { ".root.person.name" }
 
-      it "returns an array containing a text widget" do
-        widgets = builder.build(element)
-        expect(widgets).to be_all(Y2ConfigurationManagement::Widgets::Text)
-        expect(widgets).to contain_exactly(
+      it "returns a form containing a text widget" do
+        form = builder.build(element)
+        expect(form.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
+        expect(form.children).to contain_exactly(
           an_object_having_attributes(
             "path" => ".root.person.name"
           )
@@ -48,9 +48,9 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
     context "when a group form element is given" do
       let(:path) { ".root.person.address" }
 
-      it "returns an array containing a group widgets" do
-        widgets = builder.build(element)
-        group = widgets.first
+      it "returns a form containing a group widgets" do
+        form = builder.build(element)
+        group = form.children.first
         expect(group.children).to contain_exactly(
           an_object_having_attributes("path" => ".root.person.address.street"),
           an_object_having_attributes("path" => ".root.person.address.country")
@@ -61,9 +61,9 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
     context "when a collection is given" do
       let(:path) { ".root.person.computers" }
 
-      it "returns an array containing a collection widget" do
-        widgets = builder.build(element)
-        expect(widgets).to be_all(Y2ConfigurationManagement::Widgets::Collection)
+      it "returns a form containing a collection widget" do
+        form = builder.build(element)
+        expect(form.children).to be_all(Y2ConfigurationManagement::Widgets::Collection)
       end
     end
   end
