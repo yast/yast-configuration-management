@@ -31,6 +31,8 @@ module Y2ConfigurationManagement
       attr_reader :default
       # @return [String] Form element path
       attr_reader :path
+      # @return [String] Form element id
+      attr_reader :id
 
       # Constructor
       #
@@ -41,6 +43,7 @@ module Y2ConfigurationManagement
         @items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
         @default = spec.default
         @path = spec.path
+        @id = spec.id
         @controller = controller
         self.widget_id = "select:#{spec.id}"
       end

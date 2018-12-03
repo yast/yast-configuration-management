@@ -29,6 +29,8 @@ module Y2ConfigurationManagement
       attr_reader :path
       # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
       attr_reader :children
+      # @return [String] Form element id
+      attr_reader :id
 
       # Constructor
       #
@@ -41,6 +43,7 @@ module Y2ConfigurationManagement
         @children = children
         @controller = controller
         @path = spec.path
+        @id = spec.id
         self.widget_id = "group:#{spec.id}"
       end
 

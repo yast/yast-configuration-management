@@ -27,7 +27,7 @@ module Y2ConfigurationManagement
     # This widget uses a table to display a collection of elements and offers
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
-      attr_reader :label, :min_items, :max_items, :controller, :path
+      attr_reader :label, :min_items, :max_items, :controller, :path, :id
 
       # Constructor
       #
@@ -40,6 +40,7 @@ module Y2ConfigurationManagement
         @max_items = spec.max_items
         @controller = controller
         @path = spec.path # form element path
+        @id = spec.id
         self.widget_id = "collection:#{spec.id}"
       end
 
