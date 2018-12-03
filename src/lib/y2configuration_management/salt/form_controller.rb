@@ -91,6 +91,17 @@ module Y2ConfigurationManagement
         @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new(self)
       end
 
+      # Displays a form dialog
+      #
+      # @param title       [String] Dialog title
+      # @param widget_form [Y2ConfigurationManagement::Widgets:Form] Form to show
+      def show_dialog(widget_form)
+        Yast::CWM.show(
+          HBox(replace_point),
+          caption: form.root.name, next_handler: method(:next_handler)
+        )
+      end
+
       # Renders the main form's dialog
       def main_form
         widget_form = form_builder.build(form.root.elements)
