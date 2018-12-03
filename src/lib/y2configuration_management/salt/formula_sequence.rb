@@ -60,7 +60,7 @@ module Y2ConfigurationManagement
         Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
       end
 
-      # Iterates over the enabled {Formula}s running the {FormController]} for
+      # Iterates over the enabled {Formula}s running the {FormController} for
       # each of them.
       def configure_formulas
         Y2ConfigurationManagement::Salt::FormulaConfiguration.new(formulas).run
@@ -77,7 +77,7 @@ module Y2ConfigurationManagement
 
     private
 
-      # @macro seeSequence#run
+      # @macro seeSequence
       def sequence_hash
         {
           START                => "choose_formulas",

@@ -117,7 +117,7 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param [Formula]
+      # @param formula [Formula]
       # @macro seeAbstractWidget
       def initialize(formula)
         textdomain "configuration_management"
