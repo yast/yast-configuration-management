@@ -38,7 +38,8 @@ module Y2ConfigurationManagement
       # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
       # @return [Array<Y2ConfigurationManagement::Widgets::AbstractWidget>] List of widgets
       def build(form_element)
-        Array(form_element).map { |e| build_element(e) }
+        widgets = Array(form_element).map { |e| build_element(e) }
+        Y2ConfigurationManagement::Widgets::Form.new(widgets)
       end
 
     private

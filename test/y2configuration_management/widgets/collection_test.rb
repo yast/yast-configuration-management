@@ -43,4 +43,28 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       expect(collection.max_items).to eq(4)
     end
   end
+
+  describe "#handle" do
+    context "when it is an 'add' event" do
+      let(:event) { { "ID" => :add } }
+
+      it "adds a new element to the collection" do
+        expect(controller).to receive(:add).with(path)
+        collection.handle(event)
+      end
+    end
+
+    context "when it is an 'remove' event" do
+      let(:event) { { "ID" => :remove } }
+
+      before do
+        allow(collection).to receive(:selected_row).and_return(1)
+      end
+
+      it "removes the selected element from the collection" do
+        expect(controller).to receive(:remove).with(path, 1)
+        collection.handle(event)
+      end
+    end
+  end
 end

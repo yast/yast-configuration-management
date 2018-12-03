@@ -28,6 +28,8 @@ module Y2ConfigurationManagement
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
       attr_reader :label, :min_items, :max_items, :controller, :path, :id
+      # @return [Array<Object>] List of objects which are included in the collection
+      attr_accessor :value
 
       # Constructor
       #
@@ -42,6 +44,7 @@ module Y2ConfigurationManagement
         @path = spec.path # form element path
         @id = spec.id
         self.widget_id = "collection:#{spec.id}"
+        self.value = []
       end
 
       # Widget contents
@@ -86,6 +89,7 @@ module Y2ConfigurationManagement
         when "#{widget_id}_remove".to_sym
           # TODO
           # controller.remove(path, selected_row) if selected_row
+          controller.remove(path, selected_row) if selected_row
         end
 
         nil
@@ -107,6 +111,7 @@ module Y2ConfigurationManagement
       #
       # @return [Array<String>]
       def headers
+        return unless value.first
         value.first.keys
       end
 
