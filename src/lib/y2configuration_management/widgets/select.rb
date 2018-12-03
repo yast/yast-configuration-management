@@ -40,7 +40,7 @@ module Y2ConfigurationManagement
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
       def initialize(spec, controller)
         @label = spec.label
-        @items = spec.values.each_with_index.map { |v, i| [i.to_s, v] }
+        @items = spec.values.map { |v| [v, v] }
         @default = spec.default
         @path = spec.path
         @id = spec.id
