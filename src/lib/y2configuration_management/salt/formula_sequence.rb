@@ -21,6 +21,7 @@ require "ui/sequence"
 require "y2configuration_management/salt/formula_configuration"
 require "y2configuration_management/salt/formula_selection"
 
+Yast.import "Report"
 Yast.import "Message"
 Yast.import "Popup"
 
@@ -52,7 +53,7 @@ module Y2ConfigurationManagement
       # It runs the {FormulaSelection} dialog
       def choose_formulas
         if Array.new(formulas).empty?
-          Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
+          Yast::Report.Error(_("There are no formulas available. Please check the log files."))
           return :abort
         end
 

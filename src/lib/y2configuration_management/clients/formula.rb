@@ -39,7 +39,6 @@ module Y2ConfigurationManagement
       end
 
       def main
-        import_modules
         configure_directories
         read_formulas
         start_workflow
@@ -60,16 +59,6 @@ module Y2ConfigurationManagement
 
       def read_formulas
         self.formulas = Y2ConfigurationManagement::Salt::Formula.all(formulas_root)
-      end
-
-      def import_modules
-        Yast.import "Wizard"
-        Yast.import "Mode"
-        Yast.import "Label"
-        Yast.import "Sequencer"
-        Yast.import "Report"
-        Yast.import "Popup"
-        Yast.import "Message"
       end
     end
   end

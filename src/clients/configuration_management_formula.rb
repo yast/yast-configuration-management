@@ -61,7 +61,7 @@ module ConfigurationManagement
       if formulas && !formulas.empty?
         ret = start_workflow
       else
-        Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
+        Yast::Report.Error(_("Formulas cannot be read. Please check the log files."))
         ret = false
       end
       Wizard.CloseDialog
