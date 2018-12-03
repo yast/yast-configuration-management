@@ -1,0 +1,6 @@
+---
+no_one:
+  "$type": namespace
+  name:
+    "$type": text
+    "$default": "No One"

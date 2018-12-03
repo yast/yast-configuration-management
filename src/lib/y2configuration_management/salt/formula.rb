@@ -78,15 +78,22 @@ module Y2ConfigurationManagement
       end
 
       # Return all the installed formulas
+      #
+      # @return [Array<Formula>]
       def self.all(*paths)
-        metadata_paths = paths.empty? ? [FORMULA_BASE_DIR, FORMULA_CUSTOM_DIR] : paths
-        metadata_paths = metadata_paths.flatten.compact.map { |p| p + "/metadata/*" }
-        return [] if metadata_paths.empty?
-        Dir.glob(metadata_paths)
+        metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
+        Dir.glob(metadata_paths.map { |p| p + "/metadata/*" })
            .map { |p| Pathname.new(p) }
            .select(&:directory?)
            .map { |p| Formula.new(p) }
            .select(&:form)
+      end
+
+      # Return formula default directories
+      #
+      # @return [String]
+      def self.formula_directories
+        [FORMULA_BASE_DIR, FORMULA_CUSTOM_DIR]
       end
     end
   end
