@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "yaml"
+require "yast"
 
 module Y2ConfigurationManagement
   module Salt
@@ -26,6 +27,7 @@ module Y2ConfigurationManagement
     # [1]: https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html#best.practice.salt.formulas.pillar
     # [2]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
     class Form
+      include Yast::Logger
       # @return [Container]
       attr_reader :root
       # @return [Hash] The original specification (deserialized form.yml).
@@ -44,10 +46,14 @@ module Y2ConfigurationManagement
       # Creates a new Form object reading the definition from a YAML file
       #
       # @param path [String] file path to read the form YAML definition
-      # @return [Form]
+      # @return [Form, nil]
       def self.from_file(path)
+        return nil unless File.exist?(path)
         definition = YAML.safe_load(File.read(path))
         new(definition)
+      rescue IOError, SystemCallError, RuntimeError => error
+        log.error("Reading #{path} failed with exception: #{error.inspect}")
+        nil
       end
 
       # Convenience method for looking for a particular FormElement.
