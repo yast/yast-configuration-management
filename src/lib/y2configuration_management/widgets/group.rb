@@ -29,7 +29,6 @@ module Y2ConfigurationManagement
       attr_reader :path
       # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
       attr_reader :children
-      # @return [String] Form element id
       attr_reader :id
 
       # Constructor
@@ -52,6 +51,33 @@ module Y2ConfigurationManagement
       # @return [Yast::Term]
       def contents
         VBox(*children)
+      end
+
+      # Sets the value for the form
+      #
+      # This method propagates the values to the underlying widgets.
+      #
+      # @example Setting values for included widgets
+      #   form.values = { "name" => "John", "surname" => "Doe" }
+      # @example Setting values for nested widgets
+      #   form.values = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
+      #
+      # @return value [Hash] New value
+      def value=(values)
+        children.each do |widget|
+          widget.value = values[widget.id]
+        end
+      end
+
+      # Returns form widgets
+      #
+      # This method gets the values from the underlying widgets returning them in a
+      # hash index by widget ids.
+      #
+      # @return value [Hash] New value
+      # @see #value=
+      def value
+        children.reduce({}) { |h, w| h.merge(w.id => w.value) }
       end
     end
   end
