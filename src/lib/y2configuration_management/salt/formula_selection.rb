@@ -62,8 +62,29 @@ module Y2ConfigurationManagement
       end
 
       # @macro seeDialog
+      def run
+        ret = nil
+        loop do
+          ret = super
+          break if continue?(ret)
+          Yast::Report.Error(_("You must select at least one formula before continuing."))
+        end
+        ret
+      end
+
+      # @macro seeDialog
       def disable_buttons
         ["back_button"]
+      end
+
+    private
+
+      # Whether we can continue with the action selected or not
+      #
+      # @param ret [Symbol] the dialog action
+      # @return [Boolean]
+      def continue?(ret)
+        ret != :next || !formulas.select(&:enabled?).empty?
       end
     end
 
@@ -71,6 +92,12 @@ module Y2ConfigurationManagement
     #
     # @see FormulaSelection
     class FormulaSelectionHelp < CWM::CustomWidget
+      # Constructor
+      # @macro seeAbstractWidget
+      def initialize
+        textdomain "configuration_management"
+      end
+
       # @macro seeAbstractWidget
       def help
         _("Select which formulas you want to apply to this machine. "\
@@ -96,12 +123,12 @@ module Y2ConfigurationManagement
         textdomain "configuration_management"
 
         @formula = formula
-        self.widget_id = "formula_select:#{formula.name}"
+        self.widget_id = "formula_select:#{formula.id}"
       end
 
       # @macro seeAbstractWidget
       def label
-        "#{formula.name}: #{formula.description}"
+        "#{formula.id}: #{formula.description}"
       end
 
       # @macro seeAbstractWidget

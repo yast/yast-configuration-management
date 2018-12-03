@@ -40,6 +40,8 @@ module Y2ConfigurationManagement
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
       # @param state [Hash] Current state (TODO)
       def initialize(form, state = {})
+        textdomain "configuration_management"
+
         @state = state # TODO
         @form = form
       end

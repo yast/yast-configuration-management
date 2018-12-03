@@ -1,7 +1,25 @@
+# Copyright (c) [2018] SUSE LLC
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of version 2 of the GNU General Public License as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, contact SUSE LLC.
+#
+# To contact SUSE LLC about this file by physical or electronic mail, you may
+# find current contact information at www.suse.com.
+
 require "yast"
 require "y2configuration_management/salt/formula"
-require "y2configuration_management/salt/form_controller"
-require "y2configuration_management/salt/formula_selection"
+require "y2configuration_management/salt/formula_sequence"
 
 module Y2ConfigurationManagement
   module Clients
@@ -15,95 +33,22 @@ module Y2ConfigurationManagement
       # @return [String]
       attr_reader :states_root, :formulas_root, :pillar_root
 
-      def main
+      # Constructor
+      def initialize
         textdomain "configuration_management"
+      end
+
+      def main
         import_modules
         configure_directories
         read_formulas
-
-        # Mechanism to detect if we're going back
-        @last_formula_idx = 0
-
         start_workflow
       end
 
     private
 
-      # This code is still experimental, so let's disable this check.
-      # rubocop:disable Metrics/AbcSize
       def start_workflow
-        sequence = {
-          "ws_start"        => "choose_formulas",
-          "choose_formulas" => {
-            abort: :abort,
-            next:  formulas.empty? ? :next : formulas[0].name
-          },
-          "apply_formulas"  => {
-            abort: :abort,
-            next:  :next
-          }
-        }
-
-        workflow_aliases = {
-          "choose_formulas" => ->() { choose_formulas },
-          "apply_formulas"  => ->() { apply_formulas }
-        }
-
-        formulas.each_with_index do |formula, idx|
-          sequence[formula.name] = {
-            abort:  :abort,
-            cancel: "choose_formulas",
-            next:   idx < formulas.size - 1 ? formulas[idx + 1].name : "apply_formulas",
-            back:   idx > 0 ? formulas[idx - 1].name : "choose_formulas"
-          }
-          workflow_aliases[formula.name] = ->() { parametrize_formula(formula) }
-        end
-
-        log.info "Starting formula sequence"
-        log.info "Aliases: #{workflow_aliases.inspect}"
-        log.info "Sequence: #{sequence.inspect}"
-
-        Sequencer.Run(workflow_aliases, sequence)
-      end
-
-      # This code is still experimental, so let's disable this check.
-      def choose_formulas
-        if Array(formulas).empty?
-          Yast::Report.Error(_("Formulas cannot not be read. Please check logfiles."))
-          return :abort
-        end
-
-        Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
-      end
-
-      def parametrize_formula(formula)
-        if !formula.enabled?
-          ret = going_back?(formula) ? :back : :next
-          return ret
-        end
-        @last_formula_idx = formulas.index(formula)
-
-        controller = Y2ConfigurationManagement::Salt::FormController.new(formula.form)
-        controller.show_main_dialog
-      end
-
-      # Apply selected formulas
-      #
-      # TODO: Pending implementation
-      def apply_formulas
-        return :next if enabled_formulas.empty?
-
-        Yast::Wizard.SetContents(
-          _("Applying formulas"),
-          Label(enabled_formulas.map(&:name).join(", ")),
-          "",
-          false,
-          false
-        )
-
-        sleep 2
-
-        :next
+        Y2ConfigurationManagement::Salt::FormulaSequence.new(formulas).run
       end
 
       def configure_directories
@@ -117,24 +62,14 @@ module Y2ConfigurationManagement
         self.formulas = Y2ConfigurationManagement::Salt::Formula.all(formulas_root)
       end
 
-      def enabled_formulas
-        formulas.select(&:enabled?)
-      end
-
-      # Helper method do detect if we're going back
-      def going_back?(formula)
-        idx = formulas.index(formula)
-        ret = idx < @last_formula_idx
-        @last_formula_idx = idx
-        ret
-      end
-
       def import_modules
         Yast.import "Wizard"
         Yast.import "Mode"
         Yast.import "Label"
         Yast.import "Sequencer"
         Yast.import "Report"
+        Yast.import "Popup"
+        Yast.import "Message"
       end
     end
   end

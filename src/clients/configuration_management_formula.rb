@@ -35,6 +35,8 @@ module ConfigurationManagement
       CommandLine.Run(@cmdline_description)
     end
 
+  private
+
     def import_modules
       Yast.import "CommandLine"
       Yast.import "UI"

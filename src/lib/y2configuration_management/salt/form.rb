@@ -175,7 +175,7 @@ module Y2ConfigurationManagement
         build_elements(spec)
       end
 
-      # Recursively looks for a particular FormElement
+      # Recursively looks for a particular {FormElement}
       #
       # @example look for a FormElement by a specific name, path or id
       #
@@ -242,7 +242,7 @@ module Y2ConfigurationManagement
 
     private
 
-      # Return a single or group of FormElements based on the prototype given
+      # Return a single or group of {FormElement}s based on the prototype given
       # in the form specification
       #
       # @param id [String]
