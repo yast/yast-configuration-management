@@ -54,7 +54,7 @@ module Y2ConfigurationManagement
 
       # @param current_index [Integer]
       def previous_formula(current_index)
-        return :cancel if current_index.zero?
+        return :back if current_index.zero?
         formulas[current_index - 1].id
       end
 
