@@ -50,10 +50,10 @@ module Y2ConfigurationManagement
       def contents
         VBox(
           Table(
-            Id("table_#{widget_id}"),
+            Id("table:#{path}"),
             Opt(:notify, :immediate),
-            Header(label),
-            []
+            Header(*headers),
+            items_list
           ),
           HBox(
             HStretch(),
@@ -97,8 +97,27 @@ module Y2ConfigurationManagement
       #
       # @return [Integer,nil] Index of the selected row or nil if no row is selected
       def selected_row
-        row_id = UI.QueryWidget(Id("table_#{widget_id}"), :CurrentItem)
+        row_id = Yast::UI.QueryWidget(Id("table:#{path}"), :CurrentItem)
         row_id ? row_id.to_i : nil
+      end
+
+      # Returns the headers for the collection table
+      #
+      # @todo Get this information from the formula spec
+      #
+      # @return [Array<String>]
+      def headers
+        value.first.keys
+      end
+
+      # Format the items list for the colletion table
+      #
+      # @return [Array<Array<String|Yast::Term>>]
+      def items_list
+        value.each_with_index.map do |item, index|
+          values = headers.map { |h| item[h] }
+          Item(Id(index.to_s), *values)
+        end
       end
     end
   end
