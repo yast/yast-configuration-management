@@ -111,8 +111,9 @@ module Y2ConfigurationManagement
       end
     end
 
-    # This class represents a CheckBox for enabling a specific Salt Formula
+    # This class represents a CheckBox for enabling a specific Salt {Formula}
     class FormulaCheckBox < CWM::CheckBox
+      # @return [Formula]
       attr_reader :formula
 
       # Constructor

@@ -24,9 +24,9 @@ require "y2configuration_management/salt/form"
 require "y2configuration_management/widgets"
 
 describe Y2ConfigurationManagement::Salt::Formula do
-  describe ".all" do
-    let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s) }
+  let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s) }
 
+  describe ".all" do
     it "returns all the formulas from the given path" do
       expect(formulas.size).to eql(2)
     end
@@ -61,6 +61,20 @@ describe Y2ConfigurationManagement::Salt::Formula do
     it "returns an array with the default formula directories" do
       expect(described_class.formula_directories)
         .to eql([described_class::FORMULA_BASE_DIR, described_class::FORMULA_CUSTOM_DIR])
+    end
+  end
+
+  describe "#description" do
+    it "returns the formula description from the metadata" do
+      formula = formulas.find { |f| f.id == "test-formula" }
+      expect(formula.description).to include("This is the description of the test formula")
+    end
+
+    context "when the formula does not have metadata" do
+      it "returns an empty string" do
+        formula = formulas.find { |f| f.id == "no-metadata" }
+        expect(formula.description).to be_empty
+      end
     end
   end
 end
