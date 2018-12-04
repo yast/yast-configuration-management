@@ -48,7 +48,41 @@ describe Y2ConfigurationManagement::Salt::FormController do
   end
 
   describe "#add" do
-    it "opens the dialog using the collections's prototype"
+    let(:path) { ".root.person.computers" }
+    let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
+    let(:widget) { instance_double(Y2ConfigurationManagement::Widgets::Form, result: result) }
+    let(:result) { nil }
+    let(:prototype) { form.find_element_by(path: path).prototype }
+
+    before do
+      allow(Y2ConfigurationManagement::Widgets::FormPopup)
+        .to receive(:new).and_return(popup)
+      allow(builder).to receive(:build).and_call_original
+      allow(builder).to receive(:build).with(prototype).and_return(widget)
+    end
+
+    it "opens the dialog using the collections's prototype" do
+      expect(builder).to receive(:build).with(prototype).and_return(widget)
+      controller.add(path)
+    end
+
+    context "when the user accepts the dialog" do
+      let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
+
+      it "updates the form data" do
+        controller.add(path)
+        expect(data.get(".root.person.computers")).to include("brand" => "Lenovo", "disks" => 2)
+      end
+    end
+
+    context "when the user cancels the dialog" do
+      let(:result) { nil }
+
+      it "does not modify form data" do
+        expect(data).to_not receive(:add)
+        controller.add(path)
+      end
+    end
   end
 
   describe "#remove" do
