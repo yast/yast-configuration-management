@@ -82,7 +82,7 @@ module Y2ConfigurationManagement
       # @return [Array<Formula>]
       def self.all(*paths)
         metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
-        Dir.glob(metadata_paths.map { |p| p + "/metadata/*" })
+        Dir.glob(metadata_paths.map { |p| p + "/*" })
            .map { |p| Pathname.new(p) }
            .select(&:directory?)
            .map { |p| Formula.new(p) }
@@ -93,7 +93,7 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def self.formula_directories
-        [FORMULA_BASE_DIR, FORMULA_CUSTOM_DIR]
+        [FORMULA_BASE_DIR + "/metadata", FORMULA_CUSTOM_DIR]
       end
     end
   end

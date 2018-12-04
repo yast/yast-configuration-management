@@ -20,8 +20,6 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula"
-require "y2configuration_management/salt/form"
-require "y2configuration_management/widgets"
 
 describe Y2ConfigurationManagement::Salt::Formula do
   let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s) }
@@ -60,7 +58,7 @@ describe Y2ConfigurationManagement::Salt::Formula do
   describe ".formula_directories" do
     it "returns an array with the default formula directories" do
       expect(described_class.formula_directories)
-        .to eql([described_class::FORMULA_BASE_DIR, described_class::FORMULA_CUSTOM_DIR])
+        .to eql([described_class::FORMULA_BASE_DIR+"/metadata", described_class::FORMULA_CUSTOM_DIR])
     end
   end
 
