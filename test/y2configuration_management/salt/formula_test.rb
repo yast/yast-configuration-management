@@ -56,9 +56,12 @@ describe Y2ConfigurationManagement::Salt::Formula do
   end
 
   describe ".formula_directories" do
+    let(:default_directories) do
+      [described_class::FORMULA_BASE_DIR + "/metadata", described_class::FORMULA_CUSTOM_DIR]
+    end
+
     it "returns an array with the default formula directories" do
-      expect(described_class.formula_directories)
-        .to eql([described_class::FORMULA_BASE_DIR+"/metadata", described_class::FORMULA_CUSTOM_DIR])
+      expect(described_class.formula_directories).to eql(default_directories)
     end
   end
 
