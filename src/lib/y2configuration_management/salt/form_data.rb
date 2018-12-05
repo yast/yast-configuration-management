@@ -96,15 +96,15 @@ module Y2ConfigurationManagement
 
       # Builds a hash to keep the form data
       #
-      # @param [Y2ConfigurationManagement::Salt::Form]
+      # @param form [Y2ConfigurationManagement::Salt::Form]
       # @return [Hash]
       def data_for_form(form)
         data_for_element(form.root)
       end
 
-      # Builds a hash to keep the form data
+      # Builds a hash to keep the form element data
       #
-      # @param [Y2ConfigurationManagement::Salt::Form]
+      # @param element [Y2ConfigurationManagement::Salt::FormElement]
       # @return [Hash]
       def data_for_element(element)
         if element.is_a?(Container)

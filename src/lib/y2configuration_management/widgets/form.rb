@@ -53,7 +53,7 @@ module Y2ConfigurationManagement
       # @example Setting values for nested widgets
       #   form.values = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       #
-      # @return value [Hash] New value
+      # @param value [Hash] New value
       def value=(value)
         children.each do |widget|
           widget.value = value[widget.id]

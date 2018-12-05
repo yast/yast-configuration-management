@@ -39,7 +39,6 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
-
       def initialize(form)
         @data = FormData.new(form)
         @form = form
@@ -112,7 +111,7 @@ module Y2ConfigurationManagement
       # Displays a popup
       #
       # @param title    [String] Popup title
-      # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
+      # @param widget [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
       # @return [Hash,nil] Dialog's result
       def show_popup(title, widget)
         Widgets::FormPopup.new(title, widget).run
