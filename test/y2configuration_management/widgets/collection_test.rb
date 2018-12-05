@@ -1,3 +1,4 @@
+#!/usr/bin/env rspec
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -46,7 +47,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
 
   describe "#handle" do
     context "when it is an 'add' event" do
-      let(:event) { { "ID" => :add } }
+      let(:event) { { "ID" => "#{collection.widget_id}_add".to_sym } }
 
       it "adds a new element to the collection" do
         expect(controller).to receive(:add).with(path)
@@ -55,7 +56,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
     end
 
     context "when it is an 'remove' event" do
-      let(:event) { { "ID" => :remove } }
+      let(:event) { { "ID" => "#{collection.widget_id}_remove".to_sym } }
 
       before do
         allow(collection).to receive(:selected_row).and_return(1)
