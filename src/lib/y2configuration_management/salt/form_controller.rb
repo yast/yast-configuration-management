@@ -51,9 +51,13 @@ module Y2ConfigurationManagement
           HBox(replace_point),
           caption: form.root.name, next_handler: method(:next_handler)
         )
+      ensure
         Yast::Wizard.CloseDialog
       end
 
+      # Convenience method for returning the value of a given element
+      #
+      # @param path [String] Path to the element
       def get(path)
         @data.get(path)
       end
@@ -80,7 +84,10 @@ module Y2ConfigurationManagement
 
     private
 
-      attr_reader :form, :data
+      # @return [Form]
+      attr_reader :form
+      # @return [FormData]
+      attr_reader :data
 
       # Returns the form builder
       #

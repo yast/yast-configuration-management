@@ -24,6 +24,7 @@ module Y2ConfigurationManagement
     # @todo The support for collections is rather simple and nesting collections is not supported.
     #       We might consider using JSON Patch to modify the data.
     class FormData
+      PATH_DELIMITER = ".".freeze
       # @return [Y2ConfigurationManagement::Salt::Form] Form
       attr_reader :form
 
@@ -91,7 +92,7 @@ module Y2ConfigurationManagement
       #
       # @param path [String] Element path
       def path_to_parts(path)
-        path[1..-1].split(".")
+        path[1..-1].split(PATH_DELIMITER)
       end
 
       # Builds a hash to keep the form data

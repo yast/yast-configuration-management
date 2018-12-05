@@ -49,9 +49,9 @@ module Y2ConfigurationManagement
       # This method propagates the values to the underlying widgets.
       #
       # @example Setting values for included widgets
-      #   form.values = { "name" => "John", "surname" => "Doe" }
+      #   form.value = { "name" => "John", "surname" => "Doe" }
       # @example Setting values for nested widgets
-      #   form.values = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
+      #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       #
       # @param value [Hash] New value
       def value=(value)
