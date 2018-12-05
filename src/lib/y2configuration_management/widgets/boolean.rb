@@ -30,6 +30,8 @@ module Y2ConfigurationManagement
       attr_reader :default
       # @return [String] Form path
       attr_reader :path
+      # @return [String] Form element id
+      attr_reader :id
 
       # Constructor
       #
@@ -40,6 +42,7 @@ module Y2ConfigurationManagement
         @default = spec.default == true # nil -> false
         @controller = controller
         @path = spec.path
+        @id = spec.id
         self.widget_id = "boolean:#{spec.id}"
       end
 
