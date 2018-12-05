@@ -73,7 +73,7 @@ module Yast
 
         # Return a path to a temporal directory to extract states/pillars
         #
-        # @param  [Symbol] Path relative to inst-sys (:local) or the target system (:target)
+        # @param scope [Symbol] Path relative to inst-sys (:local) or the target system (:target)
         # @return [String] Path name to the temporal directory
         def work_dir(scope = :local)
           @work_dir ||= build_work_dir_name

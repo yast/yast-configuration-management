@@ -36,7 +36,6 @@ module Y2ConfigurationManagement
       # Returns the list of widgets to be included in the form
       #
       # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
-      # @param controller   [Y2ConfigurationManagement::Salt::FormController] Form controller
       # @return [Array<Y2ConfigurationManagement::Widgets::AbstractWidget>] List of widgets
       def build(form_element)
         Array(form_element).map { |e| build_element(e) }
@@ -63,9 +62,9 @@ module Y2ConfigurationManagement
           build_group(element)
         when :"edit-group"
           build_collection(element)
-        when :text, :email, :number, :select
+        when :text, :email, :number, :select, :boolean
           build_input(element)
-        when :password, :url, :date, :time, :datetime, :boolean, :color
+        when :password, :url, :date, :time, :datetime, :color
           raise "Known but unimplemented $type: #{element.type}, sorry"
         else
           raise "Unknown $type: #{element.type}"
@@ -97,6 +96,8 @@ module Y2ConfigurationManagement
             Y2ConfigurationManagement::Widgets::Text
           when :select
             Y2ConfigurationManagement::Widgets::Select
+          when :boolean
+            Y2ConfigurationManagement::Widgets::Boolean
           end
         klass.new(input_spec, controller)
       end

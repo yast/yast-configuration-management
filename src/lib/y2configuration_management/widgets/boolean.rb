@@ -17,29 +17,35 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm/popup"
+require "cwm"
 
 module Y2ConfigurationManagement
+  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This dialog displays a set of widgets in a popup
-    class FormPopup < ::CWM::Popup
-      # @return [String] Popup title
-      attr_reader :title
+    # This class represents a boolean (checkbox) field. TODO: is tristate possible?
+    class Boolean < ::CWM::CheckBox
+      # @return [String] Widget label
+      attr_reader :label
+      # @return [Boolean] Default value
+      attr_reader :default
+      # @return [String] Form path
+      attr_reader :path
 
       # Constructor
       #
-      # @param title [String] Popup title
-      # @param content [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
-      def initialize(title, content)
-        @inner_content = content
-        @title = title
+      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      # @param controller [FormController] Form controller
+      def initialize(spec, controller)
+        @label = spec.label
+        @default = spec.default == true # nil -> false
+        @controller = controller
+        @path = spec.path
+        self.widget_id = "boolean:#{spec.id}"
       end
 
-      # Widget's content
-      #
-      # @see CWM::AbstractWidget#contents
-      def contents
-        VBox(*@inner_content)
+      # @see CWM::AbstractWidget
+      def init
+        self.value = default
       end
     end
   end

@@ -40,6 +40,8 @@ module Y2ConfigurationManagement
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
       # @param state [Hash] Current state (TODO)
       def initialize(form, state = {})
+        textdomain "configuration_management"
+
         @state = state # TODO
         @form = form
       end
@@ -77,6 +79,7 @@ module Y2ConfigurationManagement
         Yast::CWM.show(
           VBox(*contents), caption: title, next_handler: next_handler
         )
+      ensure
         Yast::Wizard.CloseDialog
       end
 

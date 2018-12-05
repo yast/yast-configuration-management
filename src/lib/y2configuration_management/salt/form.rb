@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "yaml"
+require "yast"
 
 module Y2ConfigurationManagement
   module Salt
@@ -26,6 +27,7 @@ module Y2ConfigurationManagement
     # [1]: https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html#best.practice.salt.formulas.pillar
     # [2]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
     class Form
+      include Yast::Logger
       # @return [Container]
       attr_reader :root
       # @return [Hash] The original specification (deserialized form.yml).
@@ -44,10 +46,14 @@ module Y2ConfigurationManagement
       # Creates a new Form object reading the definition from a YAML file
       #
       # @param path [String] file path to read the form YAML definition
-      # @return [Form]
+      # @return [Form, nil]
       def self.from_file(path)
+        return nil unless File.exist?(path)
         definition = YAML.safe_load(File.read(path))
         new(definition)
+      rescue IOError, SystemCallError, RuntimeError => error
+        log.error("Reading #{path} failed with exception: #{error.inspect}")
+        nil
       end
 
       # Convenience method for looking for a particular FormElement.
@@ -101,7 +107,7 @@ module Y2ConfigurationManagement
       # @return [Symbol] specify the level in which the value can be edited.
       #   Possible values are: system, group and readonly
       attr_reader :scope
-      # @return optional [Boolean]
+      # @return [Boolean]
       attr_reader :optional
 
       # Constructor
@@ -161,7 +167,7 @@ module Y2ConfigurationManagement
 
     # Container Element
     class Container < FormElement
-      # @return elements [Array<FormElement>]
+      # @return [Array<FormElement>]
       attr_reader :elements
 
       # Constructor
@@ -175,7 +181,7 @@ module Y2ConfigurationManagement
         build_elements(spec)
       end
 
-      # Recursively looks for a particular FormElement
+      # Recursively looks for a particular {FormElement}
       #
       # @example look for a FormElement by a specific name, path or id
       #
@@ -236,13 +242,13 @@ module Y2ConfigurationManagement
         @item_name = spec["item_name"] if spec["item_name"]
         @min_items = spec["$minItems"] if spec["$minItems"]
         @max_items = spec["$maxItems"] if spec["$maxItems"]
-        @prototype = prototype_for(name, spec)
+        @prototype = prototype_for(id, spec)
         @default = spec["$default"] if spec["$default"]
       end
 
     private
 
-      # Return a single or group of FormElements based on the prototype given
+      # Return a single or group of {FormElement}s based on the prototype given
       # in the form specification
       #
       # @param id [String]
