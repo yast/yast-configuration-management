@@ -27,7 +27,9 @@ module Y2ConfigurationManagement
     # This widget uses a table to display a collection of elements and offers
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
-      attr_reader :label, :min_items, :max_items, :controller, :path
+      attr_reader :label, :min_items, :max_items, :controller, :path, :id
+      # @return [Array<Object>] List of objects which are included in the collection
+      attr_accessor :value
 
       # Constructor
       #
@@ -40,7 +42,9 @@ module Y2ConfigurationManagement
         @max_items = spec.max_items
         @controller = controller
         @path = spec.path # form element path
+        @id = spec.id
         self.widget_id = "collection:#{spec.id}"
+        self.value = []
       end
 
       # Widget contents
@@ -49,10 +53,10 @@ module Y2ConfigurationManagement
       def contents
         VBox(
           Table(
-            Id("table_#{widget_id}"),
+            Id("table:#{path}"),
             Opt(:notify, :immediate),
-            Header(label),
-            []
+            Header(*headers),
+            items_list
           ),
           HBox(
             HStretch(),
@@ -85,6 +89,7 @@ module Y2ConfigurationManagement
         when "#{widget_id}_remove".to_sym
           # TODO
           # controller.remove(path, selected_row) if selected_row
+          controller.remove(path, selected_row) if selected_row
         end
 
         nil
@@ -96,8 +101,28 @@ module Y2ConfigurationManagement
       #
       # @return [Integer,nil] Index of the selected row or nil if no row is selected
       def selected_row
-        row_id = UI.QueryWidget(Id("table_#{widget_id}"), :CurrentItem)
+        row_id = Yast::UI.QueryWidget(Id("table:#{path}"), :CurrentItem)
         row_id ? row_id.to_i : nil
+      end
+
+      # Returns the headers for the collection table
+      #
+      # @todo Get this information from the formula spec
+      #
+      # @return [Array<String>]
+      def headers
+        return unless value.first
+        value.first.keys
+      end
+
+      # Format the items list for the colletion table
+      #
+      # @return [Array<Array<String|Yast::Term>>]
+      def items_list
+        value.each_with_index.map do |item, index|
+          values = headers.map { |h| item[h] }
+          Item(Id(index.to_s), *values)
+        end
       end
     end
   end

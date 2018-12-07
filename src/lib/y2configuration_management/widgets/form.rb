@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -21,36 +23,25 @@ require "cwm"
 
 module Y2ConfigurationManagement
   module Widgets
-    # Represents a group of elements
-    class Group < ::CWM::CustomWidget
-      # @return [String] Widget label
-      attr_reader :label
-      # @return [String] Form element path
-      attr_reader :path
-      # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
+    # Widget which represents a Salt Formula Form
+    #
+    # This acts as a container for those all the widgets that are related to a formula
+    # and takes care of:
+    #
+    # * Initializing the included widgets (see #value)...
+    # * and storing the final result (see #store and #result).
+    # It is able
+    class Form < ::CWM::CustomWidget
+      # @return [Array<CWM::AbstractWidget>] Widgets included in the form
       attr_reader :children
-      attr_reader :id
+      # @return [Hash] Form values from included widgets when this one is removed from the UI
+      attr_reader :result
 
       # Constructor
       #
-      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param children   [Array<AbstractWidget>] Widgets which are included in the group
-      # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      def initialize(spec, children, controller)
-        textdomain "configuration_management"
-        @label = spec.label
+      # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
+      def initialize(children)
         @children = children
-        @controller = controller
-        @path = spec.path
-        @id = spec.id
-        self.widget_id = "group:#{spec.id}"
-      end
-
-      # Widget contents
-      #
-      # @return [Yast::Term]
-      def contents
-        VBox(*children)
       end
 
       # Sets the value for the form
@@ -62,22 +53,27 @@ module Y2ConfigurationManagement
       # @example Setting values for nested widgets
       #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       #
-      # @param values [Hash] New value
-      def value=(values)
+      # @param value [Hash] New value
+      def value=(value)
         children.each do |widget|
-          widget.value = values[widget.id]
+          widget.value = value[widget.id]
         end
       end
 
-      # Returns form widgets
+      # Widget's content
       #
-      # This method gets the values from the underlying widgets returning them in a
-      # hash index by widget ids.
+      # @see CWM::AbstractWidget
+      def contents
+        VBox(*children)
+      end
+
+      # Stores the widget's content
       #
-      # @return [Hash]
-      # @see #value=
-      def value
-        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+      # The stored value can be obtained using the #result method
+      #
+      # @see CWM::AbstractWidget
+      def store
+        @result = children.reduce({}) { |a, e| a.merge(e.id => e.value) }
       end
     end
   end

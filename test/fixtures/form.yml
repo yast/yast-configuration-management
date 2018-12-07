@@ -7,6 +7,7 @@ person:
   email:
     "$name": "E-mail"
     "$type": email
+    "$default": "somebody@example.net"
   wants_newsletter:
     "$type": boolean
     "$default": true
@@ -25,6 +26,9 @@ person:
     "$type": edit-group
     "$minItems": 1
     "$maxItems": 4
+    "$default":
+      - brand: ACME
+        disks: 1
     "$prototype":
       $type: group
       brand:

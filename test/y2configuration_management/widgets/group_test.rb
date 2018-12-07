@@ -35,12 +35,19 @@ describe Y2ConfigurationManagement::Widgets::Group do
   let(:spec) { form_spec.find_element_by(path: path) }
   let(:path) { ".root.person.address" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
-  let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text) }
+  let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text, id: "widget1") }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       group = described_class.new(spec, [widget1], controller)
       expect(group.path).to eq(path)
+    end
+  end
+
+  describe "#value=" do
+    it "sets values of underlying widgets" do
+      expect(widget1).to receive(:value=).with("foobar")
+      group.value = { "widget1" => "foobar" }
     end
   end
 end

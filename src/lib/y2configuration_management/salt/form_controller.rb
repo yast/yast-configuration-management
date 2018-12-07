@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/form_builder"
+require "y2configuration_management/salt/form_data"
 require "y2configuration_management/widgets/form_popup"
 
 Yast.import "CWM"
@@ -38,29 +39,55 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      # @param state [Hash] Current state (TODO)
-      def initialize(form, state = {})
-        textdomain "configuration_management"
-
-        @state = state # TODO
+      def initialize(form)
+        @data = FormData.new(form)
         @form = form
       end
 
       # Renders the main form's dialog
       def show_main_dialog
-        show_dialog(form.root.name, form_builder.build(form.root.elements))
+        Yast::Wizard.CreateDialog
+        Yast::CWM.show(
+          HBox(replace_point),
+          caption: form.root.name, next_handler: method(:next_handler)
+        )
+      ensure
+        Yast::Wizard.CloseDialog
+      end
+
+      # Convenience method for returning the value of a given element
+      #
+      # @param path [String] Path to the element
+      def get(path)
+        @data.get(path)
       end
 
       # Opens a new dialog in order to add a new element to a collection
-      # @todo
+      #
+      # @param path [String] Collection's path
       def add(path)
         element = form.find_element_by(path: path).prototype
-        show_popup(element.name, form_builder.build(element))
+        result = show_popup(element.name, form_builder.build(element))
+        return if result.nil?
+        @data.add(path, result.values.first)
+        refresh_main_form
+      end
+
+      # Removes an element from a collection
+      #
+      # @param path  [String] Collection's path
+      # @param index [Integer] Element's index
+      def remove(path, index)
+        @data.remove(path, index)
+        refresh_main_form
       end
 
     private
 
-      attr_reader :form, :state
+      # @return [Form]
+      attr_reader :form
+      # @return [FormData]
+      attr_reader :data
 
       # Returns the form builder
       #
@@ -69,26 +96,45 @@ module Y2ConfigurationManagement
         @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new(self)
       end
 
-      # Displays a form dialog
+      # Renders the main form's dialog
+      def main_form
+        widget_form = form_builder.build(form.root.elements)
+        widget_form.value = get(form.root.path)
+        widget_form
+      end
+
+      # Refreshes the main form content
+      def refresh_main_form
+        replace_point.replace(main_form)
+      end
+
+      # Replace point to place the main dialog
       #
-      # @param title    [String] Dialog title
-      # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
-      def show_dialog(title, contents)
-        next_handler = proc { Yast::Popup.YesNo("Exit?") }
-        Yast::Wizard.CreateDialog
-        Yast::CWM.show(
-          VBox(*contents), caption: title, next_handler: next_handler
-        )
-      ensure
-        Yast::Wizard.CloseDialog
+      # @return [CWM::ReplacePoint]
+      def replace_point
+        @replace_point ||= ::CWM::ReplacePoint.new(widget: main_form)
       end
 
       # Displays a popup
       #
       # @param title    [String] Popup title
-      # @param contents [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
-      def show_popup(title, contents)
-        Widgets::FormPopup.new(title, contents).run
+      # @param widget [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
+      # @return [Hash,nil] Dialog's result
+      def show_popup(title, widget)
+        Widgets::FormPopup.new(title, widget).run
+        widget.result
+      end
+
+      # @todo This version is just for debugging purposes. It should be replaced with a meaningful
+      #   version.
+      def next_handler
+        return false unless Yast::Popup.YesNo("Do you want to exit?")
+        # This does not work. should main_form be memoized?
+        #   main_form.store
+        #   data.update(form.root.path, main_form.result)
+        data.update(form.root.path, main_form.store)
+        puts data.to_h.inspect
+        true
       end
     end
   end
