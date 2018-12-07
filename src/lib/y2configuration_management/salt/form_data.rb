@@ -58,7 +58,9 @@ module Y2ConfigurationManagement
       # @param value [Object] New value
       def update(path, value)
         parts = path_to_parts(path)
-        parent = @data.dig(*parts[0..-2])
+        parent_parts = parts[0..-2]
+        parent = @data
+        parent = parent.dig(* parent_parts) unless parent_parts.empty?
         parent[parts.last] = value
       end
 

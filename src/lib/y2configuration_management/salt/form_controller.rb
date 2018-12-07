@@ -129,6 +129,10 @@ module Y2ConfigurationManagement
       #   version.
       def next_handler
         return false unless Yast::Popup.YesNo("Do you want to exit?")
+        # This does not work. should main_form be memoized?
+        #   main_form.store
+        #   data.update(form.root.path, main_form.result)
+        data.update(form.root.path, main_form.store)
         puts data.to_h.inspect
         true
       end
