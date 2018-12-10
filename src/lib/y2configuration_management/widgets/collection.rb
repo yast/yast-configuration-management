@@ -61,7 +61,7 @@ module Y2ConfigurationManagement
             Id("table:#{path}"),
             Opt(:notify, :immediate),
             Header(*headers),
-            [],
+            []
           ),
           HBox(
             HStretch(),
@@ -97,11 +97,8 @@ module Y2ConfigurationManagement
         when "#{widget_id}_add".to_sym
           controller.add(path)
         when "#{widget_id}_edit".to_sym
-          # TODO
-          # controller.edit(path, selected_row) if selected_row
+          controller.edit(path, selected_row) if selected_row
         when "#{widget_id}_remove".to_sym
-          # TODO
-          # controller.remove(path, selected_row) if selected_row
           controller.remove(path, selected_row) if selected_row
         end
 
