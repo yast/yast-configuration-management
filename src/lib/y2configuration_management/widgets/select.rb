@@ -50,7 +50,7 @@ module Y2ConfigurationManagement
 
       # @see CWM::AbstractWidget
       def init
-        return if default.nil?
+        return if default.nil? || !value.nil?
         item = items.find { |_i, v| v == default }
         self.value = item.first if item
       end

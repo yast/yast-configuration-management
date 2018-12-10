@@ -30,10 +30,14 @@ describe Y2ConfigurationManagement::Widgets::Form do
     instance_double(Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar")
   end
 
-  describe "#value" do
+  describe "#init" do
+    before do
+      form.value = { "text1" => "example" }
+    end
+
     it "sets values for underlying widgets" do
       expect(text_input).to receive(:value=).with("example")
-      form.value = { "text1" => "example" }
+      form.init
     end
   end
 

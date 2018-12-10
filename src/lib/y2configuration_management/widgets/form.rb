@@ -37,26 +37,27 @@ module Y2ConfigurationManagement
       # @return [Hash] Form values from included widgets when this one is removed from the UI
       attr_reader :result
 
+      # @example Setting values for included widgets
+      #   form.value = { "name" => "John", "surname" => "Doe" }
+      # @example Setting values for nested widgets
+      #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
+      attr_accessor :value
+
       # Constructor
       #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
       def initialize(children)
         @children = children
+        @value = {}
       end
 
-      # Sets the value for the form
-      #
       # This method propagates the values to the underlying widgets.
+      # The values are defined using the `#value=` method.
       #
-      # @example Setting values for included widgets
-      #   form.value = { "name" => "John", "surname" => "Doe" }
-      # @example Setting values for nested widgets
-      #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
-      #
-      # @param value [Hash] New value
-      def value=(value)
+      # @see CWM::AbstractWidget#init
+      def init
         children.each do |widget|
-          widget.value = value[widget.id]
+          widget.value = value[widget.id] if value[widget.id]
         end
       end
 

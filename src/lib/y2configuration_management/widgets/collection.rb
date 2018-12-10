@@ -27,7 +27,11 @@ module Y2ConfigurationManagement
     # This widget uses a table to display a collection of elements and offers
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
-      attr_reader :label, :min_items, :max_items, :controller, :path, :id
+      attr_reader :label, :min_items, :max_items, :controller, :path, :id, :headers
+
+      # @return [Array<String>] Headers for the collection table
+      attr_reader :headers
+
       # @return [Array<Object>] List of objects which are included in the collection
       attr_accessor :value
 
@@ -43,6 +47,7 @@ module Y2ConfigurationManagement
         @controller = controller
         @path = spec.path # form element path
         @id = spec.id
+        @headers = spec.prototype.elements.map(&:id)
         self.widget_id = "collection:#{spec.id}"
         self.value = []
       end
@@ -56,7 +61,7 @@ module Y2ConfigurationManagement
             Id("table:#{path}"),
             Opt(:notify, :immediate),
             Header(*headers),
-            items_list
+            [],
           ),
           HBox(
             HStretch(),
@@ -65,6 +70,14 @@ module Y2ConfigurationManagement
             PushButton(Id("#{widget_id}_remove".to_sym), Yast::Label.RemoveButton)
           )
         )
+      end
+
+      # Sets the value
+      #
+      # @param items_list [Array<Hash>] Collection items
+      def value=(items_list)
+        Yast::UI.ChangeWidget(Id("table:#{path}"), :Items, format_items(items_list))
+        @value = items_list
       end
 
       # Forces the widget to inspect all events
@@ -105,21 +118,11 @@ module Y2ConfigurationManagement
         row_id ? row_id.to_i : nil
       end
 
-      # Returns the headers for the collection table
-      #
-      # @todo Get this information from the formula spec
-      #
-      # @return [Array<String>]
-      def headers
-        return unless value.first
-        value.first.keys
-      end
-
       # Format the items list for the colletion table
       #
       # @return [Array<Array<String|Yast::Term>>]
-      def items_list
-        value.each_with_index.map do |item, index|
+      def format_items(items_list)
+        items_list.each_with_index.map do |item, index|
           values = headers.map { |h| item[h] }
           Item(Id(index.to_s), *values)
         end

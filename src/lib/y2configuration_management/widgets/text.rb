@@ -48,7 +48,12 @@ module Y2ConfigurationManagement
 
       # @see CWM::AbstractWidget
       def init
-        self.value = default
+        self.value = default if value.nil? || value.empty?
+      end
+
+      # @see CWM::ValueBasedWidget
+      def value=(val)
+        Yast::UI.ChangeWidget(Id(widget_id), :Value, val.to_s)
       end
     end
   end
