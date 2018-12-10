@@ -58,8 +58,9 @@ module Y2ConfigurationManagement
       # Convenience method for returning the value of a given element
       #
       # @param path [String] Path to the element
-      def get(path)
-        @data.get(path)
+      # @param index [Integer] Element's index when path refers to a collection
+      def get(path, index = nil)
+        @data.get(path, index)
       end
 
       # Opens a new dialog in order to add a new element to a collection
@@ -69,7 +70,21 @@ module Y2ConfigurationManagement
         element = form.find_element_by(path: path).prototype
         result = show_popup(element.name, form_builder.build(element))
         return if result.nil?
-        @data.add(path, result.values.first)
+        @data.add_item(path, result.values.first)
+        refresh_main_form
+      end
+
+      # Opens a new dialog in order to edit an element within a collection
+      #
+      # @param path  [String] Collection's path
+      # @param index [Integer] Element's index
+      def edit(path, index)
+        element = form.find_element_by(path: path)
+        widget_form = form_builder.build(element.prototype)
+        widget_form.value = { element.id => get(path, index) }
+        result = show_popup(element.name, widget_form)
+        return if result.nil?
+        @data.update_item(path, index, result.values.first)
         refresh_main_form
       end
 
@@ -78,7 +93,7 @@ module Y2ConfigurationManagement
       # @param path  [String] Collection's path
       # @param index [Integer] Element's index
       def remove(path, index)
-        @data.remove(path, index)
+        @data.remove_item(path, index)
         refresh_main_form
       end
 
