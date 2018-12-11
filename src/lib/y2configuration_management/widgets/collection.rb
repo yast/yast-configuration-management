@@ -47,7 +47,7 @@ module Y2ConfigurationManagement
         @controller = controller
         @path = spec.path # form element path
         @id = spec.id
-        @headers = spec.prototype.elements.map(&:id)
+        @headers, @headers_ids = headers_from_prototype(spec.prototype)
         self.widget_id = "collection:#{spec.id}"
         self.value = []
       end
@@ -107,6 +107,9 @@ module Y2ConfigurationManagement
 
     private
 
+      # @return [Array<String>] Header identifiers
+      attr_reader :headers_ids
+
       # Returns the index of the selected row
       #
       # @return [Integer,nil] Index of the selected row or nil if no row is selected
@@ -120,9 +123,18 @@ module Y2ConfigurationManagement
       # @return [Array<Array<String|Yast::Term>>]
       def format_items(items_list)
         items_list.each_with_index.map do |item, index|
-          values = headers.map { |h| item[h] }
+          values = headers_ids.map { |h| item[h] }
           Item(Id(index.to_s), *values)
         end
+      end
+
+      # Returns the list of headers names and IDs from the prototype spec
+      #
+      # @param prototype [FormElement] Prototype definition
+      def headers_from_prototype(prototype)
+        names = prototype.elements.map { |h| (h.name || h.id) }
+        ids = prototype.elements.map(&:id)
+        [names, ids]
       end
     end
   end

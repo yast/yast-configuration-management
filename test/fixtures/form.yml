@@ -32,6 +32,7 @@ person:
     "$prototype":
       $type: group
       brand:
+        "$name": Brand
         "$default": Dell
         "$type": select
         "$values":

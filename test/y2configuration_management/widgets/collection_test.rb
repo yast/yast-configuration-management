@@ -81,4 +81,10 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
     end
   end
+
+  describe "#headers" do
+    it "returns the headers to be displayed in the table" do
+      expect(collection.headers).to eq(["Brand", "Number of Disks"])
+    end
+  end
 end
