@@ -31,10 +31,14 @@ module Y2ConfigurationManagement
     class Formula
       include Yast::Logger
 
-      # Default path to formulas repository
-      FORMULA_BASE_DIR = "/usr/share/susemanager/formulas".freeze
-      FORMULA_CUSTOM_DIR = "/srv/salt/formula_metadata".freeze
-      FORMULA_DATA = "/srv/susemanager/formula_data".freeze
+      # Default path to formulas repository. SuMa *-formula.rpm put them there
+      BASE_DIR = "/usr/share/susemanager/formulas".freeze
+      # Custom formulas metadada directory
+      # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.filedir
+      CUSTOM_METADATA_DIR = "/srv/formula_metadata".freeze
+      # Saved data directory
+      # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.req
+      DATA_DIR = "/srv/susemanager/formula_data".freeze
 
       # @return [String] Formula path
       attr_reader :path
@@ -98,7 +102,7 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def self.formula_directories
-        [FORMULA_BASE_DIR + "/metadata", FORMULA_CUSTOM_DIR]
+        [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
       end
 
     private
@@ -107,7 +111,7 @@ module Y2ConfigurationManagement
       #
       # @return [Pathname]
       def pillar_path
-        Pathname.new(FORMULA_DATA).join("pillar")
+        Pathname.new(DATA_DIR).join("pillar")
       end
     end
   end

@@ -57,7 +57,7 @@ describe Y2ConfigurationManagement::Salt::Formula do
 
   describe ".formula_directories" do
     let(:default_directories) do
-      [described_class::FORMULA_BASE_DIR + "/metadata", described_class::FORMULA_CUSTOM_DIR]
+      [described_class::BASE_DIR + "/metadata", described_class::CUSTOM_METADATA_DIR]
     end
 
     it "returns an array with the default formula directories" do

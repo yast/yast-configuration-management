@@ -53,8 +53,8 @@ module Y2ConfigurationManagement
       def configure_directories
         @states_root, @formulas_root, @pillar_root = Yast::WFM.Args()
         @formulas_root ||= Y2ConfigurationManagement::Salt::Formula.formula_directories
-        @states_root ||= Y2ConfigurationManagement::Salt::Formula::FORMULA_BASE_DIR + "/states"
-        @pillar_root ||= Y2ConfigurationManagement::Salt::Formula::FORMULA_DATA + "/pillar"
+        @states_root ||= Y2ConfigurationManagement::Salt::Formula::BASE_DIR + "/states"
+        @pillar_root ||= Y2ConfigurationManagement::Salt::Formula::DATA_DIR + "/pillar"
       end
 
       def read_formulas
