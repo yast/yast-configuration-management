@@ -20,6 +20,7 @@
 require "y2configuration_management/salt/form_builder"
 require "y2configuration_management/salt/form_data"
 require "y2configuration_management/widgets/form_popup"
+require "yaml"
 
 Yast.import "CWM"
 Yast.import "Wizard"

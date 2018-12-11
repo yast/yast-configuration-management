@@ -53,7 +53,7 @@ module Y2ConfigurationManagement
 
       # @see CWM::ValueBasedWidget
       def value=(val)
-        Yast::UI.ChangeWidget(Id(widget_id), :Value, val.to_s)
+        super(val.to_s)
       end
     end
   end

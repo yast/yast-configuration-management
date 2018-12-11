@@ -70,7 +70,7 @@ module Y2ConfigurationManagement
       # @param value [Object] New value
       def update_item(path, index, value)
         collection = get(path)
-        collection[index, 1] = [value]
+        collection[index] = value
       end
 
       # Removes an element from a collection
