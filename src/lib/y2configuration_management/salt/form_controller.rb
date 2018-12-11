@@ -113,14 +113,15 @@ module Y2ConfigurationManagement
 
       # Renders the main form's dialog
       def main_form
-        widget_form = form_builder.build(form.root.elements)
-        widget_form.value = get(form.root.path)
-        widget_form
+        return @main_form if @main_form
+        @main_form = form_builder.build(form.root.elements)
+        @main_form.value = get(form.root.path)
+        @main_form
       end
 
       # Refreshes the main form content
       def refresh_main_form
-        replace_point.replace(main_form)
+        main_form.refresh(get(form.root.path))
       end
 
       # Replace point to place the main dialog
@@ -144,11 +145,9 @@ module Y2ConfigurationManagement
       #   version.
       def next_handler
         return false unless Yast::Popup.YesNo("Do you want to exit?")
-        # This does not work. should main_form be memoized?
-        #   main_form.store
-        #   data.update(form.root.path, main_form.result)
-        data.update(form.root.path, main_form.store)
-        puts data.to_h.inspect
+        main_form.store
+        data.update(form.root.path, main_form.result)
+        puts YAML.dump(data.to_h)
         true
       end
     end

@@ -56,9 +56,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget#init
       def init
-        children.each do |widget|
-          widget.value = value[widget.id] if value[widget.id]
-        end
+        set_children_contents
       end
 
       # Widget's content
@@ -75,6 +73,22 @@ module Y2ConfigurationManagement
       # @see CWM::AbstractWidget
       def store
         @result = children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+      end
+
+      # Refreshes the widget's content
+      #
+      # @param values [Hash] New values
+      def refresh(values)
+        self.value = values
+        set_children_contents
+      end
+
+    private
+
+      def set_children_contents
+        children.each do |widget|
+          widget.value = value[widget.id] if value[widget.id]
+        end
       end
     end
   end
