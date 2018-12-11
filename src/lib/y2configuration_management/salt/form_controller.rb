@@ -68,8 +68,7 @@ module Y2ConfigurationManagement
       #
       # @param path [String] Collection's path
       def add(path)
-        element = form.find_element_by(path: path).prototype
-        result = show_popup(element.name, form_builder.build(element))
+        result = edit_item(path, {})
         return if result.nil?
         @data.add_item(path, result.values.first)
         refresh_main_form
@@ -80,10 +79,7 @@ module Y2ConfigurationManagement
       # @param path  [String] Collection's path
       # @param index [Integer] Element's index
       def edit(path, index)
-        element = form.find_element_by(path: path)
-        widget_form = form_builder.build(element.prototype)
-        widget_form.value = { element.id => get(path, index) }
-        result = show_popup(element.name, widget_form)
+        result = edit_item(path, get(path, index))
         return if result.nil?
         @data.update_item(path, index, result.values.first)
         refresh_main_form
@@ -130,6 +126,18 @@ module Y2ConfigurationManagement
       # @return [CWM::ReplacePoint]
       def replace_point
         @replace_point ||= ::CWM::ReplacePoint.new(widget: main_form)
+      end
+
+      # Displays a form to edit a given item
+      #
+      # @param path [String] Collection path
+      # @param item [Object] Item to edit
+      # @return [Hash,nil] edited data; `nil` when the user cancels the dialog
+      def edit_item(path, item)
+        element = form.find_element_by(path: path)
+        widget_form = form_builder.build(element.prototype)
+        widget_form.value = item
+        show_popup(element.name, widget_form)
       end
 
       # Displays a popup
