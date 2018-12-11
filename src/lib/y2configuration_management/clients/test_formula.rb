@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/form"
+require "y2configuration_management/salt/pillar"
 require "y2configuration_management/salt/form_controller"
 
 module Y2ConfigurationManagement
@@ -30,8 +31,9 @@ module Y2ConfigurationManagement
       def run
         textdomain "configuration_management"
 
-        form = Y2ConfigurationManagement::Salt::Form.from_file("test/fixtures/form.yml")
-        controller = Y2ConfigurationManagement::Salt::FormController.new(form)
+        form = Salt::Form.from_file("test/fixtures/form.yml")
+        pillar = Salt::Pillar.from_file("test/fixtures/pillar/test-formula.sls")
+        controller = Salt::FormController.new(form, pillar)
         controller.show_main_dialog
       end
     end

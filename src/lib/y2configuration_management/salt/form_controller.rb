@@ -42,8 +42,9 @@ module Y2ConfigurationManagement
     # back some controller methods (basically {#add}, {#edit} or {#remove}).
     #
     # @example Rendering the form
-    #   form_form = Form.from_file("test/fixtures/form.yml")
-    #   controller = FormController.new(form_form)
+    #   formula_form = Form.from_file("test/fixtures/form.yml")
+    #   formula_pillar = Pillar.from_file("test/fixtures/pillar/pillar.sls")
+    #   controller = FormController.new(formula_form, formula_pillar)
     #   controller.show_main_dialog
     class FormController
       include Yast::I18n
@@ -52,8 +53,9 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      def initialize(form)
-        @data = FormData.new(form)
+      # @param pillar [Y2ConfigurationManagement::Salt::Pillar] Pillar
+      def initialize(form, pillar)
+        @data = FormData.new(form, pillar.data)
         @form = form
       end
 

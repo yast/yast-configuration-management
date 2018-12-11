@@ -21,6 +21,7 @@ require "yaml"
 require "pathname"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/metadata"
+require "y2configuration_management/salt/pillar"
 
 module Y2ConfigurationManagement
   module Salt
@@ -32,7 +33,7 @@ module Y2ConfigurationManagement
 
       # Default path to formulas repository
       FORMULA_BASE_DIR = "/usr/share/susemanager/formulas".freeze
-      FORMULA_CUSTOM_DIR = "/srv/susemanager/formulas".freeze
+      FORMULA_CUSTOM_DIR = "/srv/salt/formula_metadata".freeze
       FORMULA_DATA = "/srv/susemanager/formula_data".freeze
 
       # @return [String] Formula path
@@ -44,6 +45,9 @@ module Y2ConfigurationManagement
       # @return [Form] Formula form
       attr_reader :form
 
+      # @return [Pillar] Formula pillar
+      attr_reader :pillar
+
       # Constructor
       #
       # @param path [String]
@@ -51,6 +55,7 @@ module Y2ConfigurationManagement
         @path = path
         @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
         @form = Form.from_file(File.join(@path, "form.yml"))
+        @pillar = Pillar.from_file(File.join(pillar_path, "#{id}.sls")) || Pillar.new({})
         @enabled = false
       end
 
@@ -94,6 +99,15 @@ module Y2ConfigurationManagement
       # @return [String]
       def self.formula_directories
         [FORMULA_BASE_DIR + "/metadata", FORMULA_CUSTOM_DIR]
+      end
+
+    private
+
+      # Convenience method for obtaining the pillars Pathname
+      #
+      # @return [Pathname]
+      def pillar_path
+        Pathname.new(FORMULA_DATA).join("pillar")
       end
     end
   end

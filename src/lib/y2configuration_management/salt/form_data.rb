@@ -31,8 +31,9 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      def initialize(form)
-        @data = data_for_form(form)
+      # @param data [Hash] Pillar data
+      def initialize(form, data = {})
+        @data = data_for_form(form, data || {})
         @form = form
       end
 
@@ -109,21 +110,25 @@ module Y2ConfigurationManagement
       # Builds a hash to keep the form data
       #
       # @param form [Y2ConfigurationManagement::Salt::Form]
+      # @param data [Hash] Pillar data
       # @return [Hash]
-      def data_for_form(form)
-        data_for_element(form.root)
+      def data_for_form(form, data)
+        data_for_element(form.root, data)
       end
 
       # Builds a hash to keep the form element data
       #
       # @param element [Y2ConfigurationManagement::Salt::FormElement]
+      # @param data [Hash] Pillar data
       # @return [Hash]
-      def data_for_element(element)
+      def data_for_element(element, data)
         if element.is_a?(Container)
-          defaults = element.elements.reduce({}) { |a, e| a.merge(data_for_element(e)) }
+          defaults = element.elements.reduce({}) { |a, e| a.merge(data_for_element(e, data)) }
           { element.id => defaults }
         else
-          { element.id => element.default }
+          # TODO: we probably should remove the .root path prefix
+          value = data.dig(*path_to_parts(element.path.gsub(/^\.(root)?/, "")))
+          { element.id => value.nil? ? element.default : value }
         end
       end
     end
