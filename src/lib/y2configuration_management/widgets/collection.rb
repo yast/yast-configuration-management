@@ -132,8 +132,13 @@ module Y2ConfigurationManagement
       #
       # @param prototype [FormElement] Prototype definition
       def headers_from_prototype(prototype)
-        names = prototype.elements.map { |h| (h.name || h.id) }
-        ids = prototype.elements.map(&:id)
+        els = if prototype.is_a? Salt::Container
+          prototype.elements
+        else
+          [prototype]
+        end
+        names = els.map { |h| (h.name || h.id) }
+        ids = els.map(&:id)
         [names, ids]
       end
     end
