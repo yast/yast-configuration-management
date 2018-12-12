@@ -72,7 +72,7 @@ module Y2ConfigurationManagement
       def apply_formulas
         return :next if formulas.select(&:enabled?).empty?
         Yast::Popup.Feedback(_("Applying formulas"), Yast::Message.takes_a_while) do
-          formulas.select(&:enabled?).each { |f| f.write_pillar }
+          formulas.select(&:enabled?).each(&:write_pillar)
         end
         :next
       end

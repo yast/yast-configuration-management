@@ -15,7 +15,7 @@ describe Y2ConfigurationManagement::Salt::Pillar do
 
   describe ".new" do
     let(:spec) { { person: { name: "John Doe" } } }
-    let(:pillar) { described_class.new(spec) }
+    let(:pillar) { described_class.new(data: spec) }
 
     it "creates a new #{described_class} instance from the given specification" do
       expect(pillar).to be_a(described_class)

@@ -12,6 +12,7 @@ describe Y2ConfigurationManagement::Clients::Formula do
       allow(subject).to receive(:configure_directories)
       allow(subject).to receive(:read_formulas)
       allow(subject).to receive(:start_workflow)
+      allow(subject).to receive(:write_formulas)
       allow(Y2ConfigurationManagement::Salt::FormulaSequence)
         .to receive(:new).and_return(sequence)
     end
@@ -29,6 +30,11 @@ describe Y2ConfigurationManagement::Clients::Formula do
     it "starts the workflow for selecting, configuraring and applying the system Salt Formulas" do
       expect(subject).to receive(:start_workflow).and_call_original
       expect(sequence).to receive(:run)
+      subject.main
+    end
+
+    it "adds the configured formulas to the top state file" do
+      expect(subject).to receive(:write_formulas)
       subject.main
     end
   end

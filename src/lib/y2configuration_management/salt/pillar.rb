@@ -30,11 +30,15 @@ module Y2ConfigurationManagement
       # @return [Object] Pillar data
       attr_accessor :data
 
+      # @return [String] Pillar file path
+      attr_accessor :path
+
       # Constructor
       #
       # @param data [Hash] The pillar data (deserialized pillar_name.yml).
-      def initialize(data)
+      def initialize(data: {}, path: "")
         @data = data
+        @path = path
       end
 
       # Creates a new {Pillar} object reading its data from a YAML file
@@ -42,8 +46,12 @@ module Y2ConfigurationManagement
       # @param path [String] file path to read the form YAML definition
       # @return [Metadata, nil]
       def self.from_file(path)
-        definition = YAML.safe_load(File.read(path))
-        new(definition)
+        pillar = new(data: {}, path: path)
+        pillar.load ? pillar : nil
+      end
+
+      def load
+        @data = YAML.safe_load(File.read(path))
       rescue IOError, SystemCallError, RuntimeError => error
         log.error("Reading #{path} failed with exception: #{error.inspect}")
         nil

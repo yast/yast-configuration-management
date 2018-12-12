@@ -20,6 +20,7 @@
 require "yast"
 require "y2configuration_management/salt/formula"
 require "y2configuration_management/salt/formula_sequence"
+require "configuration_management/cfa/salt_top"
 
 module Y2ConfigurationManagement
   module Clients
@@ -42,6 +43,7 @@ module Y2ConfigurationManagement
         configure_directories
         read_formulas
         start_workflow
+        write_formulas
       end
 
     private
@@ -59,6 +61,24 @@ module Y2ConfigurationManagement
 
       def read_formulas
         self.formulas = Y2ConfigurationManagement::Salt::Formula.all(formulas_root)
+        formulas.each { |f| f.pillar = pillar_for(f) }
+      end
+
+      def write_formulas
+        [pillar_root, states_root].each do |path|
+          ::FileUtils.mkdir_p(path) unless File.exist?(path)
+          top = Yast::ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+          top.load
+          top.add_states(formulas.select(&:enabled?).map(&:id))
+          top.save
+        end
+      end
+
+      def pillar_for(formula)
+        pillar_file = File.join(pillar_root, "#{formula.id}.sls")
+        pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
+        pillar.load
+        pillar
       end
     end
   end

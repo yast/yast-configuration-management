@@ -51,7 +51,7 @@ module Y2ConfigurationManagement
       attr_reader :form
 
       # @return [Pillar] Formula pillar
-      attr_reader :pillar
+      attr_accessor :pillar
 
       # Constructor
       #
@@ -60,7 +60,7 @@ module Y2ConfigurationManagement
         @path = path
         @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
         @form = Form.from_file(File.join(@path, "form.yml"))
-        @pillar = pillar || Pillar.from_file(pillar_path) || Pillar.new({})
+        @pillar = pillar || Pillar.new
         @enabled = false
       end
 
@@ -110,24 +110,14 @@ module Y2ConfigurationManagement
       #
       # @return [Boolean] whether the pillar was written or not
       def write_pillar
-        puts pillar.data.inspect
-        pillar_dir = File.dirname(pillar_path)
+        pillar_dir = File.dirname(pillar.path)
         FileUtils.mkdir_p(pillar_dir) unless File.exist?(pillar_dir)
-        puts "Writing #{pillar_path}"
-        File.open(pillar_path, "w+") { |f| f.puts YAML.dump(pillar.data) }
+        log.info("Writing #{pillar.path} with data: #{pillar.data.inspect}")
+        File.open(pillar.path, "w+") { |f| f.puts YAML.dump(pillar.data) }
         true
       rescue IOError, SystemCallError, RuntimeError => error
-        log.error("Writing #{pillar_path} failed with exception: #{error.inspect}")
+        log.error("Writing #{pillar.path} failed with exception: #{error.inspect}")
         false
-      end
-
-    private
-
-      # Convenience method for obtaining the pillars Pathname
-      #
-      # @return [Pathname]
-      def pillar_path
-        File.join(Pathname.new(DATA_DIR).join("pillar").join("#{id}.sls"))
       end
     end
   end
