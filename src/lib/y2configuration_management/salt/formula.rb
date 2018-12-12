@@ -19,6 +19,7 @@
 
 require "yaml"
 require "pathname"
+require "fileutils"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/metadata"
 require "y2configuration_management/salt/pillar"
@@ -55,11 +56,11 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param path [String]
-      def initialize(path)
+      def initialize(path, pillar = nil)
         @path = path
         @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
         @form = Form.from_file(File.join(@path, "form.yml"))
-        @pillar = Pillar.from_file(File.join(pillar_path, "#{id}.sls")) || Pillar.new({})
+        @pillar = pillar || Pillar.from_file(pillar_path) || Pillar.new({})
         @enabled = false
       end
 
@@ -105,13 +106,28 @@ module Y2ConfigurationManagement
         [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
       end
 
+      # Write the pillar data to its file
+      #
+      # @return [Boolean] whether the pillar was written or not
+      def write_pillar
+        puts pillar.data.inspect
+        pillar_dir = File.dirname(pillar_path)
+        FileUtils.mkdir_p(pillar_dir) unless File.exist?(pillar_dir)
+        puts "Writing #{pillar_path}"
+        File.open(pillar_path, "w+") { |f| f.puts YAML.dump(pillar.data) }
+        true
+      rescue IOError, SystemCallError, RuntimeError => error
+        log.error("Writing #{pillar_path} failed with exception: #{error.inspect}")
+        false
+      end
+
     private
 
       # Convenience method for obtaining the pillars Pathname
       #
       # @return [Pathname]
       def pillar_path
-        Pathname.new(DATA_DIR).join("pillar")
+        File.join(Pathname.new(DATA_DIR).join("pillar").join("#{id}.sls"))
       end
     end
   end

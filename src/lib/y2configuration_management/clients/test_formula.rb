@@ -17,8 +17,7 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2configuration_management/salt/form"
-require "y2configuration_management/salt/pillar"
+require "y2configuration_management/salt/formula"
 require "y2configuration_management/salt/form_controller"
 
 module Y2ConfigurationManagement
@@ -31,9 +30,9 @@ module Y2ConfigurationManagement
       def run
         textdomain "configuration_management"
 
-        form = Salt::Form.from_file("test/fixtures/form.yml")
+        formula = Salt::Formula.new(Pathname.new("test/fixtures"), pillar)
         pillar = Salt::Pillar.from_file("test/fixtures/pillar/test-formula.sls")
-        controller = Salt::FormController.new(form, pillar)
+        controller = Salt::FormController.new(formula.form, pillar)
         controller.show_main_dialog
       end
     end
