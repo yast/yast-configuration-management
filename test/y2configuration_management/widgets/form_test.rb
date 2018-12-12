@@ -27,13 +27,29 @@ require "y2configuration_management/widgets/text"
 describe Y2ConfigurationManagement::Widgets::Form do
   subject(:form) { described_class.new([text_input]) }
   let(:text_input) do
-    instance_double(Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar")
+    instance_double(
+      Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil
+    )
   end
+  let(:new_val) { { "text1" => "example" } }
 
-  describe "#value" do
+  describe "#init" do
+    before { form.value = new_val }
+
     it "sets values for underlying widgets" do
       expect(text_input).to receive(:value=).with("example")
-      form.value = { "text1" => "example" }
+      form.init
+    end
+  end
+
+  describe "#refresh" do
+    it "sets values for underlying widgets" do
+      expect(text_input).to receive(:value=).with("example")
+      form.refresh(new_val)
+    end
+
+    it "sets the widget's value" do
+      expect { form.refresh(new_val) }.to change { form.value }.to(new_val)
     end
   end
 

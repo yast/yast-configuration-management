@@ -20,6 +20,7 @@
 require "y2configuration_management/salt/form_builder"
 require "y2configuration_management/salt/form_data"
 require "y2configuration_management/widgets/form_popup"
+require "yaml"
 
 Yast.import "CWM"
 Yast.import "Wizard"
@@ -28,7 +29,19 @@ module Y2ConfigurationManagement
   module Salt
     # This class takes care of driving the form for a Salt Formula.
     #
-    # @example Rendering a form
+    # The constructor of this class takes a ({Y2ConfigurationManagement::Salt::Form a form
+    # description}) which will be used to build the UI when the #show_main_dialog method
+    # is called.
+    #
+    # The data is stored using a {Y2ConfigurationManagement::Salt::FormData} instance and the values
+    # are injected into the UI as a Hash using the {Y2ConfigurationManagement::Widgets::Form#value=}
+    # method.
+    #
+    # Finally, all widgets has access to the controller instance if needed. For instance, the
+    # Y2ConfigurationManagement::Widgets::Collection reacts to the buttons being pushed by calling
+    # back some controller methods (basically {#add}, {#edit} or {#remove}).
+    #
+    # @example Rendering the form
     #   form_form = Form.from_file("test/fixtures/form.yml")
     #   controller = FormController.new(form_form)
     #   controller.show_main_dialog
@@ -48,7 +61,7 @@ module Y2ConfigurationManagement
       def show_main_dialog
         Yast::Wizard.CreateDialog
         Yast::CWM.show(
-          HBox(replace_point),
+          HBox(main_form),
           caption: form.root.name, next_handler: method(:next_handler)
         )
       ensure
@@ -58,18 +71,29 @@ module Y2ConfigurationManagement
       # Convenience method for returning the value of a given element
       #
       # @param path [String] Path to the element
-      def get(path)
-        @data.get(path)
+      # @param index [Integer] Element's index when path refers to a collection
+      def get(path, index = nil)
+        @data.get(path, index)
       end
 
       # Opens a new dialog in order to add a new element to a collection
       #
       # @param path [String] Collection's path
       def add(path)
-        element = form.find_element_by(path: path).prototype
-        result = show_popup(element.name, form_builder.build(element))
+        result = edit_item(path, {})
         return if result.nil?
-        @data.add(path, result.values.first)
+        @data.add_item(path, result.values.first)
+        refresh_main_form
+      end
+
+      # Opens a new dialog in order to edit an element within a collection
+      #
+      # @param path  [String] Collection's path
+      # @param index [Integer] Element's index
+      def edit(path, index)
+        result = edit_item(path, get(path, index))
+        return if result.nil?
+        @data.update_item(path, index, result.values.first)
         refresh_main_form
       end
 
@@ -78,7 +102,7 @@ module Y2ConfigurationManagement
       # @param path  [String] Collection's path
       # @param index [Integer] Element's index
       def remove(path, index)
-        @data.remove(path, index)
+        @data.remove_item(path, index)
         refresh_main_form
       end
 
@@ -98,21 +122,28 @@ module Y2ConfigurationManagement
 
       # Renders the main form's dialog
       def main_form
-        widget_form = form_builder.build(form.root.elements)
-        widget_form.value = get(form.root.path)
-        widget_form
+        return @main_form if @main_form
+        @main_form = form_builder.build(form.root.elements)
+        @main_form.value = get(form.root.path)
+        @main_form
       end
 
       # Refreshes the main form content
       def refresh_main_form
-        replace_point.replace(main_form)
+        data.update(form.root.path, main_form.current_values)
+        main_form.refresh(get(form.root.path))
       end
 
-      # Replace point to place the main dialog
+      # Displays a form to edit a given item
       #
-      # @return [CWM::ReplacePoint]
-      def replace_point
-        @replace_point ||= ::CWM::ReplacePoint.new(widget: main_form)
+      # @param path [String] Collection path
+      # @param item [Object] Item to edit
+      # @return [Hash,nil] edited data; `nil` when the user cancels the dialog
+      def edit_item(path, item)
+        element = form.find_element_by(path: path)
+        widget_form = form_builder.build(element.prototype)
+        widget_form.value = item
+        show_popup(element.name, widget_form)
       end
 
       # Displays a popup
@@ -129,11 +160,9 @@ module Y2ConfigurationManagement
       #   version.
       def next_handler
         return false unless Yast::Popup.YesNo("Do you want to exit?")
-        # This does not work. should main_form be memoized?
-        #   main_form.store
-        #   data.update(form.root.path, main_form.result)
-        data.update(form.root.path, main_form.store)
-        puts data.to_h.inspect
+        main_form.store
+        data.update(form.root.path, main_form.result)
+        puts YAML.dump(data.to_h)
         true
       end
     end

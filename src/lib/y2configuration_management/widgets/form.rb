@@ -37,27 +37,26 @@ module Y2ConfigurationManagement
       # @return [Hash] Form values from included widgets when this one is removed from the UI
       attr_reader :result
 
+      # @example Setting values for included widgets
+      #   form.value = { "name" => "John", "surname" => "Doe" }
+      # @example Setting values for nested widgets
+      #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
+      attr_accessor :value
+
       # Constructor
       #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
       def initialize(children)
         @children = children
+        @value = {}
       end
 
-      # Sets the value for the form
-      #
       # This method propagates the values to the underlying widgets.
+      # The values are defined using the `#value=` method.
       #
-      # @example Setting values for included widgets
-      #   form.value = { "name" => "John", "surname" => "Doe" }
-      # @example Setting values for nested widgets
-      #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
-      #
-      # @param value [Hash] New value
-      def value=(value)
-        children.each do |widget|
-          widget.value = value[widget.id]
-        end
+      # @see CWM::AbstractWidget#init
+      def init
+        set_children_contents
       end
 
       # Widget's content
@@ -67,13 +66,38 @@ module Y2ConfigurationManagement
         VBox(*children)
       end
 
-      # Stores the widget's content
+      # Stores the widget's value
       #
-      # The stored value can be obtained using the #result method
+      # The stored value can be obtained using the #result method even
+      # after the widget has been removed from the UI.
       #
       # @see CWM::AbstractWidget
       def store
-        @result = children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+        @result = current_values
+      end
+
+      # Returns widget's content
+      #
+      # @return [Hash,nil] values including the ones from the underlying widgets; nil when
+      #   the widget has been removed from the UI.
+      def current_values
+        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+      end
+
+      # Refreshes the widget's content
+      #
+      # @param values [Hash] New values
+      def refresh(values)
+        self.value = values
+        set_children_contents
+      end
+
+    private
+
+      def set_children_contents
+        children.each do |widget|
+          widget.value = value[widget.id] if value[widget.id]
+        end
       end
     end
   end

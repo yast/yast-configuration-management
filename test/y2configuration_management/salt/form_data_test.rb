@@ -51,11 +51,17 @@ describe Y2ConfigurationManagement::Salt::FormData do
         expect(form_data.get(".root.person.name")).to eq("Mr. Doe")
       end
     end
+
+    context "when a collection path and an index is given" do
+      it "returns the item in the given position" do
+        expect(form_data.get(".root.person.computers", 0)).to eq("brand" => "ACME", "disks" => 1)
+      end
+    end
   end
 
   describe "#add" do
     it "adds the element to the collection" do
-      form_data.add(".root.person.computers", "brand" => "Dell", "disks" => 2)
+      form_data.add_item(".root.person.computers", "brand" => "Dell", "disks" => 2)
       expect(form_data.get(".root.person.computers")).to eq(
         [
           { "brand" => "ACME", "disks" => 1 },
@@ -65,9 +71,18 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
   end
 
-  describe "#remove" do
+  describe "#update_item" do
+    it "updates the item in the collection" do
+      form_data.update_item(".root.person.computers", 0, "brand" => "Lenovo", "disks" => 3)
+      expect(form_data.get(".root.person.computers")).to eq(
+        [{ "brand" => "Lenovo", "disks" => 3 }]
+      )
+    end
+  end
+
+  describe "#remove_item" do
     it "removes the element from the collection" do
-      form_data.remove(".root.person.computers", 0)
+      form_data.remove_item(".root.person.computers", 0)
       expect(form_data.get(".root.person.computers")).to be_empty
     end
   end

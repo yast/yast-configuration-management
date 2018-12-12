@@ -39,17 +39,9 @@ module Y2ConfigurationManagement
       # Returns the value of a given element
       #
       # @param path [String] Path to the element
-      def get(path)
-        @data.dig(*path_to_parts(path)) || default_for(path)
-      end
-
-      # Adds an element to a collection
-      #
-      # @param path  [String] Path to the collection
-      # @param value [Hash] Value to add
-      def add(path, value)
-        collection = get(path)
-        collection.push(value)
+      def get(path, index = nil)
+        value = @data.dig(*path_to_parts(path)) || default_for(path)
+        index ? value.at(index) : value
       end
 
       # Updates an element's value
@@ -64,11 +56,28 @@ module Y2ConfigurationManagement
         parent[parts.last] = value
       end
 
+      # Adds an element to a collection
+      #
+      # @param path  [String] Path to the collection
+      # @param value [Hash] Value to add
+      def add_item(path, value)
+        collection = get(path)
+        collection.push(value)
+      end
+
+      # @param path  [String]  Path to the collection
+      # @param index [Integer] Position of the element to remove
+      # @param value [Object] New value
+      def update_item(path, index, value)
+        collection = get(path)
+        collection[index] = value
+      end
+
       # Removes an element from a collection
       #
       # @param path  [String]  Path to the collection
       # @param index [Integer] Position of the element to remove
-      def remove(path, index)
+      def remove_item(path, index)
         collection = get(path)
         collection.delete_at(index)
       end

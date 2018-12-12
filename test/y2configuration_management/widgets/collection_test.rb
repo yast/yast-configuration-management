@@ -55,7 +55,20 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
     end
 
-    context "when it is an 'remove' event" do
+    context "when it is an 'edit' event" do
+      let(:event) { { "ID" => "#{collection.widget_id}_edit".to_sym } }
+
+      before do
+        allow(collection).to receive(:selected_row).and_return(1)
+      end
+
+      it "edits an element of the collection" do
+        expect(controller).to receive(:edit).with(path, 1)
+        collection.handle(event)
+      end
+    end
+
+    context "when it is a 'remove' event" do
       let(:event) { { "ID" => "#{collection.widget_id}_remove".to_sym } }
 
       before do
@@ -66,6 +79,12 @@ describe Y2ConfigurationManagement::Widgets::Collection do
         expect(controller).to receive(:remove).with(path, 1)
         collection.handle(event)
       end
+    end
+  end
+
+  describe "#headers" do
+    it "returns the headers to be displayed in the table" do
+      expect(collection.headers).to eq(["Brand", "Number of Disks"])
     end
   end
 end
