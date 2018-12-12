@@ -33,7 +33,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
   let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
-  let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar.data) }
+  let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar) }
   let(:path) { ".root.person.computers" }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
   let(:widget) do

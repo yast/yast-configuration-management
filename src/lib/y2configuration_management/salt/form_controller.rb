@@ -52,11 +52,12 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      # @param pillar [Y2ConfigurationManagement::Salt::Pillar] Pillar
+      # @param form [Y2ConfigurationManagement::Salt::Form]
+      # @param pillar [Y2ConfigurationManagement::Salt::Pillar]
       def initialize(form, pillar)
-        @data = FormData.new(form, pillar.data)
+        @data = FormData.new(form, pillar)
         @form = form
+        @pillar = pillar
       end
 
       # Renders the main form's dialog
@@ -112,6 +113,10 @@ module Y2ConfigurationManagement
 
       # @return [Form]
       attr_reader :form
+
+      # @return [Pillar]
+      attr_reader :pillar
+
       # @return [FormData]
       attr_reader :data
 
@@ -164,6 +169,7 @@ module Y2ConfigurationManagement
         return false unless Yast::Popup.YesNo("Do you want to exit?")
         main_form.store
         data.update(form.root.path, main_form.result)
+        pillar.data = data.to_h.fetch("root", {})
         puts YAML.dump(data.to_h)
         true
       end

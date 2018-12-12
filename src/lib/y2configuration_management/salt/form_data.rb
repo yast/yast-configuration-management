@@ -27,14 +27,17 @@ module Y2ConfigurationManagement
       PATH_DELIMITER = ".".freeze
       # @return [Y2ConfigurationManagement::Salt::Form] Form
       attr_reader :form
+      # @return [Y2ConfigurationManagement::Salt::Pillar] Pillar
+      attr_reader :pillar
 
       # Constructor
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      # @param data [Hash] Pillar data
-      def initialize(form, data = {})
-        @data = data_for_form(form, data || {})
+      # @param pillar [Y2ConfigurationManagement::Salt::Form] Pillar
+      def initialize(form, pillar = Pillar.new({}))
+        @data = data_for_form(form, pillar.data)
         @form = form
+        @pillar = pillar
       end
 
       # Returns the value of a given element
