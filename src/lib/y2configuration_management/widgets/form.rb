@@ -66,13 +66,22 @@ module Y2ConfigurationManagement
         VBox(*children)
       end
 
-      # Stores the widget's content
+      # Stores the widget's value
       #
-      # The stored value can be obtained using the #result method
+      # The stored value can be obtained using the #result method even
+      # after the widget has been removed from the UI.
       #
       # @see CWM::AbstractWidget
       def store
-        @result = children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+        @result = current_values
+      end
+
+      # Returns widget's content
+      #
+      # @return [Hash,nil] values including the ones from the underlying widgets; nil when
+      #   the widget has been removed from the UI.
+      def current_values
+        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
       end
 
       # Refreshes the widget's content

@@ -73,8 +73,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
       let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
 
       it "updates the form data" do
+        expect(data).to receive(:add_item).with(path, "brand" => "Lenovo", "disks" => 2)
         controller.add(path)
-        expect(data.get(".root.person.computers")).to include("brand" => "Lenovo", "disks" => 2)
       end
     end
 
@@ -106,8 +106,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
       let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
 
       it "updates the form data" do
+        expect(data).to receive(:update_item).with(path, 0, "brand" => "Lenovo", "disks" => 2)
         controller.edit(path, 0)
-        expect(data.get(".root.person.computers", 0)).to eq("brand" => "Lenovo", "disks" => 2)
       end
     end
 

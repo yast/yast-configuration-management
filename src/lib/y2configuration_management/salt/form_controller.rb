@@ -118,8 +118,7 @@ module Y2ConfigurationManagement
 
       # Refreshes the main form content
       def refresh_main_form
-        main_form.store
-        data.update(form.root.path, main_form.result)
+        data.update(form.root.path, main_form.current_values)
         main_form.refresh(get(form.root.path))
       end
 
