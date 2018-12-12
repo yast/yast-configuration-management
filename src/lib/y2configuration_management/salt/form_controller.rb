@@ -61,7 +61,7 @@ module Y2ConfigurationManagement
       def show_main_dialog
         Yast::Wizard.CreateDialog
         Yast::CWM.show(
-          HBox(replace_point),
+          HBox(main_form),
           caption: form.root.name, next_handler: method(:next_handler)
         )
       ensure
@@ -132,13 +132,6 @@ module Y2ConfigurationManagement
       def refresh_main_form
         data.update(form.root.path, main_form.current_values)
         main_form.refresh(get(form.root.path))
-      end
-
-      # Replace point to place the main dialog
-      #
-      # @return [CWM::ReplacePoint]
-      def replace_point
-        @replace_point ||= ::CWM::ReplacePoint.new(widget: main_form)
       end
 
       # Displays a form to edit a given item
