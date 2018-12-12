@@ -243,7 +243,7 @@ module Y2ConfigurationManagement
         @min_items = spec["$minItems"] if spec["$minItems"]
         @max_items = spec["$maxItems"] if spec["$maxItems"]
         @prototype = prototype_for(id, spec)
-        @default = spec["$default"] if spec["$default"]
+        @default = spec.fetch("$default", [])
       end
 
     private
