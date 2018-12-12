@@ -29,7 +29,19 @@ module Y2ConfigurationManagement
   module Salt
     # This class takes care of driving the form for a Salt Formula.
     #
-    # @example Rendering a form
+    # The constructor of this class takes a ({Y2ConfigurationManagement::Salt::Form a form
+    # description}) which will be used to build the UI when the #show_main_dialog method
+    # is called.
+    #
+    # The data is stored using a {Y2ConfigurationManagement::Salt::FormData} instance and the values
+    # are injected into the UI as a Hash using the {Y2ConfigurationManagement::Widgets::Form#value=}
+    # method.
+    #
+    # Finally, all widgets has access to the controller instance if needed. For instance, the
+    # Y2ConfigurationManagement::Widgets::Collection reacts to the buttons being pushed by calling
+    # back some controller methods (basically {#add}, {#edit} or {#remove}).
+    #
+    # @example Rendering the form
     #   form_form = Form.from_file("test/fixtures/form.yml")
     #   controller = FormController.new(form_form)
     #   controller.show_main_dialog
