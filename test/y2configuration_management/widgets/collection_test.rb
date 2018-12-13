@@ -87,4 +87,29 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       expect(collection.headers).to eq(["Brand", "Number of Disks"])
     end
   end
+
+  shared_examples "collection" do
+    describe ".new" do
+      it "instantiates a new widget according to the spec" do
+        collection = described_class.new(spec, controller)
+        expect(collection.path).to eq(path)
+      end
+    end
+  end
+
+  context "for a collection of scalars, without $default" do
+    let(:form_spec) do
+      Y2ConfigurationManagement::Salt::Form.new(
+        "person" => {
+          "$type" => "namespace",
+          "computers" => {
+            "$type" => "edit-group",
+            "$prototype" => { "$type" => "text" }
+          }
+        }
+      )
+    end
+
+    include_examples "collection"
+  end
 end
