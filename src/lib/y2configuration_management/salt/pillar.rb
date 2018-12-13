@@ -36,7 +36,8 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param data [Hash] The pillar data (deserialized pillar_name.yml).
-      def initialize(data: {}, path: "")
+      # @param path [String] pillar file path
+      def initialize(data: {}, path: nil)
         @data = data
         @path = path
       end
@@ -50,18 +51,23 @@ module Y2ConfigurationManagement
         pillar.load ? pillar : nil
       end
 
+      # Loads the pillar data from its pillar file
+      #
+      # @return [Boolean] whether the configuration was read
       def load
+        return false unless path
         @data = YAML.safe_load(File.read(path))
+        true
       rescue IOError, SystemCallError, RuntimeError => error
         log.error("Reading #{path} failed with exception: #{error.inspect}")
-        nil
+        false
       end
 
       # Write the pillar data to its file
       #
       # @return [Boolean] whether the pillar was written or not
       def save
-        return false if path.to_s.empty?
+        return false unless path
 
         pillar_dir = File.dirname(path)
         FileUtils.mkdir_p(pillar_dir) unless File.exist?(pillar_dir)
@@ -73,6 +79,7 @@ module Y2ConfigurationManagement
         false
       end
 
+      # Does a YAML dump of the pillar data
       def dump
         YAML.dump(data)
       end

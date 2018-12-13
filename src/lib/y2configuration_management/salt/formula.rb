@@ -56,11 +56,12 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param path [String]
+      # @param pillar [Pillar] associated formula data
       def initialize(path, pillar = nil)
         @path = path
         @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
         @form = Form.from_file(File.join(@path, "form.yml"))
-        @pillar = pillar || Pillar.new
+        @pillar = pillar
         @enabled = false
       end
 

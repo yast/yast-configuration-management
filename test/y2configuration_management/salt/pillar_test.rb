@@ -27,4 +27,37 @@ describe Y2ConfigurationManagement::Salt::Pillar do
       expect(pillar.data["person"]["name"]).to eql("Jane Doe")
     end
   end
+
+  describe "#load" do
+    subject(:pillar) { described_class.new(path: pillar_path) }
+
+    it "loads its data from the known path" do
+      expect(pillar.data).to be_empty
+      pillar.load
+      expect(pillar.data["person"]["name"]).to eql("Jane Doe")
+    end
+  end
+
+  describe "#save" do
+    let(:pillar_back) { "#{FIXTURES_PATH.join("pillar").join("test-formula.sls")}.back" }
+
+    after do
+      FileUtils.rm(pillar_back)
+    end
+
+    it "writes the pillar data to its file path" do
+      expect(File.read(pillar_path)).to_not include("John Doe")
+      pillar.path = pillar_back
+      pillar.data["person"]["name"] = "John Doe"
+      pillar.save
+      expect(File.read(pillar_back)).to include("John Doe")
+    end
+  end
+
+  describe "#dump" do
+    it "does a YAML dump of the pillar data" do
+      pillar.data = { "person" => "John Doe" }
+      expect(pillar.dump).to eql("---\nperson: John Doe\n")
+    end
+  end
 end

@@ -78,4 +78,20 @@ describe Y2ConfigurationManagement::Salt::Formula do
       end
     end
   end
+
+  describe "#write_pillar" do
+    let(:formula) { formulas.find { |f| f.id == "test-formula" } }
+    let(:pillar_path) { FIXTURES_PATH.join("pillar").join("test-formula.sls") }
+    let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
+
+    it "returns false when it does not have a pillar associated" do
+      expect(formula.write_pillar).to eql(false)
+    end
+
+    it "writes the pillar data" do
+      formula.pillar = pillar
+      expect(pillar).to receive(:save).and_return(true)
+      expect(formula.write_pillar).to eql(true)
+    end
+  end
 end

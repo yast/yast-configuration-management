@@ -170,7 +170,7 @@ module Y2ConfigurationManagement
         main_form.store
         data.update(form.root.path, main_form.result)
         pillar.data = data.to_h.fetch("root", {})
-        puts YAML.dump(data.to_h)
+        puts pillar.dump
         true
       end
     end

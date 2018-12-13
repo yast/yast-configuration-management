@@ -34,7 +34,7 @@ module Y2ConfigurationManagement
       #
       # @param form [Y2ConfigurationManagement::Salt::Form] Form
       # @param pillar [Y2ConfigurationManagement::Salt::Form] Pillar
-      def initialize(form, pillar = Pillar.new({}))
+      def initialize(form, pillar = Pillar.new(data: {}))
         @data = data_for_form(form, pillar.data)
         @form = form
         @pillar = pillar
