@@ -123,7 +123,11 @@ module Y2ConfigurationManagement
       # @return [Array<Array<String|Yast::Term>>]
       def format_items(items_list)
         items_list.each_with_index.map do |item, index|
-          values = headers_ids.map { |h| item[h] }
+          values = if item.is_a? Hash
+            headers_ids.map { |h| item[h] }
+          else
+            [item]
+          end
           Item(Id(index.to_s), *values)
         end
       end
