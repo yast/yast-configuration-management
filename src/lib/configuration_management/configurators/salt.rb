@@ -10,6 +10,17 @@ module Yast
       # Salt configurator
       #
       # This class is responsible for configuring Salt before running it.
+      #
+      # ### Masterless Mode
+      #
+      # * Retrieves remote states and pillars if needed
+      # * Searches for formulas and configures them if needed (writing data into pillars).
+      # * Updates the minion configuration (see {#update_configuration})
+      #
+      # ### Client/Server Mode
+      #
+      # * Fetches keys for authentication from a given URL
+      # * Updates the minion configuration (see {#update_configuration})
       class Salt < Base
         PRIVATE_KEY_PATH = "/etc/salt/pki/minion/minion.pem".freeze
         PUBLIC_KEY_PATH = "/etc/salt/pki/minion/minion.pub".freeze

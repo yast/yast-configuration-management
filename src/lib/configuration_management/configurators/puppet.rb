@@ -12,6 +12,16 @@ module Yast
       # Puppet configurator
       #
       # This class is responsible for configuring Pupppet before running it.
+      #
+      # ### Masterless Mode
+      #
+      # * Updates Puppet agent configuration (see {#update_configuration}).
+      # * Retrieves Puppet modules.
+      #
+      # ### Client/Server Mode
+      #
+      # * Updates Puppet agent configuration (see {#update_configuration}).
+      # * Fetches keys for authentication from a given URL
       class Puppet < Base
         include Yast::Logger
 
