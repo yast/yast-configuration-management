@@ -31,7 +31,8 @@ module Y2ConfigurationManagement
   module Salt
     # This class is reponsible of running the sequence for selecting the Salt
     # {Formula}s to be applied, configuring all the {Formula}s through its
-    # {Form}s and applying the selected {Formula}s to the system.
+    # {Form}s and write the {Pillar}s data associated to each of the selected
+    # {Formula}s into the system.
     class FormulaSequence < UI::Sequence
       # @return [Array<Formula>] available on the system
       attr_reader :formulas
@@ -66,12 +67,10 @@ module Y2ConfigurationManagement
         Y2ConfigurationManagement::Salt::FormulaConfiguration.new(formulas).run
       end
 
-      # Apply selected {Formula}s to the current system
-      #
-      # TODO: Pending implementation
-      def apply_formulas
+      # Write the data associated to the selected {Formula}s into the current system
+      def write_data
         return :next if formulas.select(&:enabled?).empty?
-        Yast::Popup.Feedback(_("Applying formulas"), Yast::Message.takes_a_while) do
+        Yast::Popup.Feedback(_("Writing data"), Yast::Message.takes_a_while) do
           formulas.select(&:enabled?).each(&:write_pillar)
         end
         :next
@@ -90,9 +89,9 @@ module Y2ConfigurationManagement
           "configure_formulas" => {
             cancel: "choose_formulas",
             abort:  :abort,
-            next:   "apply_formulas"
+            next:   "write_data"
           },
-          "apply_formulas"     => {
+          "write_data"         => {
             abort: :abort,
             next:  :finish
           }

@@ -106,18 +106,12 @@ module Y2ConfigurationManagement
         [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
       end
 
-      # Write the pillar data to its file
+      # Convenience method for writing the associated {Pillar}
       #
       # @return [Boolean] whether the pillar was written or not
       def write_pillar
-        pillar_dir = File.dirname(pillar.path)
-        FileUtils.mkdir_p(pillar_dir) unless File.exist?(pillar_dir)
-        log.info("Writing #{pillar.path} with data: #{pillar.data.inspect}")
-        File.open(pillar.path, "w+") { |f| f.puts YAML.dump(pillar.data) }
-        true
-      rescue IOError, SystemCallError, RuntimeError => error
-        log.error("Writing #{pillar.path} failed with exception: #{error.inspect}")
-        false
+        return false unless pillar
+        pillar.save
       end
     end
   end

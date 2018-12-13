@@ -56,6 +56,26 @@ module Y2ConfigurationManagement
         log.error("Reading #{path} failed with exception: #{error.inspect}")
         nil
       end
+
+      # Write the pillar data to its file
+      #
+      # @return [Boolean] whether the pillar was written or not
+      def save
+        return false if path.to_s.empty?
+
+        pillar_dir = File.dirname(path)
+        FileUtils.mkdir_p(pillar_dir) unless File.exist?(pillar_dir)
+        log.info("Writing #{path} with data: #{data.inspect}")
+        File.open(path, "w+") { |f| f.puts YAML.dump(data) }
+        true
+      rescue IOError, SystemCallError, RuntimeError => error
+        log.error("Writing #{path} failed with exception: #{error.inspect}")
+        false
+      end
+
+      def dump
+        YAML.dump(data)
+      end
     end
   end
 end
