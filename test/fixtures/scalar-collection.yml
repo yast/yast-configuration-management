@@ -1,0 +1,6 @@
+person:
+  "$type": namespace
+  computers:
+    "$type": edit-group
+    "$prototype":
+      "$type": text

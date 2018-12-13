@@ -99,15 +99,8 @@ describe Y2ConfigurationManagement::Widgets::Collection do
 
   context "for a collection of scalars, without $default" do
     let(:form_spec) do
-      Y2ConfigurationManagement::Salt::Form.new(
-        "person" => {
-          "$type" => "namespace",
-          "computers" => {
-            "$type" => "edit-group",
-            "$prototype" => { "$type" => "text" }
-          }
-        }
-      )
+      fname = FIXTURES_PATH.join("scalar-collection.yml")
+      Y2ConfigurationManagement::Salt::Form.from_file(fname)
     end
 
     include_examples "collection"
