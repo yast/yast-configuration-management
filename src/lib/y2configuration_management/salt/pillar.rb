@@ -44,7 +44,7 @@ module Y2ConfigurationManagement
       # Creates a new {Pillar} object reading its data from a YAML file
       #
       # @param path [String] file path to read the form YAML definition
-      # @return [Metadata, nil]
+      # @return [Pillar, nil]
       def self.from_file(path)
         pillar = new(data: {}, path: path)
         pillar.load ? pillar : nil
