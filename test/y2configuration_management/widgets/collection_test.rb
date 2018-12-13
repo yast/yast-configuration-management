@@ -25,6 +25,8 @@ require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Collection do
+  include Yast::UIShortcuts
+
   subject(:collection) { described_class.new(spec, controller) }
 
   include_examples "CWM::CustomWidget"
@@ -35,6 +37,11 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   let(:spec) { form_spec.find_element_by(path: path) }
   let(:path) { ".root.person.computers" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
+  let(:formatted_default) do
+    [
+      Item(Id("0"), "ACME", 1)
+    ]
+  end
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
@@ -95,12 +102,43 @@ describe Y2ConfigurationManagement::Widgets::Collection do
         expect(collection.path).to eq(path)
       end
     end
+
+    describe "#value=" do
+      it "remembers the value" do
+        allow(Yast::UI).to receive(:ChangeWidget)
+        v = ["1", "2"]
+        expect { collection.value = v }.to change { collection.value }.to(v)
+      end
+    end
+
+    describe "#format_items" do
+      it "formats the items" do
+        expect(collection.send(:format_items, spec.default)).to eq(formatted_default)
+      end
+    end
   end
+  include_examples "collection"
 
   context "for a collection of scalars, without $default" do
     let(:form_spec) do
       fname = FIXTURES_PATH.join("scalar-collection.yml")
       Y2ConfigurationManagement::Salt::Form.from_file(fname)
+    end
+    let(:formatted_default) { [] }
+
+    include_examples "collection"
+  end
+
+  context "for a collection of scalars, with $default" do
+    let(:form_spec) do
+      fname = FIXTURES_PATH.join("scalar-collection-dflt.yml")
+      Y2ConfigurationManagement::Salt::Form.from_file(fname)
+    end
+
+    let(:formatted_default) do
+      [
+        Item(Id("0"), "ZX Spectrum")
+      ]
     end
 
     include_examples "collection"
