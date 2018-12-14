@@ -19,8 +19,10 @@
 
 require "yaml"
 require "pathname"
+require "fileutils"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/metadata"
+require "y2configuration_management/salt/pillar"
 
 module Y2ConfigurationManagement
   module Salt
@@ -30,10 +32,14 @@ module Y2ConfigurationManagement
     class Formula
       include Yast::Logger
 
-      # Default path to formulas repository
-      FORMULA_BASE_DIR = "/usr/share/susemanager/formulas".freeze
-      FORMULA_CUSTOM_DIR = "/srv/susemanager/formulas".freeze
-      FORMULA_DATA = "/srv/susemanager/formula_data".freeze
+      # Default path to formulas repository. SuMa *-formula.rpm put them there
+      BASE_DIR = "/usr/share/susemanager/formulas".freeze
+      # Custom formulas metadada directory
+      # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.filedir
+      CUSTOM_METADATA_DIR = "/srv/formula_metadata".freeze
+      # Saved data directory
+      # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.req
+      DATA_DIR = "/srv/susemanager/formula_data".freeze
 
       # @return [String] Formula path
       attr_reader :path
@@ -44,13 +50,18 @@ module Y2ConfigurationManagement
       # @return [Form] Formula form
       attr_reader :form
 
+      # @return [Pillar] Formula pillar
+      attr_accessor :pillar
+
       # Constructor
       #
       # @param path [String]
-      def initialize(path)
+      # @param pillar [Pillar] associated formula data
+      def initialize(path, pillar = nil)
         @path = path
         @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
         @form = Form.from_file(File.join(@path, "form.yml"))
+        @pillar = pillar
         @enabled = false
       end
 
@@ -93,7 +104,15 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def self.formula_directories
-        [FORMULA_BASE_DIR + "/metadata", FORMULA_CUSTOM_DIR]
+        [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
+      end
+
+      # Convenience method for writing the associated {Pillar}
+      #
+      # @return [Boolean] whether the pillar was written or not
+      def write_pillar
+        return false unless pillar
+        pillar.save
       end
     end
   end

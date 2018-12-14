@@ -52,7 +52,7 @@ describe Y2ConfigurationManagement::Salt::FormulaConfiguration do
       before do
         formula.enabled = true
         allow(Y2ConfigurationManagement::Salt::FormController)
-          .to receive(:new).with(formula.form).and_return(controller)
+          .to receive(:new).with(formula.form, formula.pillar).and_return(controller)
         allow(controller).to receive(:show_main_dialog).and_return(config_result)
       end
 

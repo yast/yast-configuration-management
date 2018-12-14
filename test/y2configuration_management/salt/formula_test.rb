@@ -57,7 +57,7 @@ describe Y2ConfigurationManagement::Salt::Formula do
 
   describe ".formula_directories" do
     let(:default_directories) do
-      [described_class::FORMULA_BASE_DIR + "/metadata", described_class::FORMULA_CUSTOM_DIR]
+      [described_class::BASE_DIR + "/metadata", described_class::CUSTOM_METADATA_DIR]
     end
 
     it "returns an array with the default formula directories" do
@@ -76,6 +76,22 @@ describe Y2ConfigurationManagement::Salt::Formula do
         formula = formulas.find { |f| f.id == "no-metadata" }
         expect(formula.description).to be_empty
       end
+    end
+  end
+
+  describe "#write_pillar" do
+    let(:formula) { formulas.find { |f| f.id == "test-formula" } }
+    let(:pillar_path) { FIXTURES_PATH.join("pillar").join("test-formula.sls") }
+    let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
+
+    it "returns false when it does not have a pillar associated" do
+      expect(formula.write_pillar).to eql(false)
+    end
+
+    it "writes the pillar data" do
+      formula.pillar = pillar
+      expect(pillar).to receive(:save).and_return(true)
+      expect(formula.write_pillar).to eql(true)
     end
   end
 end

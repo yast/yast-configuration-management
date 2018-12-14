@@ -42,8 +42,9 @@ module Y2ConfigurationManagement
     # back some controller methods (basically {#add}, {#edit} or {#remove}).
     #
     # @example Rendering the form
-    #   form_form = Form.from_file("test/fixtures/form.yml")
-    #   controller = FormController.new(form_form)
+    #   formula_form = Form.from_file("test/fixtures/form.yml")
+    #   formula_pillar = Pillar.from_file("test/fixtures/pillar/pillar.sls")
+    #   controller = FormController.new(formula_form, formula_pillar)
     #   controller.show_main_dialog
     class FormController
       include Yast::I18n
@@ -51,10 +52,12 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      def initialize(form)
-        @data = FormData.new(form)
+      # @param form [Y2ConfigurationManagement::Salt::Form]
+      # @param pillar [Y2ConfigurationManagement::Salt::Pillar]
+      def initialize(form, pillar)
+        @data = FormData.new(form, pillar)
         @form = form
+        @pillar = pillar
       end
 
       # Renders the main form's dialog
@@ -110,6 +113,10 @@ module Y2ConfigurationManagement
 
       # @return [Form]
       attr_reader :form
+
+      # @return [Pillar]
+      attr_reader :pillar
+
       # @return [FormData]
       attr_reader :data
 
@@ -162,7 +169,8 @@ module Y2ConfigurationManagement
         return false unless Yast::Popup.YesNo("Do you want to exit?")
         main_form.store
         data.update(form.root.path, main_form.result)
-        puts YAML.dump(data.to_h)
+        pillar.data = data.to_h.fetch("root", {})
+        puts pillar.dump
         true
       end
     end

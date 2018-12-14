@@ -81,7 +81,7 @@ module Y2ConfigurationManagement
       #
       # @param formula [Formula]
       def configure_formula(formula)
-        controller = Y2ConfigurationManagement::Salt::FormController.new(formula.form)
+        controller = FormController.new(formula.form, formula.pillar)
         controller.show_main_dialog
       end
     end

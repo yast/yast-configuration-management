@@ -20,17 +20,20 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_builder"
 require "y2configuration_management/salt/form"
+require "y2configuration_management/salt/pillar"
 require "y2configuration_management/salt/form_controller"
 
 describe Y2ConfigurationManagement::Salt::FormController do
-  subject(:controller) { described_class.new(form) }
+  subject(:controller) { described_class.new(form, pillar) }
 
   let(:form) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
+  let(:pillar_path) { FIXTURES_PATH.join("pillar/test-formula.sls") }
+  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
-  let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form) }
+  let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar) }
   let(:path) { ".root.person.computers" }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
   let(:widget) do

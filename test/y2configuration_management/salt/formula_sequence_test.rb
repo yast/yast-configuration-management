@@ -44,8 +44,8 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
         expect(sequence.run).to eql(:abort)
       end
 
-      it "does not apply any salt state" do
-        expect(sequence).to_not receive(:apply_formulas)
+      it "does not write any pillar data" do
+        expect(sequence).to_not receive(:write_data)
         sequence.run
       end
     end
@@ -56,8 +56,8 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
         allow(sequence).to receive(:configure_formulas).and_return(:next)
       end
 
-      it "applies the salt states" do
-        expect(sequence).to receive(:apply_formulas)
+      it "writes the pillars associated to the selected formulas" do
+        expect(sequence).to receive(:write_data)
         sequence.run
       end
     end
@@ -105,7 +105,7 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     end
   end
 
-  describe "#apply_formulas" do
+  describe "#write_data" do
     before do
       formulas.each { |f| allow(f).to receive(:enabled?).and_return(true) }
     end
@@ -115,18 +115,18 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
 
       it "returns :next without notifying" do
         expect(Yast::Popup).to_not receive(:Feedback)
-        expect(sequence.apply_formulas).to eql(:next)
+        expect(sequence.write_data).to eql(:next)
       end
     end
 
     it "popups a feedback message" do
       expect(Yast::Popup).to receive(:Feedback)
-      sequence.apply_formulas
+      sequence.write_data
     end
 
     it "returns :next" do
       allow(Yast::Popup).to receive(:Feedback)
-      expect(sequence.apply_formulas).to eql(:next)
+      expect(sequence.write_data).to eql(:next)
     end
   end
 end
