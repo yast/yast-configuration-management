@@ -22,6 +22,7 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula_sequence"
 require "y2configuration_management/salt/formula"
+require "configuration_management/configurations/salt"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Salt::FormulaSequence do
@@ -32,7 +33,14 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
   let(:formula_config_sequence) do
     instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration)
   end
-  subject(:sequence) { described_class.new(formulas) }
+  let(:config) do
+    Yast::ConfigurationManagement::Configurations::Salt.new(
+      formulas_roots: [formulas_root]
+    )
+  end
+  subject(:sequence) { described_class.new(config) }
+
+  before { Y2ConfigurationManagement::Salt::Formula.reset }
 
   describe "#run" do
     context "if the user aborts during the process" do
@@ -71,7 +79,8 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     end
 
     context "when there are not formulas available in the system" do
-      let(:formulas) { [] }
+      let(:formulas_root) { FIXTURES_PATH.join("missing") }
+
       it "reports an error" do
         expect(Yast::Report).to receive(:Error).with(/There are no formulas available/)
 

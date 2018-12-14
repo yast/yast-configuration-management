@@ -21,16 +21,34 @@ require "yast"
 require "configuration_management/clients/provision"
 require "configuration_management/configurators/salt"
 require "configuration_management/configurations/salt"
-require "y2configuration_management/salt/formula"
+Yast.import "WFM"
 
 module Y2ConfigurationManagement
   module Clients
-    # Client to configure formulas
+    # Basic client to run the configuration management tools
+    #
+    # It reads the configuration from an XML file.
+    #
+    # @example Configuration example
+    #   <configuration_management>
+    #     <type>salt</type>
+    #     <states_roots config:type="list">
+    #       <listitem>/srv/salt</listitem>
+    #     </states_roots>
+    #     <formulas_roots config:type="list">
+    #       <listitem>/srv/formulas</listitem>
+    #     </formulas_roots>
+    #     <pillar_root>/srv/pillar</pillar_root>
+    #   </configuration_management>
     class Main < Yast::Client
       include Yast::Logger
 
+      # Runs the client
       def run
+        settings = settings_from_xml
+        return false unless settings
         log.info("Provisioning Configuration Management")
+        config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
         configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
         configurator.prepare
         Yast::ConfigurationManagement::Clients::Provision.new.run
@@ -38,20 +56,14 @@ module Y2ConfigurationManagement
 
     private
 
-      # Returns the configuration management configuration
+      # Reads the module settings from an XML file
       #
-      # @return [Yast::ConfigurationManagement::Configurations::Base]
-      def config
-        return @config if @config
-        settings =
-          {
-            "type"           => "salt",
-            "mode"           => "masterless",
-            "formulas_roots" => Y2ConfigurationManagement::Salt::Formula.formula_directories,
-            "states_roots"   => Y2ConfigurationManagement::Salt::Formula::BASE_DIR + "/states",
-            "pillar_root"    => Y2ConfigurationManagement::Salt::Formula::DATA_DIR + "/pillar"
-          }
-        @config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
+      # @return [Hash,nil]
+      def settings_from_xml
+        filename = Yast::WFM.Args(0)
+        return nil unless filename && File.exist?(filename)
+        content = Yast::XML.XMLToYCPFile(filename)
+        content && content["configuration_management"]
       end
     end
   end

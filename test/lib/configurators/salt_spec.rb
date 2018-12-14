@@ -74,6 +74,9 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
       let(:master) { nil }
       let(:minion_config) { double("minion", load: true, save: true, exist?: false) }
       let(:key_finder) { double("key_finder", fetch_to: true) }
+      let(:formula_sequence) do
+        instance_double(Y2ConfigurationManagement::Salt::FormulaSequence, run: true)
+      end
 
       before do
         allow(Yast::ConfigurationManagement::CFA::Minion)
@@ -92,9 +95,8 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
       end
 
       it "runs the configuration_management_formula client" do
-        expect(Yast::WFM).to receive(:CallFunction)
-          .with("configuration_management_formula",
-            [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
+        expect(Y2ConfigurationManagement::Salt::FormulaSequence).to receive(:new)
+          .with(config).and_return(formula_sequence)
         configurator.prepare
       end
 

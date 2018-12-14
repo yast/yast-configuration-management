@@ -102,6 +102,10 @@ module Y2ConfigurationManagement
              .select(&:form)
       end
 
+      def self.reset
+        @formulas = nil
+      end
+
       # Return formula default directories
       #
       # @return [String]
