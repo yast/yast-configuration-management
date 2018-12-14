@@ -37,13 +37,17 @@ module Y2ConfigurationManagement
       # @return [Array<Formula>] available on the system
       attr_reader :formulas
 
+      # @return [Yast::ConfigurationManagement::Configurations::Salt]
+      attr_reader :config
+
       # Constructor
       #
       # @macro seeSequence
       # @param formulas [Array<Formula>]
-      def initialize(formulas)
+      def initialize(config)
         textdomain "configuration_management"
-        @formulas = formulas
+        @config = config
+        read_formulas
       end
 
       # @macro seeSequence
@@ -70,9 +74,19 @@ module Y2ConfigurationManagement
       # Write the data associated to the selected {Formula}s into the current system
       def write_data
         return :next if formulas.select(&:enabled?).empty?
-        Yast::Popup.Feedback(_("Writing data"), Yast::Message.takes_a_while) do
+
+        [config.pillar_root, config.states_root].each do |path|
+          ::FileUtils.mkdir_p(path) unless File.exist?(path)
+          top = Yast::ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+          top.load
+          top.add_states(formulas.select(&:enabled?).map(&:id))
+          top.save
+        end
+
+        Yast::Popup.Feedback(_("Writing formulas data"), Yast::Message.takes_a_while) do
           formulas.select(&:enabled?).each(&:write_pillar)
         end
+
         :next
       end
 
@@ -96,6 +110,18 @@ module Y2ConfigurationManagement
             next:  :finish
           }
         }
+      end
+
+      def read_formulas
+        @formulas = Y2ConfigurationManagement::Salt::Formula.all(config.formulas_roots.map(&:to_s))
+        @formulas.each { |f| f.pillar = pillar_for(f) }
+      end
+
+      def pillar_for(formula)
+        pillar_file = File.join(config.pillar_root, "#{formula.id}.sls")
+        pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
+        pillar.load
+        pillar
       end
     end
   end
