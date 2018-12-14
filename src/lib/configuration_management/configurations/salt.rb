@@ -22,6 +22,7 @@ module Yast
           @type       = "salt"
           @states_url = URI(options[:states_url]) if options[:states_url]
           @pillar_url = URI(options[:pillar_url]) if options[:pillar_url]
+          @custom_pillar_root = pathnames_from(options[:pillar_root])
           @custom_states_roots = pathnames_from(options[:states_roots])
           @custom_formulas_roots = pathnames_from(options[:formulas_roots])
         end
@@ -37,6 +38,7 @@ module Yast
         #
         # @return [Pathname] Path to Salt pillars
         def pillar_root(scope = :local)
+          return scoped_paths(@custom_pillar_root, scope) if @custom_pillar_root.first
           work_dir(scope).join("pillar")
         end
 
