@@ -49,13 +49,25 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
   end
 
-  describe "#show_main_dialog" do
-    it "opens the dialog with the whole form" do
-      expect(builder).to receive(:build).with(form.root.elements).and_call_original
-      expect(Yast::CWM).to receive(:show)
-      controller.show_main_dialog
+  shared_examples "form_controller" do
+    describe "#show_main_dialog" do
+      it "opens the dialog with the whole form" do
+        expect(builder).to receive(:build).with(form.root.elements).and_call_original
+        expect(Yast::CWM).to receive(:show)
+        controller.show_main_dialog
+      end
+
+      it "runs the dialog with the whole form" do
+        expect(builder).to receive(:build).with(form.root.elements).and_call_original
+        # Instead of mocking CWM.show we let the CWM preparation a step further,
+        # to catch bugs in widget initialization
+        expect(Yast::UI).to receive(:WaitForEvent).and_return("ID" => :abort)
+        controller.show_main_dialog
+      end
     end
   end
+
+  include_examples "form_controller"
 
   describe "#add" do
     let(:prototype) { form.find_element_by(path: path).prototype }
@@ -129,5 +141,14 @@ describe Y2ConfigurationManagement::Salt::FormController do
       expect(data).to receive(:remove_item).with(".root.person.computers", 1)
       controller.remove(".root.person.computers", 1)
     end
+  end
+
+  context "for a collection of scalars, without $default" do
+    let(:form) do
+      fname = FIXTURES_PATH.join("scalar-collection.yml")
+      Y2ConfigurationManagement::Salt::Form.from_file(fname)
+    end
+
+    include_examples "form_controller"
   end
 end

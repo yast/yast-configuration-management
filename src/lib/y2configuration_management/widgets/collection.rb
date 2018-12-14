@@ -123,7 +123,11 @@ module Y2ConfigurationManagement
       # @return [Array<Array<String|Yast::Term>>]
       def format_items(items_list)
         items_list.each_with_index.map do |item, index|
-          values = headers_ids.map { |h| item[h] }
+          values = if item.is_a? Hash
+            headers_ids.map { |h| item[h] }
+          else
+            [item]
+          end
           Item(Id(index.to_s), *values)
         end
       end
@@ -132,8 +136,13 @@ module Y2ConfigurationManagement
       #
       # @param prototype [FormElement] Prototype definition
       def headers_from_prototype(prototype)
-        names = prototype.elements.map { |h| (h.name || h.id) }
-        ids = prototype.elements.map(&:id)
+        els = if prototype.is_a? Salt::Container
+          prototype.elements
+        else
+          [prototype]
+        end
+        names = els.map { |h| (h.name || h.id) }
+        ids = els.map(&:id)
         [names, ids]
       end
     end
