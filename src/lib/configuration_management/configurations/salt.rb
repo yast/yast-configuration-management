@@ -1,4 +1,5 @@
 require "configuration_management/configurations/base"
+require "pathname"
 
 module Yast
   module ConfigurationManagement
@@ -21,6 +22,8 @@ module Yast
           @type       = "salt"
           @states_url = URI(options[:states_url]) if options[:states_url]
           @pillar_url = URI(options[:pillar_url]) if options[:pillar_url]
+          @custom_states_roots = pathnames_from(options[:states_roots])
+          @custom_formulas_roots = pathnames_from(options[:formulas_roots])
         end
 
         # Return path to the Salt states directory
@@ -42,6 +45,29 @@ module Yast
         # @return [Pathname] Path to Salt pillars
         def formulas_root(scope = :local)
           work_dir(scope).join("formulas")
+        end
+
+        # Return paths to the states root
+        def states_roots(scope = :local)
+          scoped_paths(@custom_states_roots, scope) + [states_root(scope)]
+        end
+
+        # Return paths to the fromulas root
+        def formulas_roots(scope = :local)
+          scoped_paths(@custom_formulas_roots) + [formulas_root(scope)]
+        end
+
+      private
+
+        def scoped_paths(paths, scope = :local)
+          return paths if scope == :target
+          prefix = Pathname.new(Installation.destdir)
+          paths.map { |d| prefix.join(d) }
+        end
+
+        def pathnames_from(dirs)
+          return [] unless dirs.is_a?(Array)
+          dirs.map { |d| Pathname.new(d) }
         end
       end
     end
