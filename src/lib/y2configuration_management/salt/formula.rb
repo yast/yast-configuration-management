@@ -41,7 +41,7 @@ module Y2ConfigurationManagement
       # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.req
       DATA_DIR = "/srv/susemanager/formula_data".freeze
 
-      # @return [String] Formula path
+      # @return [Pathname] Formula path
       attr_reader :path
 
       # @return [Metadata] Formula metadata
@@ -55,12 +55,12 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param path [String]
+      # @param path [Pathname]
       # @param pillar [Pillar] associated formula data
       def initialize(path, pillar = nil)
         @path = path
-        @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
-        @form = Form.from_file(File.join(@path, "form.yml"))
+        @metadata = Metadata.from_file(@path.join("metadata.yml"))
+        @form = Form.from_file(@path.join("form.yml"))
         @pillar = pillar
         @enabled = false
       end
