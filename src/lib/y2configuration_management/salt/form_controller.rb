@@ -149,7 +149,8 @@ module Y2ConfigurationManagement
       def edit_item(path, item)
         element = form.find_element_by(path: path)
         widget_form = form_builder.build(element.prototype)
-        widget_form.value = item
+        wid = path[1..-1].split(".").last
+        widget_form.value = { wid => item }
         show_popup(element.name, widget_form)
       end
 
