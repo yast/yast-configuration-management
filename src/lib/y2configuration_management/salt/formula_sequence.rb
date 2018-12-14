@@ -20,6 +20,7 @@
 require "ui/sequence"
 require "y2configuration_management/salt/formula_configuration"
 require "y2configuration_management/salt/formula_selection"
+require "configuration_management/cfa/salt_top"
 
 Yast.import "Report"
 Yast.import "Message"

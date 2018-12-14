@@ -18,21 +18,22 @@
 # find current contact information at www.suse.com.
 
 require "yast"
+require "configuration_management/clients/provision"
 require "configuration_management/configurators/salt"
 require "configuration_management/configurations/salt"
 require "y2configuration_management/salt/formula"
-require "y2configuration_management/salt/formula_sequence"
-require "configuration_management/cfa/salt_top"
 
 module Y2ConfigurationManagement
   module Clients
     # Client to configure formulas
-    class Formula
+    class Main < Yast::Client
+      include Yast::Logger
 
       def run
+        log.info("Provisioning Configuration Management")
         configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
         configurator.prepare
-        Y2ConfigurationManagement::Salt::FormulaSequence.new(config).run
+        Yast::ConfigurationManagement::Clients::Provision.new.run
       end
 
     private
@@ -52,7 +53,6 @@ module Y2ConfigurationManagement
           }
         @config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
       end
-
     end
   end
 end

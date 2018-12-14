@@ -2,6 +2,7 @@ require "yast"
 require "cheetah"
 require "configuration_management/cfa/minion"
 require "configuration_management/configurators/base"
+require "y2configuration_management/salt/formula_sequence"
 require "pathname"
 
 module Yast
@@ -18,8 +19,7 @@ module Yast
           fetch_config(config.states_url, config.work_dir) if config.states_url
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
           update_configuration
-          Yast::WFM.CallFunction("configuration_management_formula",
-            [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
+          Y2ConfigurationManagement::Salt::FormulaSequence.new(config).run
         end
 
         mode(:client) do
