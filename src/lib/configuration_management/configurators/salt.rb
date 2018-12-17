@@ -19,7 +19,7 @@ module Yast
           fetch_config(config.states_url, config.work_dir) if config.states_url
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
           update_configuration
-          Y2ConfigurationManagement::Salt::FormulaSequence.new(config).run
+          Y2ConfigurationManagement::Salt::FormulaSequence.new(config).run == :finish
         end
 
         mode(:client) do

@@ -21,6 +21,8 @@ require "yast"
 require "configuration_management/clients/provision"
 require "configuration_management/configurators/salt"
 require "configuration_management/configurations/salt"
+require "y2configuration_management/salt/formula"
+
 Yast.import "WFM"
 Yast.import "PackageSystem"
 
@@ -44,14 +46,23 @@ module Y2ConfigurationManagement
     class Main < Yast::Client
       include Yast::Logger
 
+      DEFAULT_SETTINGS = {
+        "type"           => "salt",
+        "formulas_roots" => Y2ConfigurationManagement::Salt::Formula.formula_directories,
+        "states_roots"   => [
+          Y2ConfigurationManagement::Salt::Formula::BASE_DIR + "/states",
+          "/srv/salt/"
+        ],
+        "pillar_root"    => Y2ConfigurationManagement::Salt::Formula::DATA_DIR + "/pillar"
+      }.freeze
+
       # Runs the client
       def run
-        settings = settings_from_xml
-        return false unless settings
+        settings = settings_from_xml || DEFAULT_SETTINGS
         log.info("Provisioning Configuration Management")
         config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
         configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
-        configurator.prepare
+        return unless configurator.prepare
         if !Yast::PackageSystem.CheckAndInstallPackages(configurator.packages.fetch("install", []))
           return :abort
         end

@@ -27,6 +27,7 @@ describe Y2ConfigurationManagement::Clients::Main do
   subject(:main) { described_class.new }
 
   describe "#run" do
+    let(:prepared) { true }
     let(:config) do
       { "configuration_management" =>  { "type" => "salt" } }
     end
@@ -36,9 +37,10 @@ describe Y2ConfigurationManagement::Clients::Main do
     let(:packages) { { "install" => ["salt"] } }
     let(:configurator) do
       instance_double(
-        Yast::ConfigurationManagement::Configurators::Salt, prepare: true, packages: packages
+        Yast::ConfigurationManagement::Configurators::Salt, prepare: prepared, packages: packages
       )
     end
+    let(:configuration) { Yast::ConfigurationManagement::Configurations::Base }
 
     before do
       allow(Yast::WFM).to receive(:Args).with(0).and_return(filename)
@@ -50,34 +52,39 @@ describe Y2ConfigurationManagement::Clients::Main do
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(filename).and_return(file_exists?)
       allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages).and_return(true)
-    end
-
-    it "runs the provisioner" do
-      expect(provision).to receive(:run)
-      main.run
+      allow(provision).to receive(:run)
     end
 
     context "when the configuration file is not found" do
       let(:file_exists?) { false }
 
-      it "returns false" do
-        expect(main.run).to eq(false)
+      it "uses the default_settings" do
+        expect(configuration).to receive(:for)
+          .with(described_class::DEFAULT_SETTINGS).and_call_original
+
+        main.run
       end
     end
 
     context "when no filename is given" do
       let(:filename) { nil }
 
-      it "returns false" do
-        expect(main.run).to eq(false)
+      it "uses the default_settings" do
+        expect(configuration).to receive(:for)
+          .with(described_class::DEFAULT_SETTINGS).and_call_original
+
+        main.run
       end
     end
 
     context "when no valid configuration is given" do
       let(:config) { nil }
 
-      it "returns false" do
-        expect(main.run).to eq(false)
+      it "uses the default_settings" do
+        expect(configuration).to receive(:for)
+          .with(described_class::DEFAULT_SETTINGS).and_call_original
+
+        main.run
       end
     end
 
@@ -94,6 +101,23 @@ describe Y2ConfigurationManagement::Clients::Main do
 
       it "does not try to apply the configuration" do
         expect(provision).to_not receive(:run)
+        main.run
+      end
+    end
+
+    context "when the formulas configuration is not prepared correctly" do
+      let(:prepared) { false }
+
+      it "does not run the provisioner" do
+        expect(provision).not_to receive(:run)
+
+        main.run
+      end
+    end
+
+    context "when the formulas configuration is prepared correctly" do
+      it "runs the provisioner" do
+        expect(provision).to receive(:run)
         main.run
       end
     end
