@@ -14,6 +14,8 @@ module Yast
         attr_reader :states_url
         # @return [URI,nil] Location of Salt pillars
         attr_reader :pillar_url
+        # @return [Array<String>] States (including formulas) which will be applied
+        attr_reader :enabled_states
 
         # Custom initialization code
         #
@@ -25,6 +27,7 @@ module Yast
           @custom_pillar_root = Pathname(options[:pillar_root]) if options[:pillar_root]
           @custom_states_roots = pathnames_from(options[:states_roots])
           @custom_formulas_roots = pathnames_from(options[:formulas_roots])
+          @enabled_states = options.fetch(:enabled_states, [])
         end
 
         # Return path to the Salt states directory
