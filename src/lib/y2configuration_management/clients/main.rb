@@ -51,10 +51,10 @@ module Y2ConfigurationManagement
         log.info("Provisioning Configuration Management")
         config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
         configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
+        configurator.prepare
         if !Yast::PackageSystem.CheckAndInstallPackages(configurator.packages.fetch("install", []))
           return :abort
         end
-        configurator.prepare
         Yast::ConfigurationManagement::Clients::Provision.new.run
       end
 
