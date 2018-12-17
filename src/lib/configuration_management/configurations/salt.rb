@@ -50,23 +50,40 @@ module Yast
         end
 
         # Return paths to the states root
+        #
+        # @return [Array<Pathname>] Path to Salt state roots
         def states_roots(scope = :local)
           scoped_paths(@custom_states_roots, scope) + [states_root(scope)]
         end
 
         # Return paths to the fromulas root
+        #
+        # @return [Array<Pathname>] Path to Salt formulas roots
         def formulas_roots(scope = :local)
           scoped_paths(@custom_formulas_roots) + [formulas_root(scope)]
         end
 
       private
 
+        # Convenience method for obtaining the list of given paths relative to
+        # inst-sys (scope: :local) or to the target system (scope: :target)
+        #
+        # @param paths [Array<Pathname>] list of path to be scoped
+        # @param scope [Symbol] Path relative to inst-sys (:local) or the
+        #   target system (:target)
+        # @return [Array<Pathname>] list of the given paths prefixed by the
+        #   destination directory in case of :local scope
         def scoped_paths(paths, scope = :local)
           return paths if scope == :target
           prefix = Pathname.new(Installation.destdir)
           paths.map { |d| prefix.join(d) }
         end
 
+        # Convenience method for converting from a list of directory names to a
+        # list of {Pathname}s
+        #
+        # @param dirs [Array<String>] list of directory names
+        # @return [Array<Pathname>]
         def pathnames_from(dirs)
           return [] unless dirs.is_a?(Array)
           dirs.map { |d| Pathname.new(d) }

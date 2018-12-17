@@ -45,7 +45,7 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @macro seeSequence
-      # @param formulas [Array<Formula>]
+      # @param config [Yast::ConfigurationManagement::Configurations::Salt]
       def initialize(config)
         textdomain "configuration_management"
         @config = config
@@ -114,11 +114,18 @@ module Y2ConfigurationManagement
         }
       end
 
+      # It reads all the available {Formula}s in the system initializing also
+      # the {Pillar} associated with each one
       def read_formulas
         @formulas = Y2ConfigurationManagement::Salt::Formula.all(config.formulas_roots.map(&:to_s))
         @formulas.each { |f| f.pillar = pillar_for(f) }
       end
 
+      # Convenience method for reading the {Pillar} associated to the given
+      # formula
+      #
+      # @param formula [Formula]
+      # @return [Pillar]
       def pillar_for(formula)
         pillar_file = File.join(config.pillar_root, "#{formula.id}.sls")
         pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
