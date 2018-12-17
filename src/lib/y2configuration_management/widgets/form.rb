@@ -95,9 +95,17 @@ module Y2ConfigurationManagement
     private
 
       def set_children_contents
+        set_children_contents_precond!
         children.each do |widget|
           widget.value = value[widget.id] if value[widget.id]
         end
+      end
+
+      def set_children_contents_precond!
+        child_ids = children.map(&:id).sort
+        value_keys = value.keys.sort
+        return if child_ids == value_keys
+        raise "Form expects ids #{child_ids}, got #{value_keys}"
       end
     end
   end
