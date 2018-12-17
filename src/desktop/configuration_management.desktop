@@ -11,5 +11,5 @@ X-SuSE-YaST-AutoInstClient=configuration_management_auto
 X-SuSE-YaST-Keywords=salt,privisioning,configuration_management
 
 Name=YaST2 Configuration Management
-Icon=yast-cms
+Icon=yast-configuration-management
 Hidden=true
