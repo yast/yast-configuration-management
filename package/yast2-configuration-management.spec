@@ -17,7 +17,7 @@
 
 
 Name:           yast2-configuration-management
-Version:        4.0.3
+Version:        4.0.4
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -59,6 +59,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_clientdir}/*.rb
 %{yast_libdir}/configuration_management
 %{yast_desktopdir}/*.desktop
+%{yast_icondir}
 
 %dir %{yast_docdir}
 %license COPYING
