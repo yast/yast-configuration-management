@@ -28,7 +28,7 @@ require "cwm/rspec"
 describe Y2ConfigurationManagement::Salt::FormulaSequence do
   let(:formulas_root) { FIXTURES_PATH.join("formulas-ng") }
   let(:form) { formulas_root.join("form.yml") }
-  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s) }
+  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true) }
   let(:selector) { instance_double(Y2ConfigurationManagement::Salt::FormulaSelection) }
   let(:formula_config_sequence) do
     instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration)
@@ -39,8 +39,6 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     )
   end
   subject(:sequence) { described_class.new(config) }
-
-  before { Y2ConfigurationManagement::Salt::Formula.reset }
 
   describe "#run" do
     context "if the user aborts during the process" do

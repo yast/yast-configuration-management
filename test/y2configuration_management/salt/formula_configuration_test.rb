@@ -27,7 +27,7 @@ require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Salt::FormulaConfiguration do
   let(:formulas_root) { FIXTURES_PATH.join("formulas-ng") }
-  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s) }
+  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true) }
   let(:formula) { formulas[0] }
   let(:controller) do
     instance_double("Y2ConfigurationManagement::Salt::FormController", show_main_dialog: :cancel)

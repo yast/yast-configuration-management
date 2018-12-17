@@ -29,7 +29,10 @@ describe Y2ConfigurationManagement::Salt::FormulaSelection do
   include_examples "CWM::Dialog"
   let(:formulas_root) { FIXTURES_PATH.join("formulas-ng") }
   let(:form) { formulas_root.join("form.yml") }
-  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s) }
+  let(:formulas) do
+    Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true)
+  end
+
   subject { described_class.new(formulas) }
 
   describe "#run" do
