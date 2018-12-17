@@ -83,7 +83,7 @@ module Y2ConfigurationManagement
       #
       # @param path [String] Collection's path
       def add(path)
-        result = edit_item(path, {})
+        result = edit_item(path, nil)
         return if result.nil?
         @data.add_item(path, result.values.first)
         refresh_main_form
