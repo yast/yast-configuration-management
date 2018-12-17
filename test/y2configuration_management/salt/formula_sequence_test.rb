@@ -23,6 +23,7 @@ require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula_sequence"
 require "y2configuration_management/salt/formula"
 require "configuration_management/configurations/salt"
+require "tmpdir"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Salt::FormulaSequence do
@@ -38,7 +39,16 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
       formulas_roots: [formulas_root]
     )
   end
+  let(:tmpdir) { Pathname(Dir.mktmpdir) }
   subject(:sequence) { described_class.new(config) }
+
+  before do
+    allow(config).to receive(:work_dir).and_return(tmpdir)
+  end
+
+  after do
+    FileUtils.remove_entry_secure(tmpdir)
+  end
 
   describe "#run" do
     context "if the user aborts during the process" do
