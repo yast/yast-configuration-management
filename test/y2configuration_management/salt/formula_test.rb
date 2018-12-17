@@ -22,7 +22,7 @@ require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula"
 
 describe Y2ConfigurationManagement::Salt::Formula do
-  let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s) }
+  let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true) }
 
   describe ".all" do
     it "returns all the formulas from the given path" do

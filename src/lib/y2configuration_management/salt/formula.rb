@@ -90,9 +90,14 @@ module Y2ConfigurationManagement
 
       # Return all the installed formulas
       #
+      # @note The result is cached. To force refreshing the cache, set the `reload`
+      #   parameter to `true`.
+      #
+      # @param paths  [Array<String>|String] File system paths to search for formulas
+      # @param reload [Boolean] Refresh formulas cache
       # @return [Array<Formula>]
-      def self.all(*paths)
-        return @formulas if @formulas
+      def self.all(*paths, reload: false)
+        return @formulas if @formulas && !reload
         metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
         @formulas =
           Dir.glob(metadata_paths.map { |p| p + "/*" })
@@ -100,10 +105,6 @@ module Y2ConfigurationManagement
              .select(&:directory?)
              .map { |p| Formula.new(p) }
              .select(&:form)
-      end
-
-      def self.reset
-        @formulas = nil
       end
 
       # Return formula default directories
