@@ -32,9 +32,12 @@ describe Y2ConfigurationManagement::Clients::Main do
     end
     let(:filename) { "config.xml" }
     let(:file_exists?) { true }
-    let(:provision) { instance_double(Yast::ConfigurationManagement::Clients::Provision) }
+    let(:provision) { instance_double(Yast::ConfigurationManagement::Clients::Provision, run: nil) }
+    let(:packages) { { "install" => ["salt"] } }
     let(:configurator) do
-      instance_double(Yast::ConfigurationManagement::Configurators::Salt, prepare: true)
+      instance_double(
+        Yast::ConfigurationManagement::Configurators::Salt, prepare: true, packages: packages
+      )
     end
 
     before do
@@ -46,6 +49,7 @@ describe Y2ConfigurationManagement::Clients::Main do
         .and_return(provision)
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(filename).and_return(file_exists?)
+      allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages).and_return(true)
     end
 
     it "runs the provisioner" do
@@ -74,6 +78,23 @@ describe Y2ConfigurationManagement::Clients::Main do
 
       it "returns false" do
         expect(main.run).to eq(false)
+      end
+    end
+
+    it "ensures that needed packages are installed" do
+      expect(Yast::PackageSystem).to receive(:CheckAndInstallPackages).with(["salt"])
+        .and_return(true)
+      main.run
+    end
+
+    context "when needed packages cannot be installed" do
+      before do
+        allow(Yast::PackageSystem).to receive(:CheckAndInstallPackages).and_return(false)
+      end
+
+      it "does not try to apply the configuration" do
+        expect(provision).to_not receive(:run)
+        main.run
       end
     end
   end

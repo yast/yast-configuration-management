@@ -22,6 +22,7 @@ require "configuration_management/clients/provision"
 require "configuration_management/configurators/salt"
 require "configuration_management/configurations/salt"
 Yast.import "WFM"
+Yast.import "PackageSystem"
 
 module Y2ConfigurationManagement
   module Clients
@@ -50,6 +51,9 @@ module Y2ConfigurationManagement
         log.info("Provisioning Configuration Management")
         config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
         configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
+        if !Yast::PackageSystem.CheckAndInstallPackages(configurator.packages.fetch("install", []))
+          return :abort
+        end
         configurator.prepare
         Yast::ConfigurationManagement::Clients::Provision.new.run
       end
