@@ -8,7 +8,7 @@ module Yast
       # using Salt.
       #
       # It extends the Configurations::Base class with some
-      # custom attributes (@see #states_url and #pillar_url).
+      # custom attributes (see {#states_url} and {#pillar_url}).
       class Salt < Base
         # @return [URI,nil] Location of Salt states
         attr_reader :states_url
