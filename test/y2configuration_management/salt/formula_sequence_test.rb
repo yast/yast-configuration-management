@@ -30,7 +30,7 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
   let(:formulas_root) { FIXTURES_PATH.join("formulas-ng") }
   let(:form) { formulas_root.join("form.yml") }
   let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true) }
-  let(:selector) { instance_double(Y2ConfigurationManagement::Salt::FormulaSelection) }
+  let(:selector) { instance_double(Y2ConfigurationManagement::Salt::FormulaSelection, run: :next) }
   let(:formula_config_sequence) do
     instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration)
   end
