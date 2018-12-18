@@ -28,10 +28,23 @@ Depending on the module's configuration, it will take care of:
   modules).
 * Updating Salt/Puppet configuration and running them.
 
-## Example
+## Supported Systems
+
+### Salt
+
+In this case, `salt-minion` package will be installed. If a `master` is set, `/etc/salt/minion` will
+be updated. Finally, `salt-call` will be used to apply the configuration.
+
+### Puppet
+
+In this case, `puppet` package will be installed. If a `master` is set, `/etc/puppet/puppet.conf`
+will be updated. Finally, `puppet agent` will be used to apply the configuration.
+
+## Module Configuration
 
 YaST Configuration Management needs some configuration in order to know how to proceed. The snippets
-below can be embedded into an AutoYaST profile or in the Firstboot configuration.
+below can be embedded into an AutoYaST profile or in the Firstboot configuration
+(`/etc/YaST2/firstboot.xml`).
 
 ### Client/Server
 
@@ -71,9 +84,9 @@ The Firstboot module offers integration with YaST Configuration Management throu
 a `<configuration_management/>` section containing the configuration options and add the client to
 the required workflow. In the example below, only the relevant parts are shown:
 
-*WARNING: During firstboot, only Salt is supported.*
+**WARNING: Only Salt is supported by Firstboot.**
 
-```
+```xml
 <?xml version="1.0"?>
 <productDefines xmlns="http://www.suse.com/1.0/yast2ns" 
   xmlns:config="http://www.suse.com/1.0/configns">
@@ -113,33 +126,32 @@ the required workflow. In the example below, only the relevant parts are shown:
 </productDefines>
 ```
 
-## Supported Systems
+## Salt Formulas Forms Support
 
-### Salt
+**WARNING: Under development.**
 
-In this case, `salt-minion` package will be installed. If a `master`
-is set in the AutoYaST profile, `/etc/salt/minion` will be
-updated. Finally, `salt-call` will be used to apply the configuration.
+The support for Salt Formulas Forms is still under development. Currently, the module is able to
+render the corresponding UI to get user's input, store the information and run Salt accordingly.
+However, some stuff is still missing:
 
-### Puppet
-
-In this case, `puppet` package will be installed. If a `master`
-is set in the AutoYaST profile, `/etc/puppet/puppet.conf` will be
-updated. Finally, `puppet agent` will be used to apply the configuration.
+* Some basic widgets are not implemented yet (passwords, numbers, etc.).
+* Support for nested collections, although simple collections are already working.
+* Better integration with Firstboot (supporting stuff like going back or running Salt at the end).
+* Good documentation.
 
 ## Options Reference
 
-Name           | Type         | Mode       | Description
----            | ---          | ---        | ---
-type           | string       | all        | Configuration Management System. Only `salt` is supported
-master         | string       | client     | Master server
-auth_attempts  | integer      | client     | Number of attempts when connecting to the master server
-auth_time_out  | integer      | client     | Time between attempts to connect to the master server
-keys_url       | string       | masterless | URL to get authentication keys from
-formulas_roots | list(string) | all        | List of directories to search for Salt formulas
-states_roots   | list(string) | all        | List of directories to search for Salt states
-pillar_root    | string       | all        | Path to write the Salt Pillar content
-pillar_url     | string       | masterless | URL to get Pillar content from
-states_url     | string       | masterless | URL to get the Salt states from
-enabled_states | list(string) | masterless | List of states/formulas to apply
-enable_service | boolean      | client     | Enable the configuration management service at the end
+Name            | Type         | Mode       | Description
+---             | ---          | ---        | ---
+type            | string       | all        | Configuration Management System (`salt` or `puppet`)
+master          | string       | client     | Master server
+auth_attempts   | integer      | client     | Number of attempts when connecting to the master server
+auth_time_out   | integer      | client     | Time between attempts to connect to the master server
+enable_services | boolean      | client     | Enable the configuration management service at the end
+formulas_roots  | list(string) | all        | List of directories to search for Salt formulas
+states_roots    | list(string) | all        | List of directories to search for Salt states
+pillar_root     | string       | all        | Path to write the Salt Pillar content
+pillar_url      | string       | masterless | URL to get Pillar content from
+keys_url        | string       | masterless | URL to get authentication keys from
+states_url      | string       | masterless | URL to get the Salt states from
+enabled_states  | list(string) | masterless | List of states/formulas to apply
