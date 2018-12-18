@@ -30,13 +30,13 @@ module Y2ConfigurationManagement
       # @return [Object] Pillar data
       attr_accessor :data
 
-      # @return [String] Pillar file path
+      # @return [Pathname] Pillar file path
       attr_accessor :path
 
       # Constructor
       #
       # @param data [Hash] The pillar data (deserialized pillar_name.yml).
-      # @param path [String] pillar file path
+      # @param path [Pathname] pillar file path
       def initialize(data: {}, path: nil)
         @data = data
         @path = path
@@ -44,7 +44,7 @@ module Y2ConfigurationManagement
 
       # Creates a new {Pillar} object reading its data from a YAML file
       #
-      # @param path [String] file path to read the form YAML definition
+      # @param path [Pathname] file path to read the form YAML definition
       # @return [Pillar, nil]
       def self.from_file(path)
         pillar = new(data: {}, path: path)

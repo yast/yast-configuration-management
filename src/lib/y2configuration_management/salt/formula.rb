@@ -41,7 +41,7 @@ module Y2ConfigurationManagement
       # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.req
       DATA_DIR = "/srv/susemanager/formula_data".freeze
 
-      # @return [String] Formula path
+      # @return [Pathname] Formula path
       attr_reader :path
 
       # @return [Metadata] Formula metadata
@@ -55,12 +55,12 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param path [String]
+      # @param path [Pathname]
       # @param pillar [Pillar] associated formula data
       def initialize(path, pillar = nil)
         @path = path
-        @metadata = Metadata.from_file(File.join(@path, "metadata.yml"))
-        @form = Form.from_file(File.join(@path, "form.yml"))
+        @metadata = Metadata.from_file(@path.join("metadata.yml"))
+        @form = Form.from_file(@path.join("form.yml"))
         @pillar = pillar
         @enabled = false
       end
@@ -90,14 +90,21 @@ module Y2ConfigurationManagement
 
       # Return all the installed formulas
       #
+      # @note The result is cached. To force refreshing the cache, set the `reload`
+      #   parameter to `true`.
+      #
+      # @param paths  [Array<String>|String] File system paths to search for formulas
+      # @param reload [Boolean] Refresh formulas cache
       # @return [Array<Formula>]
-      def self.all(*paths)
+      def self.all(*paths, reload: false)
+        return @formulas if @formulas && !reload
         metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
-        Dir.glob(metadata_paths.map { |p| p + "/*" })
-           .map { |p| Pathname.new(p) }
-           .select(&:directory?)
-           .map { |p| Formula.new(p) }
-           .select(&:form)
+        @formulas =
+          Dir.glob(metadata_paths.map { |p| p + "/*" })
+             .map { |p| Pathname.new(p) }
+             .select(&:directory?)
+             .map { |p| Formula.new(p) }
+             .select(&:form)
       end
 
       # Return formula default directories

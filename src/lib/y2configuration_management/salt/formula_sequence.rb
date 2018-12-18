@@ -20,6 +20,8 @@
 require "ui/sequence"
 require "y2configuration_management/salt/formula_configuration"
 require "y2configuration_management/salt/formula_selection"
+require "y2configuration_management/salt/formula"
+require "configuration_management/cfa/salt_top"
 
 Yast.import "Report"
 Yast.import "Message"
@@ -37,13 +39,17 @@ module Y2ConfigurationManagement
       # @return [Array<Formula>] available on the system
       attr_reader :formulas
 
+      # @return [Yast::ConfigurationManagement::Configurations::Salt]
+      attr_reader :config
+
       # Constructor
       #
       # @macro seeSequence
-      # @param formulas [Array<Formula>]
-      def initialize(formulas)
+      # @param config [Yast::ConfigurationManagement::Configurations::Salt]
+      def initialize(config)
         textdomain "configuration_management"
-        @formulas = formulas
+        @config = config
+        read_formulas
       end
 
       # @macro seeSequence
@@ -58,7 +64,12 @@ module Y2ConfigurationManagement
           return :abort
         end
 
-        Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
+        if config.enabled_states.empty?
+          enable_formulas_by_user
+        else
+          enable_formulas_by_config
+          :next
+        end
       end
 
       # Iterates over the enabled {Formula}s running the {FormController} for
@@ -70,9 +81,19 @@ module Y2ConfigurationManagement
       # Write the data associated to the selected {Formula}s into the current system
       def write_data
         return :next if formulas.select(&:enabled?).empty?
-        Yast::Popup.Feedback(_("Writing data"), Yast::Message.takes_a_while) do
+
+        [config.pillar_root, config.states_root].each do |path|
+          ::FileUtils.mkdir_p(path) unless File.exist?(path)
+          top = Yast::ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+          top.load
+          top.add_states(formulas.select(&:enabled?).map(&:id))
+          top.save
+        end
+
+        Yast::Popup.Feedback(_("Writing formulas data"), Yast::Message.takes_a_while) do
           formulas.select(&:enabled?).each(&:write_pillar)
         end
+
         :next
       end
 
@@ -96,6 +117,37 @@ module Y2ConfigurationManagement
             next:  :finish
           }
         }
+      end
+
+      # It reads all the available {Formula}s in the system initializing also
+      # the {Pillar} associated with each one
+      def read_formulas
+        @formulas = Y2ConfigurationManagement::Salt::Formula.all(config.formulas_roots.map(&:to_s))
+        @formulas.each { |f| f.pillar = pillar_for(f) }
+      end
+
+      # Convenience method for reading the {Pillar} associated to the given
+      # formula
+      #
+      # @param formula [Formula]
+      # @return [Pillar]
+      def pillar_for(formula)
+        pillar_file = File.join(config.pillar_root, "#{formula.id}.sls")
+        pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
+        pillar.load
+        pillar
+      end
+
+      # Asks the user to select the enabled formulas/states
+      def enable_formulas_by_user
+        Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
+      end
+
+      # Sets the list of enabled formulas/states according to the given configuration
+      def enable_formulas_by_config
+        formulas
+          .select { |f| config.enabled_states.include?(f.id) }
+          .each { |f| f.enabled = true }
       end
     end
   end

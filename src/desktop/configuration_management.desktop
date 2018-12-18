@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Categories=Settings;System;Qt;X-SuSE-YaST;X-SuSE-YaST-Misc;
-X-SuSE-YaST-Call=configuration_management_formula_ng
+X-SuSE-YaST-Call=configuration_management
 
 X-SuSE-YaST-Group=Misc
 X-SuSE-YaST-AutoInst=all
@@ -13,6 +13,6 @@ X-SuSE-YaST-AutoInstClient=configuration_management_auto
 X-SuSE-YaST-Keywords=salt,privisioning,configuration_management
 
 Icon=yast2-software
-Exec=/usr/bin/xdg-su -c '/sbin/yast2 configuration_management_formula_ng'
+Exec=/usr/bin/xdg-su -c "/sbin/yast2 configuration_management"
 
 Name=YaST2 Configuration Management
