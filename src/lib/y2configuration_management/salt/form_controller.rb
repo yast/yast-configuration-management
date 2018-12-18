@@ -167,7 +167,6 @@ module Y2ConfigurationManagement
       # @todo This version is just for debugging purposes. It should be replaced with a meaningful
       #   version.
       def next_handler
-        return false unless Yast::Popup.YesNo("Do you want to exit?")
         main_form.store
         data.update(form.root.path, main_form.result)
         pillar.data = data.to_h.fetch("root", {})
