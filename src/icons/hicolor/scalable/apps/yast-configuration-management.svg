@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg enable-background="new" version="1.0" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<linearGradient id="b" x1="40" x2="88" y1="204" y2="204" gradientUnits="userSpaceOnUse">
+<stop stop-color="#deddda" offset="0"/>
+<stop stop-color="#c0bfbc" offset="1"/>
+</linearGradient>
+<linearGradient id="a" x1="40" x2="88" y1="210" y2="210" gradientUnits="userSpaceOnUse">
+<stop stop-color="#c0bfbc" offset="0"/>
+<stop stop-color="#deddda" offset=".083333"/>
+<stop stop-color="#c0bfbc" offset=".16667"/>
+<stop stop-color="#c0bfbc" offset=".83333"/>
+<stop stop-color="#f6f5f4" offset=".91667"/>
+<stop stop-color="#9a9996" offset="1"/>
+</linearGradient>
+</defs>
+<g transform="translate(0,-172)">
+<g display="none">
+<text x="7.9499588" y="148.65199" display="inline" enable-background="new" fill="#000000" font-family="Cantarell" font-size="5.3333px" stroke-width=".33265" style="line-height:125%" xml:space="preserve"><tspan x="7.9499588" y="148.65199" font-size="5.3333px" stroke-width=".33265">apps</tspan></text>
+<text x="7.7533054" y="157.23398" display="inline" enable-background="new" fill="#000000" font-family="Cantarell" font-size="5.3333px" font-weight="bold" stroke-width=".33265" style="line-height:125%" xml:space="preserve"><tspan x="7.7533054" y="157.23398" font-size="5.3333px" stroke-width=".33265">org.gnome.</tspan></text>
+<rect x="9.2651e-8" y="172" width="128" height="128" display="inline" enable-background="accumulate" fill="#f0f0f0"/>
+<g transform="matrix(.25 0 0 .25 6.9489e-8 225)" fill="#2864b0">
+<circle cx="256" cy="44" r="240" opacity=".1" style="paint-order:normal"/>
+<rect x="96" y="-180" width="320" height="448" rx="32" ry="32" opacity=".1" style="paint-order:normal"/>
+<rect x="48" y="-164" width="416" height="416" rx="32" ry="32" display="inline" enable-background="new" opacity=".1" style="paint-order:normal"/>
+<rect x="32" y="-116" width="448" height="320" rx="32" ry="32" display="inline" enable-background="new" opacity=".1" style="paint-order:normal"/>
+</g>
+</g>
+<g>
+<rect x="40" y="208" width="48" height="80" ry="8" fill="#f6f5f4"/>
+<rect x="40" y="232" width="48" height="56" ry="8" fill="#e4effb"/>
+<rect x="40" y="232" width="48" height="20" ry="8" fill="#d8e7f9"/>
+<path transform="translate(0,172)" d="m48 36c-4.432 0-8 3.568-8 8v64c0 4.432 3.568 8 8 8h2.666l26.668-80h-29.334z" enable-background="new" fill="#fff" opacity=".3"/>
+<rect x="40" y="200" width="48" height="24" ry="8" fill="url(#a)"/>
+<rect x="40" y="188" width="48" height="28" ry="8" fill="url(#b)"/>
+<circle cx="74" cy="194" r="2" fill="#5e5c64"/>
+<circle cx="66" cy="194" r="2" fill="#5e5c64"/>
+<circle cx="58" cy="194" r="2" fill="#5e5c64"/>
+<circle cx="50" cy="198" r="2" fill="#5e5c64"/>
+<circle cx="58" cy="202" r="2" fill="#5e5c64"/>
+<circle cx="66" cy="202" r="2" fill="#5e5c64"/>
+<circle cx="74" cy="206" r="2" fill="#5e5c64"/>
+<circle cx="66" cy="210" r="2" fill="#5e5c64"/>
+<circle cx="58" cy="210" r="2" fill="#5e5c64"/>
+<circle cx="50" cy="210" r="2" fill="#5e5c64"/>
+</g>
+</g>
+</svg>

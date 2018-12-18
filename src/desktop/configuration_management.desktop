@@ -12,7 +12,7 @@ X-SuSE-YaST-AutoInstResource=configuration_management
 X-SuSE-YaST-AutoInstClient=configuration_management_auto
 X-SuSE-YaST-Keywords=salt,privisioning,configuration_management
 
-Icon=yast2-software
+Icon=yast-configuration-management
 Exec=/usr/bin/xdg-su -c "/sbin/yast2 configuration_management"
 
 Name=YaST2 Configuration Management
