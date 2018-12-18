@@ -68,9 +68,8 @@ module Y2ConfigurationManagement
           enable_formulas_by_user
         else
           enable_formulas_by_config
+          :next
         end
-
-        :next
       end
 
       # Iterates over the enabled {Formula}s running the {FormController} for
