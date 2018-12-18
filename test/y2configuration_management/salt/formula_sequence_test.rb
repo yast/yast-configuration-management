@@ -86,6 +86,32 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
         .to receive(:new).with(formulas).and_return(selector)
     end
 
+    it "runs the formula selection dialog" do
+      expect(selector).to receive(:run)
+      sequence.choose_formulas
+    end
+
+    it "returns :next" do
+      expect(sequence.choose_formulas).to eq(:next)
+    end
+
+    context "when some formulas are already enabled via config" do
+      before do
+        allow(config).to receive(:enabled_states).and_return(["test-formula"])
+      end
+
+      it "enables the formulas" do
+        sequence.choose_formulas
+        enabled_formulas = sequence.formulas.select(&:enabled?)
+        expect(enabled_formulas.map(&:id)).to eq(["test-formula"])
+      end
+
+      it "does not ask the user to select the formulas" do
+        expect(selector).to_not receive(:run)
+        sequence.choose_formulas
+      end
+    end
+
     context "when there are not formulas available in the system" do
       let(:formulas_root) { FIXTURES_PATH.join("missing") }
 
@@ -97,14 +123,6 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
 
       it "returns :abort" do
         expect(sequence.choose_formulas).to eql(:abort)
-      end
-    end
-
-    context "when there are some formulas available in the system" do
-      it "runs the formula selection dialog" do
-        expect(selector).to receive(:run)
-
-        sequence.choose_formulas
       end
     end
   end

@@ -64,7 +64,13 @@ module Y2ConfigurationManagement
           return :abort
         end
 
-        Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
+        if config.enabled_states.empty?
+          enable_formulas_by_user
+        else
+          enable_formulas_by_config
+        end
+
+        :next
       end
 
       # Iterates over the enabled {Formula}s running the {FormController} for
@@ -131,6 +137,18 @@ module Y2ConfigurationManagement
         pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
         pillar.load
         pillar
+      end
+
+      # Asks the user to select the enabled formulas/states
+      def enable_formulas_by_user
+        Y2ConfigurationManagement::Salt::FormulaSelection.new(formulas).run
+      end
+
+      # Sets the list of enabled formulas/states according to the given configuration
+      def enable_formulas_by_config
+        formulas
+          .select { |f| config.enabled_states.include?(f.id) }
+          .each { |f| f.enabled = true }
       end
     end
   end
