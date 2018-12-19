@@ -9,9 +9,14 @@
 [![Issue Count](https://codeclimate.com/github/yast/yast-configuration-management/badges/issue_count.svg)](
   https://codeclimate.com/github/yast/yast-configuration-management/issues)
 
-This module allows AutoYaST2 and Firstboot to delegate part of the configuration to a [Software
+This module allows [AutoYaST][] and [Firstboot][] to delegate part of the configuration to a [Software
 Configuration Management](https://en.wikipedia.org/wiki/Software_configuration_management) system.
-Salt and Puppet are supported.
+[Salt][] and [Puppet][] are supported.
+
+[AutoYaST]: https://doc.opensuse.org/projects/autoyast/
+[Firstboot]: https://en.opensuse.org/YaST_Firstboot
+[Salt]: https://www.saltstack.com/
+[Puppet]: https://puppet.com/
 
 ## How It Works
 
@@ -66,7 +71,7 @@ in *masterless* mode retrieving the required data from elsewhere.
 
 ## Firstboot Integration
 
-The Firstboot module offers integration with YaST Configuration Management through a client called
+The [Firstboot][] module offers integration with YaST Configuration Management through a client called
 `firstboot_configuration_management`. So in order to use this module in firstboot you need to write
 a `<configuration_management/>` section containing the configuration options and add the client to
 the required workflow. In the example below, only the relevant parts are shown:
