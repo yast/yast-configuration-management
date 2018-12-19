@@ -82,12 +82,12 @@ the required workflow. In the example below, only the relevant parts are shown:
       <type>salt</type>
       <!-- Default Salt Formulas root directories -->
       <formulas_roots config:type="list">
-        <formula_root>/usr/share/susemanager/formulas/metadata</formula_root>
-        <formula_root>/srv/formula_metadata</formula_root>
+        <formulas_root>/usr/share/susemanager/formulas/metadata</formulas_root>
+        <formulas_root>/srv/formula_metadata</formulas_root>
       </formulas_roots>
       <!-- Default Salt Formulas state directories -->
       <states_roots config:type="list">
-        <state_root>/usr/share/susemanager/formulas/states</state_root>
+        <states_root>/usr/share/susemanager/formulas/states</states_root>
       </states_roots>
       <!-- Default Salt Formulas pillar data directory  -->
       <pillar_root>/srv/susemanager/formula_data</pillar_root>
