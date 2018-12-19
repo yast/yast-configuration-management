@@ -138,7 +138,7 @@ Name            | Type         | Mode       | Description
 type            | string       | all        | Configuration Management System (`salt` or `puppet`)
 master          | string       | client     | Master server (if not set, it will run as masterless
 auth_attempts   | integer      | client     | Number of attempts when connecting to the master server
-auth_time_out   | integer      | client     | Time between attempts to connect to the master server
+auth_time_out   | integer      | client     | Time (in seconds) between attempts to connect to the master
 enable_services | boolean      | client     | Enable the configuration management service at the end
 formulas_roots  | list(string) | all        | List of directories to search for Salt formulas
 states_roots    | list(string) | all        | List of directories to search for Salt states
