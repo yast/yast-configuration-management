@@ -11,8 +11,6 @@ module Yast
     module Configurations
       # This class inteprets the module configuration
       class Base
-        # Default location of the module configuration
-        DEFAULT_PATH = Pathname.new("/var/adm/autoinstall/configuration_management.yml")
         # Default value for auth_attempts
         DEFAULT_AUTH_ATTEMPTS = 3
         # Defaull value for auth_time_out
@@ -67,6 +65,11 @@ module Yast
           post_initialize(symbolized_opts)
         end
 
+        # Hook to run after initializing the instance
+        #
+        # This method is supposed to be overwritten by configuration classes if needed.
+        #
+        # @param _options [Hash] Configuration options
         def post_initialize(_options)
           nil
         end
