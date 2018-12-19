@@ -56,14 +56,14 @@ module Yast
         #
         # @return [Array<Pathname>] Path to Salt state roots
         def states_roots(scope = :local)
-          scoped_paths(@custom_states_roots, scope) + [states_root(scope)]
+          [states_root(scope)] + scoped_paths(@custom_states_roots, scope)
         end
 
         # Return paths to the fromulas root
         #
         # @return [Array<Pathname>] Path to Salt formulas roots
         def formulas_roots(scope = :local)
-          scoped_paths(@custom_formulas_roots) + [formulas_root(scope)]
+          [formulas_root(scope)] + scoped_paths(@custom_formulas_roots)
         end
 
       private
