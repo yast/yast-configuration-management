@@ -28,8 +28,8 @@ module Y2ConfigurationManagement
       attr_reader :label
       # @return [String] Default value
       attr_reader :default
-      # @return [String] Form path
-      attr_reader :path
+      # @return [String] Form locator
+      attr_reader :locator
       # @return [String] Form element id
       attr_reader :id
 
@@ -41,7 +41,7 @@ module Y2ConfigurationManagement
         @label = spec.label
         @default = spec.default.to_s
         @controller = controller
-        @path = spec.path
+        @locator = spec.locator
         @id = spec.id
         self.widget_id = "text:#{spec.id}"
       end

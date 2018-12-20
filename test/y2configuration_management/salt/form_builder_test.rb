@@ -27,39 +27,39 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
   let(:form) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
-  let(:element) { form.find_element_by(path: path) }
+  let(:element) { form.find_element_by(locator: locator) }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
   describe "#build" do
     context "when an input form element is given" do
-      let(:path) { ".root.person.name" }
+      let(:locator) { ".root.person.name" }
 
       it "returns a form containing a text widget" do
         form = builder.build(element)
         expect(form.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
         expect(form.children).to contain_exactly(
           an_object_having_attributes(
-            "path" => ".root.person.name"
+            "locator" => ".root.person.name"
           )
         )
       end
     end
 
     context "when a group form element is given" do
-      let(:path) { ".root.person.address" }
+      let(:locator) { ".root.person.address" }
 
       it "returns a form containing a group widgets" do
         form = builder.build(element)
         group = form.children.first
         expect(group.children).to contain_exactly(
-          an_object_having_attributes("path" => ".root.person.address.street"),
-          an_object_having_attributes("path" => ".root.person.address.country")
+          an_object_having_attributes("locator" => ".root.person.address.street"),
+          an_object_having_attributes("locator" => ".root.person.address.country")
         )
       end
     end
 
     context "when a collection is given" do
-      let(:path) { ".root.person.computers" }
+      let(:locator) { ".root.person.computers" }
 
       it "returns a form containing a collection widget" do
         form = builder.build(element)

@@ -73,39 +73,39 @@ module Y2ConfigurationManagement
 
       # Convenience method for returning the value of a given element
       #
-      # @param path [String] Path to the element
-      # @param index [Integer] Element's index when path refers to a collection
-      def get(path, index = nil)
-        @data.get(path, index)
+      # @param locator [String] Locator of the element
+      # @param index [Integer] Element's index when locator refers to a collection
+      def get(locator, index = nil)
+        @data.get(locator, index)
       end
 
       # Opens a new dialog in order to add a new element to a collection
       #
-      # @param path [String] Collection's path
-      def add(path)
-        result = edit_item(path, nil)
+      # @param locator [String] Collection's locator
+      def add(locator)
+        result = edit_item(locator, nil)
         return if result.nil?
-        @data.add_item(path, result.values.first)
+        @data.add_item(locator, result.values.first)
         refresh_main_form
       end
 
       # Opens a new dialog in order to edit an element within a collection
       #
-      # @param path  [String] Collection's path
+      # @param locator  [String] Collection's locator
       # @param index [Integer] Element's index
-      def edit(path, index)
-        result = edit_item(path, get(path, index))
+      def edit(locator, index)
+        result = edit_item(locator, get(locator, index))
         return if result.nil?
-        @data.update_item(path, index, result.values.first)
+        @data.update_item(locator, index, result.values.first)
         refresh_main_form
       end
 
       # Removes an element from a collection
       #
-      # @param path  [String] Collection's path
+      # @param locator  [String] Collection's locator
       # @param index [Integer] Element's index
-      def remove(path, index)
-        @data.remove_item(path, index)
+      def remove(locator, index)
+        @data.remove_item(locator, index)
         refresh_main_form
       end
 
@@ -131,25 +131,25 @@ module Y2ConfigurationManagement
       def main_form
         return @main_form if @main_form
         @main_form = form_builder.build(form.root.elements)
-        @main_form.value = get(form.root.path)
+        @main_form.value = get(form.root.locator)
         @main_form
       end
 
       # Refreshes the main form content
       def refresh_main_form
-        data.update(form.root.path, main_form.current_values)
-        main_form.refresh(get(form.root.path))
+        data.update(form.root.locator, main_form.current_values)
+        main_form.refresh(get(form.root.locator))
       end
 
       # Displays a form to edit a given item
       #
-      # @param path [String] Collection path
+      # @param locator [String] Collection locator
       # @param item [Object] Item to edit
       # @return [Hash,nil] edited data; `nil` when the user cancels the dialog
-      def edit_item(path, item)
-        element = form.find_element_by(path: path)
+      def edit_item(locator, item)
+        element = form.find_element_by(locator: locator)
         widget_form = form_builder.build(element.prototype)
-        wid = path[1..-1].split(".").last
+        wid = locator[1..-1].split(".").last
         widget_form.value = { wid => item }
         show_popup(element.name, widget_form)
       end
@@ -168,7 +168,7 @@ module Y2ConfigurationManagement
       #   version.
       def next_handler
         main_form.store
-        data.update(form.root.path, main_form.result)
+        data.update(form.root.locator, main_form.result)
         pillar.data = data.to_h.fetch("root", {})
         puts pillar.dump
         true

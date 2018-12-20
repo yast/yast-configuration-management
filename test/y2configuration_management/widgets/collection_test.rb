@@ -34,8 +34,8 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
-  let(:spec) { form_spec.find_element_by(path: path) }
-  let(:path) { ".root.person.computers" }
+  let(:spec) { form_spec.find_element_by(locator: locator) }
+  let(:locator) { ".root.person.computers" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:formatted_default) do
     [
@@ -46,7 +46,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       collection = described_class.new(spec, controller)
-      expect(collection.path).to eq(path)
+      expect(collection.locator).to eq(locator)
       expect(collection.min_items).to eq(1)
       expect(collection.max_items).to eq(4)
     end
@@ -57,7 +57,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       let(:event) { { "ID" => "#{collection.widget_id}_add".to_sym } }
 
       it "adds a new element to the collection" do
-        expect(controller).to receive(:add).with(path)
+        expect(controller).to receive(:add).with(locator)
         collection.handle(event)
       end
     end
@@ -70,7 +70,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "edits an element of the collection" do
-        expect(controller).to receive(:edit).with(path, 1)
+        expect(controller).to receive(:edit).with(locator, 1)
         collection.handle(event)
       end
     end
@@ -83,7 +83,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "removes the selected element from the collection" do
-        expect(controller).to receive(:remove).with(path, 1)
+        expect(controller).to receive(:remove).with(locator, 1)
         collection.handle(event)
       end
     end
@@ -99,7 +99,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
     describe ".new" do
       it "instantiates a new widget according to the spec" do
         collection = described_class.new(spec, controller)
-        expect(collection.path).to eq(path)
+        expect(collection.locator).to eq(locator)
       end
     end
 

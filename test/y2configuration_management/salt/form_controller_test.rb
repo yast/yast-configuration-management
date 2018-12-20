@@ -34,7 +34,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar) }
-  let(:path) { ".root.person.computers" }
+  let(:locator) { ".root.person.computers" }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
   let(:widget) do
     instance_double(Y2ConfigurationManagement::Widgets::Form, result: result, "value=" => nil)
@@ -70,7 +70,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
   include_examples "form_controller"
 
   describe "#add" do
-    let(:prototype) { form.find_element_by(path: path).prototype }
+    let(:prototype) { form.find_element_by(locator: locator).prototype }
 
     before do
       allow(Y2ConfigurationManagement::Widgets::FormPopup)
@@ -81,15 +81,15 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
     it "opens the dialog using the collections's prototype" do
       expect(builder).to receive(:build).with(prototype).and_return(widget)
-      controller.add(path)
+      controller.add(locator)
     end
 
     context "when the user accepts the dialog" do
       let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
 
       it "updates the form data" do
-        expect(data).to receive(:add_item).with(path, "brand" => "Lenovo", "disks" => 2)
-        controller.add(path)
+        expect(data).to receive(:add_item).with(locator, "brand" => "Lenovo", "disks" => 2)
+        controller.add(locator)
       end
     end
 
@@ -98,14 +98,14 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "does not modify form data" do
         expect(data).to_not receive(:add_item)
-        controller.add(path)
+        controller.add(locator)
       end
     end
   end
 
   describe "#edit" do
     let(:result) { nil }
-    let(:prototype) { form.find_element_by(path: path).prototype }
+    let(:prototype) { form.find_element_by(locator: locator).prototype }
 
     before do
       allow(builder).to receive(:build).and_call_original
@@ -114,15 +114,15 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
     it "opens the dialog using the collections's prototype" do
       expect(builder).to receive(:build).with(prototype).and_return(widget)
-      controller.edit(path, 0)
+      controller.edit(locator, 0)
     end
 
     context "when the user accepts the dialog" do
       let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
 
       it "updates the form data" do
-        expect(data).to receive(:update_item).with(path, 0, "brand" => "Lenovo", "disks" => 2)
-        controller.edit(path, 0)
+        expect(data).to receive(:update_item).with(locator, 0, "brand" => "Lenovo", "disks" => 2)
+        controller.edit(locator, 0)
       end
     end
 
@@ -131,7 +131,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "does not modify form data" do
         expect(data).to_not receive(:update_item)
-        controller.edit(path, 0)
+        controller.edit(locator, 0)
       end
     end
   end

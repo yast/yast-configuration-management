@@ -52,7 +52,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
       end
     end
 
-    context "when a collection path and an index is given" do
+    context "when a collection locator and an index is given" do
       it "returns the item in the given position" do
         expect(form_data.get(".root.person.computers", 0)).to eq("brand" => "ACME", "disks" => 1)
       end
