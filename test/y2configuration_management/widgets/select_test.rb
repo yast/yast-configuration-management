@@ -64,4 +64,12 @@ describe Y2ConfigurationManagement::Widgets::Select do
       end
     end
   end
+
+  describe "#value=" do
+    it "modifies the default value with the value given" do
+      expect(selector.default).to_not eql("Spain")
+      selector.value = "Spain"
+      expect(selector.default).to eql("Spain")
+    end
+  end
 end

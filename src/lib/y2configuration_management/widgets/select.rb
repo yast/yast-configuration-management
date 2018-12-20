@@ -48,11 +48,17 @@ module Y2ConfigurationManagement
         self.widget_id = "select:#{spec.id}"
       end
 
+      # Workaround for modifying the current value. It modifies also the
+      # default value for initializing it correctly when no value is defined
+      def value=(value)
+        @default = value
+        super
+      end
+
       # @see CWM::AbstractWidget
       def init
-        return if default.nil? || !value.nil?
-        item = items.find { |_i, v| v == default }
-        self.value = item.first if item
+        return if default.nil?
+        self.value = default
       end
 
     private
