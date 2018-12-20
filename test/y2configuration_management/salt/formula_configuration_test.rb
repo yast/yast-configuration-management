@@ -97,7 +97,7 @@ describe Y2ConfigurationManagement::Salt::FormulaConfiguration do
       it "processes formulas in reverse order" do
         formulas.reverse.each do |formula|
           expect(Y2ConfigurationManagement::Salt::FormController)
-            .to receive(:new).with(formula.form, formula.pillar).ordered
+            .to receive(:new).with(formula).ordered
             .and_return(controller)
         end
 

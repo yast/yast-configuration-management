@@ -25,14 +25,15 @@ module Y2ConfigurationManagement
       PRIVATE_KEY_PATH = "/etc/salt/pki/minion/minion.pem".freeze
       PUBLIC_KEY_PATH = "/etc/salt/pki/minion/minion.pub".freeze
 
-      mode(:masterless) do
+      mode(:masterless) do |reverse: false|
         fetch_config(config.states_url, config.work_dir) if config.states_url
         fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
         update_configuration
-        Y2ConfigurationManagement::Salt::FormulaSequence.new(config).run == :finish
+        sequence = Y2ConfigurationManagement::Salt::FormulaSequence.new(config, reverse: reverse)
+        sequence.run == :finish
       end
 
-      mode(:client) do
+      mode(:client) do |_opts|
         fetch_keys(config.keys_url, private_key_path, public_key_path)
         update_configuration
       end

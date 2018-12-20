@@ -111,10 +111,11 @@ module Y2ConfigurationManagement
       # control is passed to the required configurator. See mode definitions
       # in the given configurator.
       #
+      # @param opts [Hash] Configurator options
       # @see .mode
-      def prepare
+      def prepare(opts = {})
         ::FileUtils.mkdir_p(config.work_dir) if mode?(:masterless)
-        send("prepare_#{config.mode}")
+        send("prepare_#{config.mode}", opts)
       end
 
       # Determines whether the configurator is operating in the given module

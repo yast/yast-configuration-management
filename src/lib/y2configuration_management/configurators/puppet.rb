@@ -27,12 +27,12 @@ module Y2ConfigurationManagement
       PRIVATE_KEY_BASE_PATH = "/var/lib/puppet/ssl/private_keys".freeze
       PUBLIC_KEY_BASE_PATH = "/var/lib/puppet/ssl/public_keys".freeze
 
-      mode(:masterless) do
+      mode(:masterless) do |_opts|
         update_configuration
         fetch_config(config.modules_url, config.work_dir)
       end
 
-      mode(:client) do
+      mode(:client) do |_opts|
         update_configuration
         fetch_keys(config.keys_url, private_key_path, public_key_path)
       end
