@@ -31,14 +31,14 @@ describe Y2ConfigurationManagement::Widgets::Text do
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
-  let(:spec) { form_spec.find_element_by(path: path) }
-  let(:path) { ".root.person.name" }
+  let(:spec) { form_spec.find_element_by(locator: locator) }
+  let(:locator) { ".root.person.name" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       text = described_class.new(spec, controller)
-      expect(text.path).to eq(path)
+      expect(text.locator).to eq(locator)
       expect(text.default).to eq("John Doe")
     end
   end
@@ -51,7 +51,7 @@ describe Y2ConfigurationManagement::Widgets::Text do
 
     context "when no default value was given" do
       let(:spec) do
-        sp = form_spec.find_element_by(path: path)
+        sp = form_spec.find_element_by(locator: locator)
         sp.instance_variable_set(:@default, nil)
         sp
       end

@@ -32,15 +32,15 @@ describe Y2ConfigurationManagement::Widgets::Group do
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
-  let(:spec) { form_spec.find_element_by(path: path) }
-  let(:path) { ".root.person.address" }
+  let(:spec) { form_spec.find_element_by(locator: locator) }
+  let(:locator) { ".root.person.address" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text, id: "widget1") }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       group = described_class.new(spec, [widget1], controller)
-      expect(group.path).to eq(path)
+      expect(group.locator).to eq(locator)
     end
   end
 

@@ -92,7 +92,7 @@ module Y2ConfigurationManagement
     #
     # scalar values, groups and collections
     class FormElement
-      PATH_DELIMITER = ".".freeze
+      LOCATOR_DELIMITER = ".".freeze
       # @return [String] the key for the pillar
       attr_reader :id
       # @return [Symbol]
@@ -124,14 +124,14 @@ module Y2ConfigurationManagement
         @parent = parent
       end
 
-      # Return the absolute path of this form element in the actual form
+      # Return the absolute locator of this form element in the actual form
       #
-      # FIXME: possible implementation of the form element path
+      # FIXME: possible implementation of the form element locator
       #
       # @return [String]
-      def path
-        prefix = parent ? parent.path : ""
-        "#{prefix}#{PATH_DELIMITER}#{id}"
+      def locator
+        prefix = parent ? parent.locator : ""
+        "#{prefix}#{LOCATOR_DELIMITER}#{id}"
       end
 
     private
@@ -183,11 +183,11 @@ module Y2ConfigurationManagement
 
       # Recursively looks for a particular {FormElement}
       #
-      # @example look for a FormElement by a specific name, path or id
+      # @example look for a FormElement by a specific name, locator or id
       #
       #   f = Y2ConfigurationManagemenet.from_file("form.yml")
       #   f.find_element_by(name: "subnets") #=> <Collection @name="subnets"
-      #   f.find_element_by(path: ".root.dhcpd") #=> <Container @name="dhcpd"
+      #   f.find_element_by(locator: ".root.dhcpd") #=> <Container @name="dhcpd"
       #   f.find_element_by(id: "hosts") #=> <Container @id="hosts"
       #
       # @param arg [Hash]

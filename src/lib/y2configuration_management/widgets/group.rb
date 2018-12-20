@@ -25,8 +25,8 @@ module Y2ConfigurationManagement
     class Group < ::CWM::CustomWidget
       # @return [String] Widget label
       attr_reader :label
-      # @return [String] Form element path
-      attr_reader :path
+      # @return [String] Form element locator
+      attr_reader :locator
       # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
       attr_reader :children
       attr_reader :id
@@ -41,7 +41,7 @@ module Y2ConfigurationManagement
         @label = spec.label
         @children = children
         @controller = controller
-        @path = spec.path
+        @locator = spec.locator
         @id = spec.id
         self.widget_id = "group:#{spec.id}"
       end

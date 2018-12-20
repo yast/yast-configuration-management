@@ -37,12 +37,12 @@ describe Y2ConfigurationManagement::Salt::Form do
 
   describe "#find_element_by" do
     it "returns the FormElment which match a given argument" do
-      expect(form.find_element_by(path: ".root.demo.system.text"))
+      expect(form.find_element_by(locator: ".root.demo.system.text"))
         .to be_a(Y2ConfigurationManagement::Salt::FormInput)
 
       number = form.find_element_by(name: "Number")
       expect(number).to be_a(Y2ConfigurationManagement::Salt::FormInput)
-      expect(number.path).to eql(".root.demo.number")
+      expect(number.locator).to eql(".root.demo.number")
       expect(form.find_element_by(id: "root"))
         .to be_a(Y2ConfigurationManagement::Salt::Container)
     end
@@ -93,15 +93,15 @@ end
 describe Y2ConfigurationManagement::Salt::FormElement do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
 
-  describe "#path" do
+  describe "#locator" do
     let(:file_path) { FIXTURES_PATH.join("form.yml") }
-    let(:path_form) { Y2ConfigurationManagement::Salt::Form.from_file(file_path) }
+    let(:locator_form) { Y2ConfigurationManagement::Salt::Form.from_file(file_path) }
 
-    it "returns the absolute form element path in the Form" do
-      computers_collection = path_form.find_element_by(id: "computers")
-      expect(computers_collection.path).to eql(".root.person.computers")
+    it "returns the absolute form element locator in the Form" do
+      computers_collection = locator_form.find_element_by(id: "computers")
+      expect(computers_collection.locator).to eql(".root.person.computers")
       brand = computers_collection.prototype.find_element_by(id: "brand")
-      expect(brand.path).to eql(".root.person.computers.computers.brand")
+      expect(brand.locator).to eql(".root.person.computers.computers.brand")
     end
   end
 end

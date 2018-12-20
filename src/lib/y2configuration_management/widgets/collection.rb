@@ -27,7 +27,7 @@ module Y2ConfigurationManagement
     # This widget uses a table to display a collection of elements and offers
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
-      attr_reader :label, :min_items, :max_items, :controller, :path, :id, :headers
+      attr_reader :label, :min_items, :max_items, :controller, :locator, :id, :headers
 
       # @return [Array<String>] Headers for the collection table
       attr_reader :headers
@@ -45,7 +45,7 @@ module Y2ConfigurationManagement
         @min_items = spec.min_items
         @max_items = spec.max_items
         @controller = controller
-        @path = spec.path # form element path
+        @locator = spec.locator # form element locator
         @id = spec.id
         @headers, @headers_ids = headers_from_prototype(spec.prototype)
         self.widget_id = "collection:#{spec.id}"
@@ -58,7 +58,7 @@ module Y2ConfigurationManagement
       def contents
         VBox(
           Table(
-            Id("table:#{path}"),
+            Id("table:#{locator}"),
             Opt(:notify, :immediate),
             Header(*headers),
             []
@@ -76,7 +76,7 @@ module Y2ConfigurationManagement
       #
       # @param items_list [Array<Hash>] Collection items
       def value=(items_list)
-        Yast::UI.ChangeWidget(Id("table:#{path}"), :Items, format_items(items_list))
+        Yast::UI.ChangeWidget(Id("table:#{locator}"), :Items, format_items(items_list))
         @value = items_list
       end
 
@@ -95,11 +95,11 @@ module Y2ConfigurationManagement
       def handle(event)
         case event["ID"]
         when "#{widget_id}_add".to_sym
-          controller.add(path)
+          controller.add(locator)
         when "#{widget_id}_edit".to_sym
-          controller.edit(path, selected_row) if selected_row
+          controller.edit(locator, selected_row) if selected_row
         when "#{widget_id}_remove".to_sym
-          controller.remove(path, selected_row) if selected_row
+          controller.remove(locator, selected_row) if selected_row
         end
 
         nil
@@ -114,7 +114,7 @@ module Y2ConfigurationManagement
       #
       # @return [Integer,nil] Index of the selected row or nil if no row is selected
       def selected_row
-        row_id = Yast::UI.QueryWidget(Id("table:#{path}"), :CurrentItem)
+        row_id = Yast::UI.QueryWidget(Id("table:#{locator}"), :CurrentItem)
         row_id ? row_id.to_i : nil
       end
 

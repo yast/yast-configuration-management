@@ -31,14 +31,14 @@ describe Y2ConfigurationManagement::Widgets::Boolean do
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
-  let(:spec) { form_spec.find_element_by(path: path) }
-  let(:path) { ".root.person.wants_newsletter" }
+  let(:spec) { form_spec.find_element_by(locator: locator) }
+  let(:locator) { ".root.person.wants_newsletter" }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       widget = described_class.new(spec, controller)
-      expect(widget.path).to eq(path)
+      expect(widget.locator).to eq(locator)
       expect(widget.default).to eq(true)
     end
   end
@@ -51,7 +51,7 @@ describe Y2ConfigurationManagement::Widgets::Boolean do
 
     context "when no default value was given" do
       let(:spec) do
-        sp = form_spec.find_element_by(path: path)
+        sp = form_spec.find_element_by(locator: locator)
         sp.instance_variable_set(:@default, nil)
         sp
       end
