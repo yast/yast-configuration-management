@@ -21,11 +21,10 @@ require_relative "../../spec_helper"
 require "y2configuration_management/widgets/text"
 require "y2configuration_management/widgets/group"
 require "y2configuration_management/salt/form"
-require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Group do
-  subject(:group) { described_class.new(spec, [widget1], controller) }
+  subject(:group) { described_class.new(spec, [widget1]) }
 
   include_examples "CWM::CustomWidget"
 
@@ -34,12 +33,11 @@ describe Y2ConfigurationManagement::Widgets::Group do
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { ".root.person.address" }
-  let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text, id: "widget1") }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      group = described_class.new(spec, [widget1], controller)
+      group = described_class.new(spec, [widget1])
       expect(group.locator).to eq(locator)
     end
   end

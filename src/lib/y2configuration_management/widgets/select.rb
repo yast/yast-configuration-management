@@ -23,28 +23,19 @@ module Y2ConfigurationManagement
   module Widgets
     # This class represents a select widget
     class Select < ::CWM::ComboBox
-      # @return [String] Widget label
-      attr_reader :label
+      include BaseMixin
       # @return [Array<String>] Widget items
       attr_reader :items
       # @return [String,nil] Default value
       attr_reader :default
-      # @return [String] Form element locator
-      attr_reader :locator
-      # @return [String] Form element id
-      attr_reader :id
 
       # Constructor
       #
       # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      def initialize(spec, controller)
-        @label = spec.label
-        @items = spec.values.map { |v| [v, v] }
+      def initialize(spec)
+        initialize_base(spec)
         @default = spec.default
-        @locator = spec.locator
-        @id = spec.id
-        @controller = controller
+        @items = spec.values.map { |v| [v, v] }
         self.widget_id = "select:#{spec.id}"
       end
 
@@ -54,10 +45,6 @@ module Y2ConfigurationManagement
         item = items.find { |_i, v| v == default }
         self.value = item.first if item
       end
-
-    private
-
-      attr_reader :controller
     end
   end
 end

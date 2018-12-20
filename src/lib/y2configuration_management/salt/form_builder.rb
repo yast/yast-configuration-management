@@ -81,7 +81,7 @@ module Y2ConfigurationManagement
           build_element(element_spec)
         end
         _visible = group.type == :group # FIXME: use this
-        Y2ConfigurationManagement::Widgets::Group.new(group, children, controller)
+        Y2ConfigurationManagement::Widgets::Group.new(group, children)
       end
 
       # Builds a simple input element
@@ -100,7 +100,7 @@ module Y2ConfigurationManagement
           when :boolean
             Y2ConfigurationManagement::Widgets::Boolean
           end
-        klass.new(input_spec, controller)
+        klass.new(input_spec)
       end
 
       # Builds a collection

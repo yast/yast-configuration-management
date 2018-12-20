@@ -20,11 +20,10 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/text"
 require "y2configuration_management/salt/form"
-require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Text do
-  subject(:text) { described_class.new(spec, controller) }
+  subject(:text) { described_class.new(spec) }
 
   include_examples "CWM::AbstractWidget"
 
@@ -33,11 +32,10 @@ describe Y2ConfigurationManagement::Widgets::Text do
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { ".root.person.name" }
-  let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      text = described_class.new(spec, controller)
+      text = described_class.new(spec)
       expect(text.locator).to eq(locator)
       expect(text.default).to eq("John Doe")
     end

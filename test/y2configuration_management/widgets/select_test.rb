@@ -20,11 +20,10 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/select"
 require "y2configuration_management/salt/form"
-require "y2configuration_management/salt/form_controller"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Select do
-  subject(:selector) { described_class.new(spec, controller) }
+  subject(:selector) { described_class.new(spec) }
 
   include_examples "CWM::ComboBox"
 
@@ -33,11 +32,10 @@ describe Y2ConfigurationManagement::Widgets::Select do
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { ".root.person.address.country" }
-  let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      selector = described_class.new(spec, controller)
+      selector = described_class.new(spec)
       expect(selector.locator).to eq(locator)
       expect(selector.items)
         .to eq([["Czech Republic", "Czech Republic"], ["Germany", "Germany"], ["Spain", "Spain"]])
