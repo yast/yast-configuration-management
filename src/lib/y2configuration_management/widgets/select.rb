@@ -46,19 +46,26 @@ module Y2ConfigurationManagement
         @id = spec.id
         @controller = controller
         self.widget_id = "select:#{spec.id}"
+        # Allow #value= before #init.
+        # Wrap the :value accessor to add an "uninitialized" state
+        # (which the YUI/CWM widget does not have)
+        # so that we can give it a default
+        @value = nil
       end
 
-      # Workaround for modifying the current value. It modifies also the
-      # default value for initializing it correctly when no value is defined
+      def value
+        @value = super
+      end
+
       def value=(value)
-        @default = value
+        @value = value
         super
       end
 
       # @see CWM::AbstractWidget
       def init
-        return if default.nil?
-        self.value = default
+        return if default.nil? # combo cannot have no value; prevent YUI error
+        self.value = @value || default
       end
 
     private
