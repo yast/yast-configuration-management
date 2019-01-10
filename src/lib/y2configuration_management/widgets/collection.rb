@@ -98,9 +98,9 @@ module Y2ConfigurationManagement
         when "#{widget_id}_add".to_sym
           controller.add(locator)
         when "#{widget_id}_edit".to_sym
-          controller.edit(locator, selected_row) if selected_row
+          controller.edit(locator.join(selected_row)) if selected_row
         when "#{widget_id}_remove".to_sym
-          controller.remove(locator, selected_row) if selected_row
+          controller.remove(locator.join(selected_row)) if selected_row
         end
 
         nil

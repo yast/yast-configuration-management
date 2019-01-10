@@ -74,9 +74,8 @@ module Y2ConfigurationManagement
       # Convenience method for returning the value of a given element
       #
       # @param locator [String] Locator of the element
-      # @param index [Integer] Element's index when locator refers to a collection
-      def get(locator, index = nil)
-        @data.get(locator, index)
+      def get(locator)
+        @data.get(locator)
       end
 
       # Opens a new dialog in order to add a new element to a collection
@@ -93,19 +92,18 @@ module Y2ConfigurationManagement
       #
       # @param locator  [String] Collection's locator
       # @param index [Integer] Element's index
-      def edit(locator, index)
-        result = edit_item(locator, get(locator, index))
+      def edit(locator)
+        result = edit_item(locator.parent, get(locator))
         return if result.nil?
-        @data.update_item(locator, index, result.values.first)
+        @data.update_item(locator, result.values.first)
         refresh_main_form
       end
 
       # Removes an element from a collection
       #
       # @param locator  [String] Collection's locator
-      # @param index [Integer] Element's index
-      def remove(locator, index)
-        @data.remove_item(locator, index)
+      def remove(locator)
+        @data.remove_item(locator)
         refresh_main_form
       end
 
@@ -149,8 +147,7 @@ module Y2ConfigurationManagement
       def edit_item(locator, item)
         element = form.find_element_by(locator: locator)
         widget_form = form_builder.build(element.prototype)
-        wid = locator[1..-1].split(".").last
-        widget_form.value = { wid => item }
+        widget_form.value = { locator.last => item }
         show_popup(element.name, widget_form)
       end
 

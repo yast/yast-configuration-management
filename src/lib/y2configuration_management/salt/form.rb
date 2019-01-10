@@ -19,6 +19,7 @@
 
 require "yaml"
 require "yast"
+require "y2configuration_management/salt/form_element_locator"
 
 module Y2ConfigurationManagement
   module Salt
@@ -92,7 +93,6 @@ module Y2ConfigurationManagement
     #
     # scalar values, groups and collections
     class FormElement
-      LOCATOR_DELIMITER = ".".freeze
       # @return [String] the key for the pillar
       attr_reader :id
       # @return [Symbol]
@@ -130,8 +130,8 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def locator
-        prefix = parent ? parent.locator : ""
-        "#{prefix}#{LOCATOR_DELIMITER}#{id}"
+        return FormElementLocator.new([id]) if parent.nil?
+        parent.locator.join(id)
       end
 
     private

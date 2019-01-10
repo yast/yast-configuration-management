@@ -35,7 +35,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { ".root.person.computers" }
+  let(:locator) { locator_from_string(".root.person.computers") }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:formatted_default) do
     [
@@ -70,7 +70,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "edits an element of the collection" do
-        expect(controller).to receive(:edit).with(locator, 1)
+        expect(controller).to receive(:edit).with(locator.join(1))
         collection.handle(event)
       end
     end
@@ -83,7 +83,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "removes the selected element from the collection" do
-        expect(controller).to receive(:remove).with(locator, 1)
+        expect(controller).to receive(:remove).with(locator.join(1))
         collection.handle(event)
       end
     end

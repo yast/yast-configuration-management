@@ -32,7 +32,7 @@ describe Y2ConfigurationManagement::Widgets::Group do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { ".root.person.address" }
+  let(:locator) { locator_from_string(".root.person.address") }
   let(:widget1) { instance_double(Y2ConfigurationManagement::Widgets::Text, id: "widget1") }
 
   describe ".new" do

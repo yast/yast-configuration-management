@@ -32,34 +32,34 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
 
   describe "#build" do
     context "when an input form element is given" do
-      let(:locator) { ".root.person.name" }
+      let(:locator) { locator_from_string(".root.person.name") }
 
       it "returns a form containing a text widget" do
         form = builder.build(element)
         expect(form.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
         expect(form.children).to contain_exactly(
           an_object_having_attributes(
-            "locator" => ".root.person.name"
+            "locator" => locator_from_string(".root.person.name")
           )
         )
       end
     end
 
     context "when a group form element is given" do
-      let(:locator) { ".root.person.address" }
+      let(:locator) { locator_from_string(".root.person.address") }
 
       it "returns a form containing a group widgets" do
         form = builder.build(element)
         group = form.children.first
-        expect(group.children).to contain_exactly(
-          an_object_having_attributes("locator" => ".root.person.address.street"),
-          an_object_having_attributes("locator" => ".root.person.address.country")
+        expect(group.children.map(&:locator)).to contain_exactly(
+          locator_from_string(".root.person.address.street"),
+          locator_from_string(".root.person.address.country")
         )
       end
     end
 
     context "when a collection is given" do
-      let(:locator) { ".root.person.computers" }
+      let(:locator) { locator_from_string(".root.person.computers") }
 
       it "returns a form containing a collection widget" do
         form = builder.build(element)

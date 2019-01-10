@@ -34,7 +34,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar) }
-  let(:locator) { ".root.person.computers" }
+  let(:locator) { locator_from_string(".root.person.computers") }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
   let(:widget) do
     instance_double(Y2ConfigurationManagement::Widgets::Form, result: result, "value=" => nil)
@@ -114,15 +114,16 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
     it "opens the dialog using the collections's prototype" do
       expect(builder).to receive(:build).with(prototype).and_return(widget)
-      controller.edit(locator, 0)
+      controller.edit(locator.join(0))
     end
 
     context "when the user accepts the dialog" do
       let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
 
       it "updates the form data" do
-        expect(data).to receive(:update_item).with(locator, 0, "brand" => "Lenovo", "disks" => 2)
-        controller.edit(locator, 0)
+        expect(data).to receive(:update_item)
+          .with(locator.join(0), "brand" => "Lenovo", "disks" => 2)
+        controller.edit(locator.join(0))
       end
     end
 
@@ -131,15 +132,17 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "does not modify form data" do
         expect(data).to_not receive(:update_item)
-        controller.edit(locator, 0)
+        controller.edit(locator.join(0))
       end
     end
   end
 
   describe "#remove" do
+    let(:locator) { locator_from_string(".root.person.computers[1]") }
+
     it "removes an element" do
-      expect(data).to receive(:remove_item).with(".root.person.computers", 1)
-      controller.remove(".root.person.computers", 1)
+      expect(data).to receive(:remove_item).with(locator)
+      controller.remove(locator)
     end
   end
 
