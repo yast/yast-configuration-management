@@ -64,4 +64,11 @@ describe Y2ConfigurationManagement::Widgets::Select do
       end
     end
   end
+
+  describe "#value=" do
+    it "modifies the cache @value with the value given" do
+      expect { selector.value = "Spain" }
+        .to change { selector.instance_variable_get(:@value) }.to("Spain")
+    end
+  end
 end
