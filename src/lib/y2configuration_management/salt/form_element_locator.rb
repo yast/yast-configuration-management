@@ -113,6 +113,23 @@ module Y2ConfigurationManagement
       def ==(other)
         parts == other.parts
       end
+
+      # Returns a locator relative to a given one
+      #
+      # @example
+      #   root = Locator.new(["root", "person"])
+      #   locator = Locator.new(["root", "person", "name"])
+      #   locator.relative_to(root).to_s #=> ".name"
+      #
+      # @param other [Locator] Reference locator
+      # @return [Locator,nil] Relative locator
+      def relative_to(other)
+        relative_parts = other.parts.reduce(parts) do |relative, root_part|
+          return nil if root_part != relative[0]
+          relative[1..-1]
+        end
+        relative_parts ? self.class.new(relative_parts) : nil
+      end
     end
   end
 end

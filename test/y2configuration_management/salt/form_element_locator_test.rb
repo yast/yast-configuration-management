@@ -65,4 +65,21 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
       expect(address_locator.parts).to eq(["root", "hosts", 1, "interfaces", 3, "address"])
     end
   end
+
+  describe "#relative_to" do
+    let(:reference) { locator_from_string(".root.hosts[1]") }
+
+    it "returns a locator relative to the given one" do
+      reference = locator_from_string(".root.hosts[1]")
+      expect(locator.relative_to(reference).parts).to eq(["interfaces", 3])
+    end
+
+    context "when the given reference is not included in the locator" do
+      let(:reference) { locator_from_string(".root.person") }
+
+      it "returns nil" do
+        expect(locator.relative_to(reference)).to be_nil
+      end
+    end
+  end
 end
