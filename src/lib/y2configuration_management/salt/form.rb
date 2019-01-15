@@ -17,6 +17,7 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
+require "singleton"
 require "yaml"
 require "yast"
 
@@ -88,6 +89,39 @@ module Y2ConfigurationManagement
       end
     end
 
+    # FIXME move this to its own file
+
+    # A boolean condition operating on a value in the form,
+    # used for widget visibility ($visibleIf).
+    class FormCondition
+      # @param s [String]
+      def self.parse(s)
+        if s.empty?
+          TrueCondition.instance
+        else
+          WidgetCondition.new(:TODO, s)          
+        end
+      end
+    end
+
+    # Always true; used if the form specifies no condition.
+    class TrueCondition < FormCondition
+      include Singleton
+
+      # dammit, no point evaluating at the form declaration level,
+      # must do it with widgets
+      def value
+        true
+      end
+    end
+
+    class WidgetCondition < FormCondition
+      # @param element [FormElement]
+      # @param cond_str [String] condition as specified in form.yml ($visibleIf)
+      def initialize(element, cond_str)
+      end
+    end
+
     # Three different kind of elements:
     #
     # scalar values, groups and collections
@@ -109,6 +143,8 @@ module Y2ConfigurationManagement
       attr_reader :scope
       # @return [Boolean]
       attr_reader :optional
+      # @return [FormCondition]
+      attr_reader :visible_if
 
       # Constructor
       #
@@ -121,6 +157,7 @@ module Y2ConfigurationManagement
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
         @optional = spec["$optional"] if spec["$optional"]
+        @visible_if = FormCondition.parse(spec.fetch("$visibleIf", ""))
         @parent = parent
       end
 
