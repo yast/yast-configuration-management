@@ -20,6 +20,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2configuration_management/salt/form_element_locator"
 
 module Y2ConfigurationManagement
   module Widgets
@@ -47,8 +48,8 @@ module Y2ConfigurationManagement
       #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
       def initialize(children)
-        @children = children
         @value = {}
+        add_children(*children)
       end
 
       # This method propagates the values to the underlying widgets.
@@ -90,6 +91,19 @@ module Y2ConfigurationManagement
       def refresh(values)
         self.value = values
         set_children_contents
+      end
+
+      # Add children widgets
+      #
+      # @param *widgets [Array<CWM::AbstractWidget>] Widgets to add to the form
+      def add_children(*widgets)
+        @children ||= []
+        widgets.each { |w| w.parent = self }
+        @children.concat(widgets)
+      end
+
+      def relative_locator
+        Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
 
     private

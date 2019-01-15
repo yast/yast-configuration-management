@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
@@ -37,6 +38,9 @@ module Y2ConfigurationManagement
 
       # @return [Array<Object>] List of objects which are included in the collection
       attr_accessor :value
+
+      # @return [Array<CWM::AbstractWidget>] Parent widget
+      attr_accessor :parent
 
       # Constructor
       #
@@ -96,11 +100,11 @@ module Y2ConfigurationManagement
       def handle(event)
         case event["ID"]
         when "#{widget_id}_add".to_sym
-          controller.add(locator)
+          controller.add(relative_locator)
         when "#{widget_id}_edit".to_sym
-          controller.edit(locator.join(selected_row)) if selected_row
+          controller.edit(relative_locator.join(selected_row)) if selected_row
         when "#{widget_id}_remove".to_sym
-          controller.remove(locator.join(selected_row)) if selected_row
+          controller.remove(relative_locator.join(selected_row)) if selected_row
         end
 
         nil

@@ -28,7 +28,8 @@ describe Y2ConfigurationManagement::Widgets::Form do
   subject(:form) { described_class.new([text_input]) }
   let(:text_input) do
     instance_double(
-      Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil
+      Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil,
+      :parent= => nil
     )
   end
   let(:new_val) { { "text1" => "example" } }
