@@ -39,7 +39,7 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Form] Form
       def build(form_element)
         widgets = Array(form_element).map { |e| build_element(e) }
-        Y2ConfigurationManagement::Widgets::Form.new(widgets)
+        Y2ConfigurationManagement::Widgets::Form.new(widgets, controller)
       end
 
     private

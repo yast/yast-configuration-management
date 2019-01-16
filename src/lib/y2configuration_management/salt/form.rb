@@ -97,28 +97,34 @@ module Y2ConfigurationManagement
       # @param s [String]
       def self.parse(s)
         if s.empty?
-          TrueCondition.instance
+          nil
         else
-          WidgetCondition.new(:TODO, s)          
+          # TODO EqualCondition, NotEqualCondition
+          WidgetCondition.new(s)
         end
       end
     end
 
-    # Always true; used if the form specifies no condition.
-    class TrueCondition < FormCondition
-      include Singleton
-
-      # dammit, no point evaluating at the form declaration level,
-      # must do it with widgets
-      def value
-        true
-      end
-    end
-
     class WidgetCondition < FormCondition
-      # @param element [FormElement]
       # @param cond_str [String] condition as specified in form.yml ($visibleIf)
-      def initialize(element, cond_str)
+      def initialize(cond_str)
+        # FIXME
+        @locator = ".root.branch_network.dedicated_NIC"
+        # also, how to handle errors in forms, specifying a nonexisting element?
+        # Handle it in #parse, probably as a hard error
+        @op = :==
+        @value = true
+      end
+
+      # @param data [FormData]
+      def evaluate(data)
+        left = data.get(@locator)
+        right = @value
+        if @op == :==
+          left == right
+        else
+          left != right
+        end
       end
     end
 

@@ -46,9 +46,12 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
-      def initialize(children)
+      def initialize(children, controller)
         @children = children
+        @controller = controller
         @value = {}
+        self.handle_all_events = true
+        super()
       end
 
       # This method propagates the values to the underlying widgets.
@@ -90,6 +93,17 @@ module Y2ConfigurationManagement
       def refresh(values)
         self.value = values
         set_children_contents
+      end
+
+      def handle
+        @controller.update_visibility
+        nil
+      end
+
+      def update_visibility(data)
+        children.each do |widget|
+          widget.update_visibility(data)
+        end
       end
 
     private

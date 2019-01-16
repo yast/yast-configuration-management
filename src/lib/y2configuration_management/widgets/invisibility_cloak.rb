@@ -17,13 +17,35 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
+require "cwm"
+
 module Y2ConfigurationManagement
   module Widgets
     # Widgets that can become invisible via the {visible=} method.
     # TODO: the value is discarded; check how it feels, maybe we want to save/restore it.
     module InvisibilityCloak
+      EMPTY_WIDGET = CWM::Empty.new("ic_empty")
+
+      attr_reader :visible
+
       def visible=(visible)
+        return if @visible == visible
+        @visible = visible
+        if visible
+          replace(@inner)
+        else
+          replace(EMPTY_WIDGET)
+        end
       end
+
+      # Automatic invisibility: when the form controller asks us,
+      # we evaluate a condition and update our visibility
+      # @param data [FormData]
+      def update_visibility(data)
+        return unless @visible_if
+        self.visible = @visible_if.evaluate(data)
+      end
+
     end
   end
 end

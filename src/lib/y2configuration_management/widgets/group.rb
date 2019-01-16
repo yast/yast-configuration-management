@@ -79,6 +79,12 @@ module Y2ConfigurationManagement
       def value
         children.reduce({}) { |a, e| a.merge(e.id => e.value) }
       end
+
+      def update_visibility(data)
+        children.each do |widget|
+          widget.update_visibility(data)
+        end
+      end
     end
   end
 end

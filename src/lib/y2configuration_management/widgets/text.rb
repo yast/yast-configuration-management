@@ -33,6 +33,8 @@ module Y2ConfigurationManagement
       # @return [String] Form element id
       attr_reader :id
 
+      include InvisibilityCloak
+
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification

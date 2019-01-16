@@ -24,8 +24,6 @@ module Y2ConfigurationManagement
   module Widgets
     # This class represents a boolean (checkbox) field. TODO: is tristate possible?
     class Boolean < ::CWM::ReplacePoint
-      # @return [String] Widget label
-      attr_reader :label
       # @return [Boolean] Default value
       attr_reader :default
       # @return [String] Form locator
@@ -33,50 +31,59 @@ module Y2ConfigurationManagement
       # @return [String] Form element id
       attr_reader :id
 
+      class CheckBox < ::CWM::CheckBox
+        # @return [String] Widget label
+        attr_reader :label
+
+        def initialize(label)
+          @label = label
+        end
+
+        # TODO: only if I am mentioned in a visible_if
+        def opt
+          [:notify]
+        end
+      end
+
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
       # @param controller [FormController] Form controller
       def initialize(spec, controller)
-        @label = spec.label
         @default = spec.default == true # nil -> false
         @controller = controller
         @locator = spec.locator
         @id = spec.id
-        
-        @inner = CWM::CheckBox.new
+
+        @inner = CheckBox.new(spec.label)
         @inner.widget_id = "boolean:#{spec.id}"
         super(id: "vis:#{spec.id}", widget: @inner)
         @visible = true
         # ^: manual visibility
         # v: automatic
-        @visible_if = spec.visible_if 
+        @visible_if = spec.visible_if
       end
 
       # @see CWM::AbstractWidget
       def init
+        replace(@inner)
         self.value = default
       end
 
-      attr_reader :visible
-
-      def visible=(visible)
-        return if @visible == visible
-        @visible = visible
-        if visible
-          replace(@inner)
-        else
-          replace(Empty())
-        end
+      # Fixup for CWM::ReplacePoint which defaults to non unique ids
+      # @return [UITerm]
+      def contents
+        # In `contents` we must use an Empty Term, otherwise CWMClass
+        # would see an {AbstractWidget} and handle events itself,
+        # which result in double calling of methods like {handle} or {store} for
+        # initial widget.
+        ReplacePoint(Id(widget_id), Empty(Id("empty:#{widget_id}")))
       end
 
-      # Automatic invisibility: when the form controller asks us,
-      # we evaluate a condition and update our visibility
-      def update_visibility
-        # Hmm, the evaluation does not really depend on self, but on ANOTHER widget
-        # that should be passed?/found?
-        self.visible = @visible_if.evaluate(self)
-      end
+      extend Forwardable
+      def_delegators :@inner, :value, :value=
+
+      include InvisibilityCloak
     end
   end
 end

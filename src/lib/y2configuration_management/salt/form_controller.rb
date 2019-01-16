@@ -109,6 +109,11 @@ module Y2ConfigurationManagement
         refresh_main_form
       end
 
+      def update_visibility
+        data.update(form.root.locator, main_form.current_values)
+        main_form.update_visibility(data)
+      end
+
     private
 
       # @return [Form]
@@ -128,6 +133,7 @@ module Y2ConfigurationManagement
       end
 
       # Renders the main form's dialog
+      # @return [Widgets::Form]
       def main_form
         return @main_form if @main_form
         @main_form = form_builder.build(form.root.elements)
@@ -138,6 +144,7 @@ module Y2ConfigurationManagement
       # Refreshes the main form content
       def refresh_main_form
         data.update(form.root.locator, main_form.current_values)
+        main_form.update_visibility(data)
         main_form.refresh(get(form.root.locator))
       end
 
