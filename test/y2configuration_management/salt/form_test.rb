@@ -4,10 +4,10 @@ require_relative "../../spec_helper"
 require "y2configuration_management/salt/form"
 
 describe Y2ConfigurationManagement::Salt::Form do
-  subject { described_class.new(formula_path.to_s) }
+  subject(:form) { described_class.from_file(form_path) }
+
   let(:formula_path) { FIXTURES_PATH.join("formulas").join("test-formula") }
-  let(:form_path) { formula_path.join("form.yml") }
-  let(:form) { described_class.from_file(form_path) }
+  let(:form_path) { FIXTURES_PATH.join("form.yml") }
 
   describe ".from_file" do
     it "reads the form specification from a YAML file" do
@@ -37,14 +37,19 @@ describe Y2ConfigurationManagement::Salt::Form do
 
   describe "#find_element_by" do
     it "returns the FormElment which match a given argument" do
-      expect(form.find_element_by(locator: locator_from_string(".root.demo.system.text")))
+      expect(form.find_element_by(locator: locator_from_string(".root.person.name")))
         .to be_a(Y2ConfigurationManagement::Salt::FormInput)
 
-      number = form.find_element_by(name: "Number")
+      number = form.find_element_by(name: "E-mail")
       expect(number).to be_a(Y2ConfigurationManagement::Salt::FormInput)
-      expect(number.locator.to_s).to eql(".root.demo.number")
+      expect(number.locator.to_s).to eql(".root.person.email")
       expect(form.find_element_by(id: "root"))
         .to be_a(Y2ConfigurationManagement::Salt::Container)
+
+      nested = form.find_element_by(
+        locator: locator_from_string(".root.person.computers.disks.size")
+      )
+      expect(nested).to be_a(Y2ConfigurationManagement::Salt::FormInput)
     end
 
     it "returns nil if no FormElement match the given attribute" do
@@ -101,7 +106,7 @@ describe Y2ConfigurationManagement::Salt::FormElement do
       computers_collection = locator_form.find_element_by(id: "computers")
       expect(computers_collection.locator.to_s).to eql(".root.person.computers")
       brand = computers_collection.prototype.find_element_by(id: "brand")
-      expect(brand.locator.to_s).to eql(".root.person.computers.computers.brand")
+      expect(brand.locator.to_s).to eql(".root.person.computers.brand")
     end
   end
 end
