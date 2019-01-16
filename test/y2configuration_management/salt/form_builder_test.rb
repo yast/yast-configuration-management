@@ -35,9 +35,9 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
       let(:locator) { locator_from_string(".root.person.name") }
 
       it "returns a form containing a text widget" do
-        form = builder.build(element)
-        expect(form.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
-        expect(form.children).to contain_exactly(
+        root_element = builder.build(element)
+        expect(root_element.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
+        expect(root_element.children).to contain_exactly(
           an_object_having_attributes(
             "locator" => locator_from_string(".root.person.name")
           )
@@ -49,11 +49,11 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
       let(:locator) { locator_from_string(".root.person.address") }
 
       it "returns a form containing a group widgets" do
-        form = builder.build(element)
-        group = form.children.first
-        expect(group.children.map(&:locator)).to contain_exactly(
-          locator_from_string(".root.person.address.street"),
-          locator_from_string(".root.person.address.country")
+        root_element = builder.build(element)
+        group = root_element.children.first
+        expect(group.children.map(&:relative_locator)).to contain_exactly(
+          locator_from_string(".address.street"),
+          locator_from_string(".address.country")
         )
       end
     end
@@ -62,8 +62,12 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
       let(:locator) { locator_from_string(".root.person.computers") }
 
       it "returns a form containing a collection widget" do
-        form = builder.build(element)
-        expect(form.children).to be_all(Y2ConfigurationManagement::Widgets::Collection)
+        root_element = builder.build(element)
+        expect(root_element.children).to contain_exactly(
+          an_object_having_attributes(
+            "relative_locator" => locator_from_string(".computers")
+          )
+        )
       end
     end
   end

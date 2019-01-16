@@ -117,7 +117,7 @@ module Y2ConfigurationManagement
           defaults = element.elements.reduce({}) { |a, e| a.merge(data_for_element(e, data)) }
           { element.id => defaults }
         else
-          value = find_by_locator(data, element.locator)
+          value = find_by_locator(data, element.locator.rest) # FIXME: remove '.root'
           { element.id => value.nil? ? element.default : value }
         end
       end

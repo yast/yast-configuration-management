@@ -75,7 +75,7 @@ module Y2ConfigurationManagement
 
       # Add children widgets
       #
-      # @param *widgets [Array<CWM::AbstractWidget>] Widgets to add to the group
+      # @param widgets [Array<CWM::AbstractWidget>] Widgets to add to the group
       def add_children(*widgets)
         @children ||= []
         widgets.each { |w| w.parent = self }

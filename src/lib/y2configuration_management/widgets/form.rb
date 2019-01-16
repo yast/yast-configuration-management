@@ -37,6 +37,8 @@ module Y2ConfigurationManagement
       attr_reader :children
       # @return [Hash] Form values from included widgets when this one is removed from the UI
       attr_reader :result
+      # @return [String] Form title
+      attr_accessor :title
 
       # @example Setting values for included widgets
       #   form.value = { "name" => "John", "surname" => "Doe" }
@@ -95,7 +97,7 @@ module Y2ConfigurationManagement
 
       # Add children widgets
       #
-      # @param *widgets [Array<CWM::AbstractWidget>] Widgets to add to the form
+      # @param widgets [Array<CWM::AbstractWidget>] Widgets to add to the form
       def add_children(*widgets)
         @children ||= []
         widgets.each { |w| w.parent = self }

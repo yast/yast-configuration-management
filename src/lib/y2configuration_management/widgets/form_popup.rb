@@ -39,7 +39,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget#contents
       def contents
-        VBox(*@inner_content)
+        VBox(@inner_content)
       end
     end
   end
