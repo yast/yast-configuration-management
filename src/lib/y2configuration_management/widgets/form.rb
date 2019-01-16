@@ -118,7 +118,7 @@ module Y2ConfigurationManagement
       def set_children_contents_precond!
         child_ids = children.map(&:id).sort
         value_keys = value.keys.sort
-        return if child_ids == value_keys
+        return if value_keys.all? { |k| child_ids.include?(k) }
         raise "Form expects ids #{child_ids}, got #{value_keys}"
       end
     end
