@@ -44,7 +44,8 @@ module Y2ConfigurationManagement
       #
       # @param locator [String] Locator of the element
       def get(locator, index = nil)
-        value = @data.dig(*locator_to_parts(locator)) || default_for(locator)
+        value = @data.dig(*locator_to_parts(locator))
+        value = default_for(locator) if value.nil?
         index ? value.at(index) : value
       end
 
