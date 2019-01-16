@@ -60,9 +60,14 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
   end
 
   describe "#join" do
-    it "returns a new locator including the new part" do
-      address_locator = locator.join("address")
-      expect(address_locator.parts).to eq(["root", "hosts", 1, "interfaces", 3, "address"])
+    it "returns a new locator including the given parts" do
+      address_locator = locator.join("address", "type")
+      expect(address_locator.parts).to eq(["root", "hosts", 1, "interfaces", 3, "address", "type"])
+    end
+
+    it "returns a new locator adding the given locator" do
+      address_locator = locator.join(locator_from_string(".address.type"))
+      expect(address_locator.parts).to eq(["root", "hosts", 1, "interfaces", 3, "address", "type"])
     end
   end
 
@@ -80,6 +85,12 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
       it "returns nil" do
         expect(locator.relative_to(reference)).to be_nil
       end
+    end
+  end
+
+  describe "#unbounded" do
+    it "removes specific elements" do
+      expect(locator.unbounded.to_s).to eq(".root.hosts.interfaces")
     end
   end
 end

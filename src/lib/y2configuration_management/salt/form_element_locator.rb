@@ -98,12 +98,16 @@ module Y2ConfigurationManagement
         end
       end
 
-      # Adds a part to the locator
+      # Extends a locator
       #
-      # @param part [String,Integer] New part to add
+      # @param locators_or_parts [FormElementLocator,String,Integer] Parts or locators to join
       # @return [Locator] Augmented locator
-      def join(part)
-        self.class.new(parts + [part])
+      def join(*locators_or_parts)
+        new_parts = locators_or_parts.reduce([]) do |all, item|
+          item_parts = item.respond_to?(:parts) ? item.parts : [item]
+          all + item_parts
+        end
+        self.class.new(parts + new_parts)
       end
 
       # Determines whether two locators are equivalent
@@ -117,18 +121,25 @@ module Y2ConfigurationManagement
       # Returns a locator relative to a given one
       #
       # @example
-      #   root = Locator.new(["root", "person"])
-      #   locator = Locator.new(["root", "person", "name"])
+      #   root = FormElementLocator.new(["root", "person"])
+      #   locator = FormElementLocator.new(["root", "person", "name"])
       #   locator.relative_to(root).to_s #=> ".name"
       #
-      # @param other [Locator] Reference locator
-      # @return [Locator,nil] Relative locator
+      # @param other [FormElementLocator] Reference locator
+      # @return [FormElementLocator,nil] Relative locator
       def relative_to(other)
         relative_parts = other.parts.reduce(parts) do |relative, root_part|
           return nil if root_part != relative[0]
           relative[1..-1]
         end
         relative_parts ? self.class.new(relative_parts) : nil
+      end
+
+      # Removes references to specific collection elements
+      #
+      # @return [FormElementLocator]
+      def unbounded
+        self.class.new(parts.reject { |i| i.is_a?(Integer) })
       end
     end
   end
