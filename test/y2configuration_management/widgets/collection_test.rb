@@ -40,7 +40,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:formatted_default) do
     [
-      Item(Id("0"), "ACME", 1)
+      Item(Id("0"), "ACME", "No items")
     ]
   end
 
@@ -95,7 +95,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
 
   describe "#headers" do
     it "returns the headers to be displayed in the table" do
-      expect(collection.headers).to eq(["Brand", "Number of Disks"])
+      expect(collection.headers).to eq(["Brand", "Disks"])
     end
   end
 

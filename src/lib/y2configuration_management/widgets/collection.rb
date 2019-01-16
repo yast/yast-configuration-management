@@ -81,6 +81,7 @@ module Y2ConfigurationManagement
       #
       # @param items_list [Array<Hash>] Collection items
       def value=(items_list)
+        return if items_list.nil?
         Yast::UI.ChangeWidget(Id("table:#{locator}"), :Items, format_items(items_list))
         @value = items_list
       end
@@ -133,7 +134,8 @@ module Y2ConfigurationManagement
           else
             [item]
           end
-          Item(Id(index.to_s), *values)
+          formatted_values = values.map { |v| format_value(v) }
+          Item(Id(index.to_s), *formatted_values)
         end
       end
 
@@ -149,6 +151,21 @@ module Y2ConfigurationManagement
         names = els.map { |h| (h.name || h.id) }
         ids = els.map(&:id)
         [names, ids]
+      end
+
+      # Returns a value formatted to be shown in the table
+      #
+      # When an array is given, it returns a 'n items' message (where 'n' is the size of the array).
+      # Otherwise, it returns a string representing the object.
+      #
+      # @param val [Object]
+      # @return [String] String to show in the table
+      def format_value(val)
+        return val.to_s unless val.is_a?(Enumerable)
+        # TRANSLATORS: empty list
+        return _("No items") if val.empty?
+        # TRANSLATORS: items count in a list
+        format(n_("%s item", "%s items", val.size), val.size)
       end
     end
   end
