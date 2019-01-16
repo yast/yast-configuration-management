@@ -38,7 +38,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
       context "and it is a collection" do
         it "returns a hash with the default values" do
           expect(form_data.get(locator_from_string(".root.person.computers")))
-            .to eq([{ "brand" => "ACME", "disks" => 1 }])
+            .to eq([{ "brand" => "ACME", "disks" => [] }])
         end
       end
     end
@@ -59,7 +59,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
       let(:locator) { locator_from_string(".root.person.computers[0]") }
 
       it "returns the item in the given position" do
-        expect(form_data.get(locator)).to eq("brand" => "ACME", "disks" => 1)
+        expect(form_data.get(locator)).to eq("brand" => "ACME", "disks" => [])
       end
     end
   end
