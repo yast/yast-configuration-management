@@ -17,9 +17,9 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "singleton"
 require "yaml"
 require "yast"
+require "y2configuration_management/salt/form_condition"
 
 module Y2ConfigurationManagement
   module Salt
@@ -85,45 +85,6 @@ module Y2ConfigurationManagement
           Collection
         else
           FormInput
-        end
-      end
-    end
-
-    # FIXME move this to its own file
-
-    # A boolean condition operating on a value in the form,
-    # used for widget visibility ($visibleIf).
-    class FormCondition
-      # @param s [String]
-      def self.parse(s)
-        if s.empty?
-          nil
-        else
-          # TODO EqualCondition, NotEqualCondition
-          WidgetCondition.new(s)
-        end
-      end
-    end
-
-    class WidgetCondition < FormCondition
-      # @param cond_str [String] condition as specified in form.yml ($visibleIf)
-      def initialize(cond_str)
-        # FIXME
-        @locator = ".root.branch_network.dedicated_NIC"
-        # also, how to handle errors in forms, specifying a nonexisting element?
-        # Handle it in #parse, probably as a hard error
-        @op = :==
-        @value = true
-      end
-
-      # @param data [FormData]
-      def evaluate(data)
-        left = data.get(@locator)
-        right = @value
-        if @op == :==
-          left == right
-        else
-          left != right
         end
       end
     end
