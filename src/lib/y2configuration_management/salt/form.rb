@@ -175,6 +175,18 @@ module Y2ConfigurationManagement
         @default = spec["$default"]
         super
       end
+
+      # Determines whether the input matches search criteria
+      #
+      # This method has been implemented here to keep FormElement classes API consistent.
+      #
+      # @param arg [Hash]
+      # @return [FormInput, nil]
+      # @see Form#find_element_by
+      def find_element_by(arg)
+        return self if arg.any? { |k, v| public_send(k) == v }
+        nil
+      end
     end
 
     # Container Element
@@ -261,13 +273,12 @@ module Y2ConfigurationManagement
       # @return [FormElement, nil]
       # @see Form#find_element_by
       def find_element_by(arg)
-        if prototype.is_a?(Array)
-          prototype.each do |element|
-            return element if element.find_element_by(arg)
-          end
+        Array(prototype).each do |element|
+          nested_element = element.find_element_by(arg)
+          return nested_element if nested_element
         end
 
-        prototype.find_element_by(arg)
+        nil
       end
 
     private

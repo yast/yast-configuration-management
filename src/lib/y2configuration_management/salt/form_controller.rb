@@ -219,7 +219,9 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Form] Form widget
       def item_form_for(locator)
         element = form.find_element_by(locator: locator.unbounded)
-        form_widget = form_builder.build(element.prototype.elements)
+        prototype = element.prototype
+        elements = prototype.respond_to?(:elements) ? prototype.elements : [prototype]
+        form_widget = form_builder.build(elements)
         form_widget.title = element.name
         form_widget
       end
