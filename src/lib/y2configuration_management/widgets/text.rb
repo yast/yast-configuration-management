@@ -24,25 +24,16 @@ module Y2ConfigurationManagement
   module Widgets
     # This class represents a simple text field
     class Text < ::CWM::InputField
-      # @return [String] Widget label
-      attr_reader :label
-      # @return [String] Default value
+      include BaseMixin
+
       attr_reader :default
-      # @return [String] Form locator
-      attr_reader :locator
-      # @return [String] Form element id
-      attr_reader :id
 
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param controller [FormController] Form controller
-      def initialize(spec, controller)
-        @label = spec.label
+      def initialize(spec)
+        initialize_base(spec)
         @default = spec.default.to_s
-        @controller = controller
-        @locator = spec.locator
-        @id = spec.id
         self.widget_id = "text:#{spec.id}"
       end
 

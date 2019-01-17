@@ -17,30 +17,24 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm"
-
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This class represents a boolean (checkbox) field. TODO: is tristate possible?
-    class Boolean < ::CWM::CheckBox
-      include BaseMixin
+    # A widget has two ancestry lines: CWM, and Salt Forms.
+    # CWM is expressed through inheritance (class Boolean < ::CWM::CheckBox),
+    # Salt Forms through module inclusion (class Boolean; include BaseMixin; end).
+    module BaseMixin
+      # @return [String] Form element id
+      attr_reader :id
+      # @return [String] Form locator
+      attr_reader :locator
+      # @return [String] Widget label
+      attr_reader :label
 
-      # @return [Boolean] Default value
-      attr_reader :default
-
-      # Constructor
-      #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      def initialize(spec)
-        initialize_base(spec)
-        @default = spec.default == true # nil -> false
-        self.widget_id = "boolean:#{spec.id}"
-      end
-
-      # @see CWM::AbstractWidget
-      def init
-        self.value = default
+      def initialize_base(spec)
+        @id = spec.id
+        @locator = spec.locator
+        @label = spec.label
       end
     end
   end
