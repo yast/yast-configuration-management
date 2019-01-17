@@ -8,9 +8,20 @@ person:
     "$name": "E-mail"
     "$type": email
     "$default": "somebody@example.net"
+  birth_date:
+    "$type": date
+  password:
+    "$type": password
+    "$default": DefaultSecret
+  homepage:
+    "$type": url
+    "$default": "http://myhomepage.com"
   wants_newsletter:
     "$type": boolean
     "$default": true
+  newsletter_color:
+    $type: color
+    $default: "#73ba25"
   address:
     "$type": group
     street:

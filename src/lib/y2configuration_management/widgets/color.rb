@@ -1,4 +1,6 @@
-# Copyright (c) [2018] SUSE LLC
+# encoding: utf-8
+#
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -17,17 +19,20 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2configuration_management/widgets/base_mixin"
-require "y2configuration_management/widgets/boolean"
-require "y2configuration_management/widgets/color"
-require "y2configuration_management/widgets/collection"
-require "y2configuration_management/widgets/date"
-require "y2configuration_management/widgets/date_time"
-require "y2configuration_management/widgets/email"
-require "y2configuration_management/widgets/form"
-require "y2configuration_management/widgets/group"
-require "y2configuration_management/widgets/password"
-require "y2configuration_management/widgets/select"
 require "y2configuration_management/widgets/text"
-require "y2configuration_management/widgets/time"
-require "y2configuration_management/widgets/url"
+
+module Y2ConfigurationManagement
+  # This module contains the widgets which are used to display forms for Salt formulas
+  module Widgets
+    # This class represents a color text field
+    class Color < Text
+      # Constructor
+      #
+      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      def initialize(spec)
+        super
+        self.widget_id = "color:#{spec.id}"
+      end
+    end
+  end
+end
