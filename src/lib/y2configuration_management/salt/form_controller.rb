@@ -65,7 +65,7 @@ module Y2ConfigurationManagement
 
       # Renders the main form's dialog
       def show_main_dialog
-        form_widget = form_builder.build(form.root.elements)
+        form_widget = form_builder.build(form.root)
         form_widget.value = get(form.root.locator)
         state.open_form(:edit, form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
@@ -219,9 +219,7 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Form] Form widget
       def item_form_for(locator)
         element = form.find_element_by(locator: locator.unbounded)
-        prototype = element.prototype
-        elements = prototype.respond_to?(:elements) ? prototype.elements : [prototype]
-        form_widget = form_builder.build(elements)
+        form_widget = form_builder.build(element.prototype)
         form_widget.title = element.name
         form_widget
       end

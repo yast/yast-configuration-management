@@ -25,8 +25,9 @@ require "y2configuration_management/widgets/form"
 require "y2configuration_management/widgets/text"
 
 describe Y2ConfigurationManagement::Widgets::Form do
-  subject(:form) { described_class.new([text_input]) }
-  let(:text_input) do
+  subject(:form) { described_class.new(widget) }
+
+  let(:widget) do
     instance_double(
       Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil,
       :parent= => nil
@@ -38,14 +39,14 @@ describe Y2ConfigurationManagement::Widgets::Form do
     before { form.value = new_val }
 
     it "sets values for underlying widgets" do
-      expect(text_input).to receive(:value=).with("example")
+      expect(widget).to receive(:value=).with("example")
       form.init
     end
   end
 
   describe "#refresh" do
     it "sets values for underlying widgets" do
-      expect(text_input).to receive(:value=).with("example")
+      expect(widget).to receive(:value=).with("example")
       form.refresh(new_val)
     end
 
@@ -56,8 +57,23 @@ describe Y2ConfigurationManagement::Widgets::Form do
 
   describe "#store" do
     it "stores the final result" do
-      form.store
+      expect { form.store }.to change { form.result }.from(nil).to("text1" => "foobar")
+    end
+  end
+
+  describe "#result" do
+    before { form.store }
+
+    it "returns an hash including the values" do
       expect(form.result).to eq("text1" => "foobar")
+    end
+
+    context "when using an scalar form" do
+      subject(:form) { described_class.new(widget, scalar: true) }
+
+      it "returns just a scalar value" do
+        expect(form.result).to eq("foobar")
+      end
     end
   end
 end

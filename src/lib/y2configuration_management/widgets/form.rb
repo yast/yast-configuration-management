@@ -46,11 +46,28 @@ module Y2ConfigurationManagement
       #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       attr_accessor :value
 
+      attr_reader :scalar
+
       # Constructor
       #
+      # Usually, a form stores a set of keys and values. However, it is possible to define a
+      # "scalar" form, which holds a single value only.
+      #
+      # @example Regular form
+      #   form.value = { "name" => "John Doe" }
+      #   form.store
+      #   form.result #=> { "name" => "John Doe" }
+      #
+      # @example Scalar form
+      #   form.value = "John Doe"
+      #   form.store
+      #   form.result #=> "John Doe"
+      #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
-      def initialize(children)
-        @value = {}
+      # @param scalar [Boolean] Determines whether the form stores are scalar value
+      def initialize(children, scalar: false)
+        @value = scalar ? nil : {}
+        @scalar = scalar
         add_children(*children)
       end
 
@@ -59,7 +76,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget#init
       def init
-        set_children_contents
+        set_widgets_content
       end
 
       # Widget's content
@@ -76,7 +93,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget
       def store
-        @result = current_values
+        @result = scalar ? current_values.values.first : current_values
       end
 
       # Returns widget's content
@@ -108,7 +125,23 @@ module Y2ConfigurationManagement
         Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
 
+      def scalar?
+        @scalar
+      end
+
     private
+
+      def set_widgets_content
+        if scalar?
+          set_child_content
+        else
+          set_children_contents
+        end
+      end
+
+      def set_child_content
+        children.first.value = value
+      end
 
       def set_children_contents
         set_children_contents_precond!

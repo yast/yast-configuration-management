@@ -35,25 +35,29 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
       let(:locator) { locator_from_string(".root.person.name") }
 
       it "returns a form containing a text widget" do
-        root_element = builder.build(element)
-        expect(root_element.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
-        expect(root_element.children).to contain_exactly(
+        form_widget = builder.build(element)
+        expect(form_widget.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
+        expect(form_widget.children).to contain_exactly(
           an_object_having_attributes(
             "locator" => locator_from_string(".root.person.name")
           )
         )
+      end
+
+      it "returns a single value form" do
+        form_widget = builder.build(element)
+        expect(form_widget).to be_scalar
       end
     end
 
     context "when a group form element is given" do
       let(:locator) { locator_from_string(".root.person.address") }
 
-      it "returns a form containing a group widgets" do
-        root_element = builder.build(element)
-        group = root_element.children.first
-        expect(group.children.map(&:relative_locator)).to contain_exactly(
-          locator_from_string(".address.street"),
-          locator_from_string(".address.country")
+      it "returns a form containing group widgets" do
+        form_widget = builder.build(element)
+        expect(form_widget.children.map(&:relative_locator)).to contain_exactly(
+          locator_from_string(".street"),
+          locator_from_string(".country")
         )
       end
     end
@@ -62,8 +66,8 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
       let(:locator) { locator_from_string(".root.person.computers") }
 
       it "returns a form containing a collection widget" do
-        root_element = builder.build(element)
-        expect(root_element.children).to contain_exactly(
+        form_widget = builder.build(element)
+        expect(form_widget.children).to contain_exactly(
           an_object_having_attributes(
             "relative_locator" => locator_from_string(".computers")
           )

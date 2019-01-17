@@ -51,7 +51,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
-    state.open_form(:edit, form.root.locator, builder.build(form.root.elements))
+    state.open_form(:edit, form.root.locator, builder.build(form.root))
   end
 
   shared_examples "form_controller" do
@@ -65,13 +65,13 @@ describe Y2ConfigurationManagement::Salt::FormController do
       end
 
       it "opens the dialog with the whole form" do
-        expect(builder).to receive(:build).with(form.root.elements).and_call_original
+        expect(builder).to receive(:build).with(form.root).and_call_original
         expect(Yast::CWM).to receive(:show)
         controller.show_main_dialog
       end
 
       it "runs the dialog with the whole form" do
-        expect(builder).to receive(:build).with(form.root.elements).and_call_original
+        expect(builder).to receive(:build).with(form.root).and_call_original
         controller.show_main_dialog
       end
 
@@ -102,11 +102,11 @@ describe Y2ConfigurationManagement::Salt::FormController do
       allow(Y2ConfigurationManagement::Widgets::FormPopup)
         .to receive(:new).and_return(popup)
       allow(builder).to receive(:build).and_call_original
-      allow(builder).to receive(:build).with(prototype.elements).and_return(widget)
+      allow(builder).to receive(:build).with(prototype).and_return(widget)
     end
 
     it "opens the dialog using the collections's prototype" do
-      expect(builder).to receive(:build).with(prototype.elements).and_return(widget)
+      expect(builder).to receive(:build).with(prototype).and_return(widget)
       controller.add(collection_locator)
     end
 
@@ -160,12 +160,12 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
     before do
       allow(builder).to receive(:build).and_call_original
-      allow(builder).to receive(:build).with(prototype.elements).and_return(widget)
+      allow(builder).to receive(:build).with(prototype).and_return(widget)
       allow(data).to receive(:update).and_call_original
     end
 
     it "opens the dialog using the collections's prototype" do
-      expect(builder).to receive(:build).with(prototype.elements).and_return(widget)
+      expect(builder).to receive(:build).with(prototype).and_return(widget)
       controller.edit(collection_locator.join(0))
     end
 
