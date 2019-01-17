@@ -25,7 +25,7 @@ require "y2configuration_management/widgets/form"
 require "y2configuration_management/widgets/text"
 
 describe Y2ConfigurationManagement::Widgets::Form do
-  subject(:form) { described_class.new([text_input]) }
+  subject(:form) { described_class.new([text_input], double("controller")) }
   let(:text_input) do
     instance_double(
       Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil

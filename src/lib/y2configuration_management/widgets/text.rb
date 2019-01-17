@@ -23,9 +23,7 @@ module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a simple text field
-    class Text < ::CWM::InputField
-      # @return [String] Widget label
-      attr_reader :label
+    class Text < CWM::ReplacePoint
       # @return [String] Default value
       attr_reader :default
       # @return [String] Form locator
@@ -33,29 +31,53 @@ module Y2ConfigurationManagement
       # @return [String] Form element id
       attr_reader :id
 
+      extend Forwardable
+      def_delegators :@inner, :value, :value=
+
       include InvisibilityCloak
+
+      # A helper to go inside a ReplacePoint
+      class InputField < ::CWM::InputField
+        # @return [String] Widget label
+        attr_reader :label
+
+        def initialize(id:, label:)
+          self.widget_id = id
+          @label = label
+        end
+
+        # TODO: only if I am mentioned in a visible_if
+        def opt
+          [:notify]
+        end
+      end
 
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
       # @param controller [FormController] Form controller
       def initialize(spec, controller)
-        @label = spec.label
         @default = spec.default.to_s
         @controller = controller
         @locator = spec.locator
         @id = spec.id
-        self.widget_id = "text:#{spec.id}"
+
+        @inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: @inner)
+        initialize_invisibility_cloak(spec.visible_if)
       end
 
       # @see CWM::AbstractWidget
       def init
+        replace(@inner)
         self.value = default if value.nil? || value.empty?
       end
 
       # @see CWM::ValueBasedWidget
       def value=(val)
-        super(val.to_s)
+        # FIXME: clashes with forwarding to @inner
+        # super(val.to_s)
+        @inner.value = val.to_s
       end
     end
   end

@@ -24,7 +24,7 @@ module Y2ConfigurationManagement
     class FormCondition
       # @param s [String]
       # @param context [] for resolving relative expressions
-      def self.parse(s, context: nil)
+      def self.parse(s, _context: nil)
         if s.empty?
           nil
         else
@@ -37,6 +37,7 @@ module Y2ConfigurationManagement
       end
     end
 
+    # A {FormCondition} checking if a widget is equal to a constant
     class EqualCondition < FormCondition
       def initialize(locator:, value:)
         @locator = locator
@@ -51,9 +52,10 @@ module Y2ConfigurationManagement
       end
     end
 
+    # A {FormCondition} checking if a widget is not equal to a constant
     class NotEqualCondition < EqualCondition
       def evaluate(data)
-        ! super
+        !super
       end
     end
   end

@@ -35,6 +35,8 @@ module Y2ConfigurationManagement
       # @return [Array<Object>] List of objects which are included in the collection
       attr_accessor :value
 
+      include InvisibilityCloak
+
       # Constructor
       #
       # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification

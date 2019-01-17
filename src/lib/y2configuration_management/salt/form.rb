@@ -110,7 +110,7 @@ module Y2ConfigurationManagement
       attr_reader :scope
       # @return [Boolean]
       attr_reader :optional
-      # @return [FormCondition]
+      # @return [FormCondition,nil]
       attr_reader :visible_if
 
       # Constructor

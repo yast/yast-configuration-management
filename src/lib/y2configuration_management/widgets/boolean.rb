@@ -31,11 +31,18 @@ module Y2ConfigurationManagement
       # @return [String] Form element id
       attr_reader :id
 
+      extend Forwardable
+      def_delegators :@inner, :value, :value=
+
+      include InvisibilityCloak
+
+      # A helper to go inside a ReplacePoint
       class CheckBox < ::CWM::CheckBox
         # @return [String] Widget label
         attr_reader :label
 
-        def initialize(label)
+        def initialize(id:, label:)
+          self.widget_id = id
           @label = label
         end
 
@@ -55,13 +62,9 @@ module Y2ConfigurationManagement
         @locator = spec.locator
         @id = spec.id
 
-        @inner = CheckBox.new(spec.label)
-        @inner.widget_id = "boolean:#{spec.id}"
+        @inner = CheckBox.new(id: "boolean:#{spec.id}", label: spec.label)
         super(id: "vis:#{spec.id}", widget: @inner)
-        @visible = true
-        # ^: manual visibility
-        # v: automatic
-        @visible_if = spec.visible_if
+        initialize_invisibility_cloak(spec.visible_if)
       end
 
       # @see CWM::AbstractWidget
@@ -79,11 +82,6 @@ module Y2ConfigurationManagement
         # initial widget.
         ReplacePoint(Id(widget_id), Empty(Id("empty:#{widget_id}")))
       end
-
-      extend Forwardable
-      def_delegators :@inner, :value, :value=
-
-      include InvisibilityCloak
     end
   end
 end

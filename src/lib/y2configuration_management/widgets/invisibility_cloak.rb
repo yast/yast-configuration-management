@@ -23,10 +23,14 @@ module Y2ConfigurationManagement
   module Widgets
     # Widgets that can become invisible via the {visible=} method.
     # TODO: the value is discarded; check how it feels, maybe we want to save/restore it.
-    module InvisibilityCloak
+    module VisibilitySwitching
       EMPTY_WIDGET = CWM::Empty.new("ic_empty")
 
       attr_reader :visible
+
+      def initialize_visibility_switching
+        @visible = true
+      end
 
       def visible=(visible)
         return if @visible == visible
@@ -37,6 +41,19 @@ module Y2ConfigurationManagement
           replace(EMPTY_WIDGET)
         end
       end
+    end
+
+    # Salt forms specific visibility switching
+    module InvisibilityCloak
+      include VisibilitySwitching
+
+      # @return [FormCondition,nil]
+      attr_reader :visible_if
+
+      def initialize_invisibility_cloak(visible_if)
+        initialize_visibility_switching
+        @visible_if = visible_if
+      end
 
       # Automatic invisibility: when the form controller asks us,
       # we evaluate a condition and update our visibility
@@ -45,7 +62,6 @@ module Y2ConfigurationManagement
         return unless @visible_if
         self.visible = @visible_if.evaluate(data)
       end
-
     end
   end
 end
