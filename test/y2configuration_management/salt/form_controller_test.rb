@@ -56,6 +56,14 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   shared_examples "form_controller" do
     describe "#show_main_dialog" do
+      let(:event_id) { :next }
+
+      before do
+        # Instead of mocking CWM.show we let the CWM preparation a step further,
+        # to catch bugs in widget initialization
+        allow(Yast::UI).to receive(:WaitForEvent).and_return("ID" => event_id)
+      end
+
       it "opens the dialog with the whole form" do
         expect(builder).to receive(:build).with(form.root.elements).and_call_original
         expect(Yast::CWM).to receive(:show)
@@ -64,10 +72,23 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "runs the dialog with the whole form" do
         expect(builder).to receive(:build).with(form.root.elements).and_call_original
-        # Instead of mocking CWM.show we let the CWM preparation a step further,
-        # to catch bugs in widget initialization
-        expect(Yast::UI).to receive(:WaitForEvent).and_return("ID" => :abort)
         controller.show_main_dialog
+      end
+
+      context "when the user accepts the dialog" do
+        let(:event_id) { :next }
+
+        it "returns :next" do
+          expect(controller.show_main_dialog).to eq(:next)
+        end
+      end
+
+      context "when the user cancels the form" do
+        let(:event_id) { :abort }
+
+        it "returns :abort" do
+          expect(controller.show_main_dialog).to eq(:abort)
+        end
       end
     end
   end

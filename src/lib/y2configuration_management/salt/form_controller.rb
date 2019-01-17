@@ -69,11 +69,12 @@ module Y2ConfigurationManagement
         form_widget.value = get(form.root.locator)
         state.open_form(:edit, form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
-        Yast::CWM.show(
+        ret = Yast::CWM.show(
           HBox(form_widget),
           caption: form.root.name, next_handler: method(:next_handler)
         )
         state.close_form
+        ret
       ensure
         Yast::Wizard.CloseDialog
       end
