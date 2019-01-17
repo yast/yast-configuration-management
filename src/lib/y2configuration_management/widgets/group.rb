@@ -39,6 +39,7 @@ module Y2ConfigurationManagement
       def initialize(spec, children, controller)
         textdomain "configuration_management"
         @label = spec.label
+        @has_frame = spec.type == :group
         @children = children
         @controller = controller
         @locator = spec.locator
@@ -50,7 +51,12 @@ module Y2ConfigurationManagement
       #
       # @return [Yast::Term]
       def contents
-        VBox(*children)
+        c = VBox(*children)
+        if @has_frame
+          Frame(label, c)
+        else
+          c
+        end
       end
 
       # Sets the value for the form

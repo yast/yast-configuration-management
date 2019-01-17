@@ -80,7 +80,6 @@ module Y2ConfigurationManagement
         children = group.elements.map do |element_spec|
           build_element(element_spec)
         end
-        _visible = group.type == :group # FIXME: use this
         Y2ConfigurationManagement::Widgets::Group.new(group, children, controller)
       end
 
