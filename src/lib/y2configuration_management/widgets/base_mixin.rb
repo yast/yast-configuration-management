@@ -17,12 +17,25 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2configuration_management/widgets/invisibility_cloak"
+module Y2ConfigurationManagement
+  module Widgets
+    # A widget has two ancestry lines: CWM, and Salt Forms.
+    # CWM is expressed through inheritance (class Boolean < ::CWM::CheckBox),
+    # Salt Forms through module inclusion (class Boolean; include BaseMixin; end).
+    module BaseMixin
+      # @return [String] Form element id
+      attr_reader :id
+      # @return [String] Form locator
+      attr_reader :locator
+      # @return [String] Widget label
+      attr_reader :label
 
-require "y2configuration_management/widgets/base_mixin"
-require "y2configuration_management/widgets/boolean"
-require "y2configuration_management/widgets/collection"
-require "y2configuration_management/widgets/group"
-require "y2configuration_management/widgets/select"
-require "y2configuration_management/widgets/text"
-require "y2configuration_management/widgets/form"
+      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      def initialize_base(spec)
+        @id = spec.id
+        @locator = spec.locator
+        @label = spec.label
+      end
+    end
+  end
+end

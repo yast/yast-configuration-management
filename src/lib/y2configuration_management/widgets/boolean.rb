@@ -24,12 +24,10 @@ module Y2ConfigurationManagement
   module Widgets
     # This class represents a boolean (checkbox) field. TODO: is tristate possible?
     class Boolean < ::CWM::ReplacePoint
+      include BaseMixin
+
       # @return [Boolean] Default value
       attr_reader :default
-      # @return [String] Form locator
-      attr_reader :locator
-      # @return [String] Form element id
-      attr_reader :id
 
       extend Forwardable
       def_delegators :@inner, :value, :value=
@@ -55,12 +53,9 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param controller [FormController] Form controller
-      def initialize(spec, controller)
+      def initialize(spec)
+        initialize_base(spec)
         @default = spec.default == true # nil -> false
-        @controller = controller
-        @locator = spec.locator
-        @id = spec.id
 
         @inner = CheckBox.new(id: "boolean:#{spec.id}", label: spec.label)
         super(id: "vis:#{spec.id}", widget: @inner)

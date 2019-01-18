@@ -27,7 +27,10 @@ module Y2ConfigurationManagement
     # This widget uses a table to display a collection of elements and offers
     # buttons to add, remove and edit them.
     class Collection < ::CWM::CustomWidget
-      attr_reader :label, :min_items, :max_items, :controller, :locator, :id, :headers
+      include BaseMixin
+      attr_reader :min_items
+      attr_reader :max_items
+      attr_reader :controller
 
       # @return [Array<String>] Headers for the collection table
       attr_reader :headers
@@ -43,12 +46,10 @@ module Y2ConfigurationManagement
       # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
       def initialize(spec, controller)
         textdomain "configuration_management"
-        @label = spec.label
+        initialize_base(spec)
+        @controller = controller
         @min_items = spec.min_items
         @max_items = spec.max_items
-        @controller = controller
-        @locator = spec.locator # form element locator
-        @id = spec.id
         @headers, @headers_ids = headers_from_prototype(spec.prototype)
         self.widget_id = "collection:#{spec.id}"
         self.value = []

@@ -23,27 +23,20 @@ module Y2ConfigurationManagement
   module Widgets
     # Represents a group of elements
     class Group < ::CWM::CustomWidget
-      # @return [String] Widget label
-      attr_reader :label
-      # @return [String] Form element locator
-      attr_reader :locator
+      include BaseMixin
+
       # @return [Array<CWM::AbstractWidget>] Widgets which are included in the group
       attr_reader :children
-      attr_reader :id
 
       # Constructor
       #
       # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
       # @param children   [Array<AbstractWidget>] Widgets which are included in the group
-      # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      def initialize(spec, children, controller)
+      def initialize(spec, children)
         textdomain "configuration_management"
-        @label = spec.label
+        initialize_base(spec)
         @has_frame = spec.type == :group
         @children = children
-        @controller = controller
-        @locator = spec.locator
-        @id = spec.id
         self.widget_id = "group:#{spec.id}"
       end
 

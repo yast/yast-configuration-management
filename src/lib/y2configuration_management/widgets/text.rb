@@ -26,10 +26,8 @@ module Y2ConfigurationManagement
     class Text < CWM::ReplacePoint
       # @return [String] Default value
       attr_reader :default
-      # @return [String] Form locator
-      attr_reader :locator
-      # @return [String] Form element id
-      attr_reader :id
+
+      include BaseMixin
 
       extend Forwardable
       def_delegators :@inner, :value, :value=
@@ -55,12 +53,9 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param controller [FormController] Form controller
-      def initialize(spec, controller)
+      def initialize(spec)
+        initialize_base(spec)
         @default = spec.default.to_s
-        @controller = controller
-        @locator = spec.locator
-        @id = spec.id
 
         @inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
         super(id: "vis:#{spec.id}", widget: @inner)
