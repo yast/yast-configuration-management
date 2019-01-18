@@ -118,23 +118,6 @@ module Y2ConfigurationManagement
         parts == other.parts
       end
 
-      # Returns a locator relative to a given one
-      #
-      # @example
-      #   root = FormElementLocator.new(["root", "person"])
-      #   locator = FormElementLocator.new(["root", "person", "name"])
-      #   locator.relative_to(root).to_s #=> ".name"
-      #
-      # @param other [FormElementLocator] Reference locator
-      # @return [FormElementLocator,nil] Relative locator
-      def relative_to(other)
-        relative_parts = other.parts.reduce(parts) do |relative, root_part|
-          return nil if root_part != relative[0]
-          relative[1..-1]
-        end
-        relative_parts ? self.class.new(relative_parts) : nil
-      end
-
       # Removes references to specific collection elements
       #
       # @return [FormElementLocator]
