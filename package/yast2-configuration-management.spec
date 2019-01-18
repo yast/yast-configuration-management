@@ -25,13 +25,15 @@ Source0:        %{name}-%{version}.tar.bz2
 
 Url:            http://github.com/yast/yast-migration
 
-BuildRequires:  yast2
+# CWM DateField and TimeField widgets
+BuildRequires:  yast2 >= 4.1.53
 BuildRequires:  yast2-devtools
 BuildRequires:  yast2-installation
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(yast-rake)
 
-Requires:       yast2
+# CWM DateField and TimeField widgets
+Requires:       yast2 => 4.1.53
 Requires:       yast2-installation
 
 BuildArch:      noarch
