@@ -19,6 +19,7 @@
 
 require "yaml"
 require "yast"
+require "y2configuration_management/salt/form_element_locator"
 
 module Y2ConfigurationManagement
   module Salt
@@ -56,7 +57,18 @@ module Y2ConfigurationManagement
         nil
       end
 
-      # Convenience method for looking for a particular FormElement.
+      # Recursively looks for a particular {FormElement}
+      #
+      # @example look for a FormElement by a specific name, locator or id
+      #
+      #   f = Y2ConfigurationManagemenet.from_file("form.yml")
+      #   f.find_element_by(name: "subnets") #=> <Collection @name="subnets">
+      #   locator = FormElementLocator.from_string(".root.dhcpd")
+      #   f.find_element_by(locator: locator) #=> <Container @name="dhcpd">
+      #   f.find_element_by(id: "hosts") #=> <Container @id="hosts">
+      #
+      # @param arg [Hash]
+      # @return [FormElement, nil]
       def find_element_by(arg)
         root.find_element_by(arg)
       end
@@ -92,7 +104,6 @@ module Y2ConfigurationManagement
     #
     # scalar values, groups and collections
     class FormElement
-      LOCATOR_DELIMITER = ".".freeze
       # @return [String] the key for the pillar
       attr_reader :id
       # @return [Symbol]
@@ -130,8 +141,9 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def locator
-        prefix = parent ? parent.locator : ""
-        "#{prefix}#{LOCATOR_DELIMITER}#{id}"
+        return FormElementLocator.new([id]) if parent.nil?
+        return parent.locator if parent.is_a?(Collection)
+        parent.locator.join(id)
       end
 
     private
@@ -163,6 +175,18 @@ module Y2ConfigurationManagement
         @default = spec["$default"]
         super
       end
+
+      # Determines whether the input matches search criteria
+      #
+      # This method has been implemented here to keep FormElement classes API consistent.
+      #
+      # @param arg [Hash]
+      # @return [FormInput, nil]
+      # @see Form#find_element_by
+      def find_element_by(arg)
+        return self if arg.any? { |k, v| public_send(k) == v }
+        nil
+      end
     end
 
     # Container Element
@@ -183,15 +207,9 @@ module Y2ConfigurationManagement
 
       # Recursively looks for a particular {FormElement}
       #
-      # @example look for a FormElement by a specific name, locator or id
-      #
-      #   f = Y2ConfigurationManagemenet.from_file("form.yml")
-      #   f.find_element_by(name: "subnets") #=> <Collection @name="subnets"
-      #   f.find_element_by(locator: ".root.dhcpd") #=> <Container @name="dhcpd"
-      #   f.find_element_by(id: "hosts") #=> <Container @id="hosts"
-      #
       # @param arg [Hash]
       # @return [FormElement, nil]
+      # @see Form#find_element_by
       def find_element_by(arg)
         return self if arg.any? { |k, v| public_send(k) == v }
 
@@ -221,10 +239,13 @@ module Y2ConfigurationManagement
     class Collection < FormElement
       # @return [Integer] lowest number of elements that needs to be defined
       attr_reader :min_items
+
       # @return [Integer] highest number of elements that needs to be defined
       attr_reader :max_items
+
       # @return [String] name for the members of the collection
       attr_reader :item_name
+
       # list of elements (let's see if we promote it to a class)
       # or children or whatever
       attr_reader :prototype
@@ -244,6 +265,20 @@ module Y2ConfigurationManagement
         @max_items = spec["$maxItems"] if spec["$maxItems"]
         @prototype = prototype_for(id, spec)
         @default = spec.fetch("$default", [])
+      end
+
+      # Recursively looks for a particular {FormElement}
+      #
+      # @param arg [Hash]
+      # @return [FormElement, nil]
+      # @see Form#find_element_by
+      def find_element_by(arg)
+        Array(prototype).each do |element|
+          nested_element = element.find_element_by(arg)
+          return nested_element if nested_element
+        end
+
+        nil
       end
 
     private

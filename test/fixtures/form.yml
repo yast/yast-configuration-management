@@ -28,7 +28,7 @@ person:
     "$maxItems": 4
     "$default":
       - brand: ACME
-        disks: 1
+        disks: []
     "$prototype":
       $type: group
       brand:
@@ -41,6 +41,16 @@ person:
           - Dell
           - Lenovo
       disks:
-        "$name": Number of Disks
-        "$type": number
-        "$default": 1
+        "$type": edit-group
+        "$minItems": 1
+        "$maxItems": 3
+        "$prototype":
+          $type: group
+          type:
+            "$name": Type
+            "$type": select
+            "$values":
+              - HDD
+              - SSD
+          size:
+            "$type": text

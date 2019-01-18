@@ -6,6 +6,12 @@ person:
       country: Germany
     computers:
       - brand: Lenovo
-        disks: 2
+        disks:
+          - type: SSD
+            size: 32GB
+          - type: HDD
+            size: 1TB
       - brand: Dell
-        disks: 4
+        disks: 
+           - type: HDD
+             size: 1TB

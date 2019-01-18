@@ -34,35 +34,61 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar) }
-  let(:locator) { ".root.person.computers" }
+  let(:locator) { locator_from_string(".root.person.computers") }
+  let(:collection_locator) { locator_from_string(".person.computers") }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
   let(:widget) do
-    instance_double(Y2ConfigurationManagement::Widgets::Form, result: result, "value=" => nil)
+    instance_double(Y2ConfigurationManagement::Widgets::Form, result: result).as_null_object
   end
   let(:result) { nil }
+  let(:state) { Y2ConfigurationManagement::Salt::FormControllerState.new }
 
   before do
+    allow(Y2ConfigurationManagement::Salt::FormControllerState).to receive(:new)
+      .and_return(state)
     allow(Y2ConfigurationManagement::Salt::FormData).to receive(:new)
       .and_return(data)
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
+    state.open_form(:edit, form.root.locator, builder.build(form.root))
   end
 
   shared_examples "form_controller" do
     describe "#show_main_dialog" do
+      let(:event_id) { :next }
+
+      before do
+        # Instead of mocking CWM.show we let the CWM preparation a step further,
+        # to catch bugs in widget initialization
+        allow(Yast::UI).to receive(:WaitForEvent).and_return("ID" => event_id)
+      end
+
       it "opens the dialog with the whole form" do
-        expect(builder).to receive(:build).with(form.root.elements).and_call_original
+        expect(builder).to receive(:build).with(form.root).and_call_original
         expect(Yast::CWM).to receive(:show)
         controller.show_main_dialog
       end
 
       it "runs the dialog with the whole form" do
-        expect(builder).to receive(:build).with(form.root.elements).and_call_original
-        # Instead of mocking CWM.show we let the CWM preparation a step further,
-        # to catch bugs in widget initialization
-        expect(Yast::UI).to receive(:WaitForEvent).and_return("ID" => :abort)
+        expect(builder).to receive(:build).with(form.root).and_call_original
         controller.show_main_dialog
+      end
+
+      context "when the user accepts the dialog" do
+        let(:event_id) { :next }
+
+        it "returns :next" do
+          expect(controller.show_main_dialog).to eq(:next)
+        end
+      end
+
+      context "when the user cancels the form" do
+        let(:event_id) { :abort }
+
+        it "returns :abort" do
+          expect(controller.show_main_dialog).to eq(:abort)
+        end
       end
     end
   end
@@ -81,15 +107,15 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
     it "opens the dialog using the collections's prototype" do
       expect(builder).to receive(:build).with(prototype).and_return(widget)
-      controller.add(locator)
+      controller.add(collection_locator)
     end
 
     context "when the user accepts the dialog" do
-      let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
+      let(:result) { { "brand" => "Lenovo", "disks" => [] } }
 
       it "updates the form data" do
-        expect(data).to receive(:add_item).with(locator, "brand" => "Lenovo", "disks" => 2)
-        controller.add(locator)
+        expect(data).to receive(:add_item).with(locator, "brand" => "Lenovo", "disks" => [])
+        controller.add(collection_locator)
       end
     end
 
@@ -98,7 +124,32 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "does not modify form data" do
         expect(data).to_not receive(:add_item)
-        controller.add(locator)
+        controller.add(collection_locator)
+      end
+    end
+
+    context "adding an element to a nested collection" do
+      let(:parent_form) do
+        instance_double(
+          Y2ConfigurationManagement::Widgets::Form, result: { "brand" => "Lenovo", "disks" => [] }
+        ).as_null_object
+      end
+
+      before do
+        allow(builder).to receive(:build).and_return(widget)
+        allow(data).to receive(:add_item).and_call_original
+        state.open_form(:add, locator_from_string(".root.person.computers"), parent_form)
+      end
+
+      context "when the user accepts the dialog" do
+        let(:collection_locator) { locator_from_string(".disks") }
+        let(:result) { { "type" => "HDD", "size" => "1TiB" } }
+
+        it "updates the form data" do
+          expect(data).to receive(:add_item)
+            .with(locator_from_string(".root.person.computers[2].disks"), result)
+          controller.add(collection_locator)
+        end
       end
     end
   end
@@ -110,19 +161,21 @@ describe Y2ConfigurationManagement::Salt::FormController do
     before do
       allow(builder).to receive(:build).and_call_original
       allow(builder).to receive(:build).with(prototype).and_return(widget)
+      allow(data).to receive(:update).and_call_original
     end
 
     it "opens the dialog using the collections's prototype" do
       expect(builder).to receive(:build).with(prototype).and_return(widget)
-      controller.edit(locator, 0)
+      controller.edit(collection_locator.join(0))
     end
 
     context "when the user accepts the dialog" do
-      let(:result) { { "computers" =>  { "brand" => "Lenovo", "disks" => 2 } } }
+      let(:result) { { "brand" => "Lenovo", "disks" => [] } }
 
       it "updates the form data" do
-        expect(data).to receive(:update_item).with(locator, 0, "brand" => "Lenovo", "disks" => 2)
-        controller.edit(locator, 0)
+        expect(data).to receive(:update)
+          .with(locator.join(0), "brand" => "Lenovo", "disks" => [])
+        controller.edit(collection_locator.join(0))
       end
     end
 
@@ -130,16 +183,43 @@ describe Y2ConfigurationManagement::Salt::FormController do
       let(:result) { nil }
 
       it "does not modify form data" do
-        expect(data).to_not receive(:update_item)
-        controller.edit(locator, 0)
+        expect(data).to_not receive(:update).with(locator, anything)
+        controller.edit(collection_locator.join(0))
+      end
+    end
+
+    context "updating an element from a nested collection" do
+      let(:parent_form) do
+        instance_double(
+          Y2ConfigurationManagement::Widgets::Form, result: { "brand" => "Lenovo", "disks" => [] }
+        ).as_null_object
+      end
+
+      before do
+        allow(builder).to receive(:build).and_return(widget)
+        allow(data).to receive(:update).and_call_original
+        state.open_form(:edit, locator_from_string(".root.person.computers[1]"), parent_form)
+      end
+
+      context "when the user accepts the dialog" do
+        let(:collection_locator) { locator_from_string(".disks") }
+        let(:result) { { "type" => "HDD", "size" => "1TiB" } }
+
+        it "updates the form data" do
+          expect(data).to receive(:add_item)
+            .with(locator_from_string(".root.person.computers[1].disks"), result)
+          controller.add(collection_locator)
+        end
       end
     end
   end
 
   describe "#remove" do
+    let(:element_locator) { locator_from_string(".person.computers[1]") }
+
     it "removes an element" do
-      expect(data).to receive(:remove_item).with(".root.person.computers", 1)
-      controller.remove(".root.person.computers", 1)
+      expect(data).to receive(:remove_item).with(locator_from_string(".root.person.computers[1]"))
+      controller.remove(element_locator)
     end
   end
 

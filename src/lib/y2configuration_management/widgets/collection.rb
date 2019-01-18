@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
@@ -37,6 +38,9 @@ module Y2ConfigurationManagement
 
       # @return [Array<Object>] List of objects which are included in the collection
       attr_accessor :value
+
+      # @return [Array<CWM::AbstractWidget>] Parent widget
+      attr_accessor :parent
 
       # Constructor
       #
@@ -77,6 +81,7 @@ module Y2ConfigurationManagement
       #
       # @param items_list [Array<Hash>] Collection items
       def value=(items_list)
+        return if items_list.nil?
         Yast::UI.ChangeWidget(Id("table:#{locator}"), :Items, format_items(items_list))
         @value = items_list
       end
@@ -96,11 +101,11 @@ module Y2ConfigurationManagement
       def handle(event)
         case event["ID"]
         when "#{widget_id}_add".to_sym
-          controller.add(locator)
+          controller.add(relative_locator)
         when "#{widget_id}_edit".to_sym
-          controller.edit(locator, selected_row) if selected_row
+          controller.edit(relative_locator.join(selected_row)) if selected_row
         when "#{widget_id}_remove".to_sym
-          controller.remove(locator, selected_row) if selected_row
+          controller.remove(relative_locator.join(selected_row)) if selected_row
         end
 
         nil
@@ -129,7 +134,8 @@ module Y2ConfigurationManagement
           else
             [item]
           end
-          Item(Id(index.to_s), *values)
+          formatted_values = values.map { |v| format_value(v) }
+          Item(Id(index.to_s), *formatted_values)
         end
       end
 
@@ -145,6 +151,21 @@ module Y2ConfigurationManagement
         names = els.map { |h| (h.name || h.id) }
         ids = els.map(&:id)
         [names, ids]
+      end
+
+      # Returns a value formatted to be shown in the table
+      #
+      # When an array is given, it returns a 'n items' message (where 'n' is the size of the array).
+      # Otherwise, it returns a string representing the object.
+      #
+      # @param val [Object]
+      # @return [String] String to show in the table
+      def format_value(val)
+        return val.to_s unless val.is_a?(Enumerable)
+        # TRANSLATORS: empty list
+        return _("No items") if val.empty?
+        # TRANSLATORS: items count in a list
+        format(n_("%s item", "%s items", val.size), val.size)
       end
     end
   end

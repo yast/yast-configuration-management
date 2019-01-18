@@ -35,8 +35,8 @@ module Y2ConfigurationManagement
       def initialize(spec, children)
         textdomain "configuration_management"
         initialize_base(spec)
-        @children = children
         self.widget_id = "group:#{spec.id}"
+        add_children(*children)
       end
 
       # Widget contents
@@ -71,6 +71,15 @@ module Y2ConfigurationManagement
       # @see #value=
       def value
         children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+      end
+
+      # Add children widgets
+      #
+      # @param widgets [Array<CWM::AbstractWidget>] Widgets to add to the group
+      def add_children(*widgets)
+        @children ||= []
+        widgets.each { |w| w.parent = self }
+        @children.concat(widgets)
       end
     end
   end
