@@ -135,8 +135,8 @@ module Y2ConfigurationManagement
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
         @optional = spec["$optional"] if spec["$optional"]
-        @visible_if = FormCondition.parse(spec.fetch("$visibleIf", ""))
         @parent = parent
+        @visible_if = FormCondition.parse(spec.fetch("$visibleIf", ""), context: locator)
       end
 
       # Return the absolute locator of this form element in the actual form

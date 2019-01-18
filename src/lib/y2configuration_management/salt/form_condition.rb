@@ -22,18 +22,49 @@ module Y2ConfigurationManagement
     # A boolean condition operating on a value in the form,
     # used for widget visibility ($visibleIf).
     class FormCondition
+      class ParseError < RuntimeError
+      end
+
       # @param s [String]
-      # @param context [] for resolving relative expressions
-      def self.parse(s, _context: nil)
+      # @param context [FormElementLocator] for resolving relative expressions
+      def self.parse(s, context:)
         if s.empty?
           nil
+        # This matches checkVisibilityCondition in FormulaComponentGenerator.js
+        # TODO: specify it better
+        elsif s.include?("==")
+          parts = s.split("==").map(&:strip)
+          locator = parse_locator(parts[0].strip, context)
+          value = parse_value(parts[1].strip)
+          EqualCondition.new(locator: locator, value: value)
+        elsif s.include?("!=")
+          parts = s.split("!=").map(&:strip)
+          locator = parse_locator(parts[0], context)
+          value = parse_value(parts[1])
+          NotEqualCondition.new(locator: locator, value: value)
         else
-          # FIXME: parser
+          raise ParseError, "Expecting equality or inequality: #{s.inspect}"
+        end
+      end
 
-          # also, how to handle errors in forms, specifying a nonexisting element?
-          # Handle it in #parse, probably as a hard error
-          locator = FormElementLocator.from_string ".root.branch_network.dedicated_NIC"
-          EqualCondition.new(locator: locator, value: true)
+      def self.parse_locator(s, context)
+        if s.start_with? "."
+          while s.start_with? "."
+            s = s[1..-1]
+            context = context.parent
+          end
+        else
+          context = FormElementLocator.new(["root"])
+        end
+        s_parts = s.split "#"
+        context.join(* s_parts)
+      end
+
+      def self.parse_value(s)
+        if (s[0] == "'" && s[-1] == "'") || (s[0] == "\"" && s[-1] == "\"")
+          s[1..-2]
+        else
+          s
         end
       end
     end
@@ -47,8 +78,8 @@ module Y2ConfigurationManagement
 
       # @param data [FormData]
       def evaluate(data)
-        left = data.get(@locator)
-        right = @value
+        left = data.get(@locator).to_s
+        right = @value.to_s
         left == right
       end
     end
