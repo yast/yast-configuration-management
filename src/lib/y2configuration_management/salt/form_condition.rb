@@ -32,7 +32,8 @@ module Y2ConfigurationManagement
 
           # also, how to handle errors in forms, specifying a nonexisting element?
           # Handle it in #parse, probably as a hard error
-          EqualCondition.new(locator: ".root.branch_network.dedicated_NIC", value: true)
+          locator = FormElementLocator.from_string ".root.branch_network.dedicated_NIC"
+          EqualCondition.new(locator: locator, value: true)
         end
       end
     end

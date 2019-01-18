@@ -34,30 +34,34 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
+  let(:form) { Y2ConfigurationManagement::Widgets::Form.new([], controller) }
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { ".root.person.computers" }
+  let(:locator) { locator_from_string(".root.person.computers") }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:formatted_default) do
     [
-      Item(Id("0"), "ACME", 1)
+      Item(Id("0"), "ACME", "No items")
     ]
   end
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       collection = described_class.new(spec, controller)
-      expect(collection.locator).to eq(locator)
       expect(collection.min_items).to eq(1)
       expect(collection.max_items).to eq(4)
     end
   end
 
   describe "#handle" do
+    before do
+      form.add_children(collection)
+    end
+
     context "when it is an 'add' event" do
       let(:event) { { "ID" => "#{collection.widget_id}_add".to_sym } }
 
       it "adds a new element to the collection" do
-        expect(controller).to receive(:add).with(locator)
+        expect(controller).to receive(:add).with(locator_from_string(".computers"))
         collection.handle(event)
       end
     end
@@ -70,7 +74,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "edits an element of the collection" do
-        expect(controller).to receive(:edit).with(locator, 1)
+        expect(controller).to receive(:edit).with(locator_from_string(".computers[1]"))
         collection.handle(event)
       end
     end
@@ -83,7 +87,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "removes the selected element from the collection" do
-        expect(controller).to receive(:remove).with(locator, 1)
+        expect(controller).to receive(:remove).with(locator_from_string(".computers[1]"))
         collection.handle(event)
       end
     end
@@ -91,7 +95,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
 
   describe "#headers" do
     it "returns the headers to be displayed in the table" do
-      expect(collection.headers).to eq(["Brand", "Number of Disks"])
+      expect(collection.headers).to eq(["Brand", "Disks"])
     end
   end
 

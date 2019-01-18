@@ -29,12 +29,22 @@ module Y2ConfigurationManagement
       attr_reader :locator
       # @return [String] Widget label
       attr_reader :label
+      # @return [Array<CWM::AbstractWidget>] Parent widget
+      attr_accessor :parent
 
       # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
       def initialize_base(spec)
         @id = spec.id
         @locator = spec.locator
         @label = spec.label
+      end
+
+      # Locator relative to the form where the widget belongs
+      #
+      # @return [FormElementLocator] Form element locator
+      def relative_locator
+        return parent.relative_locator.join(id) if respond_to?(:parent) && parent
+        Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
     end
   end

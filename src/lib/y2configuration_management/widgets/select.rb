@@ -18,12 +18,14 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
   module Widgets
     # This class represents a select widget
     class Select < ::CWM::ComboBox
       include BaseMixin
+
       # @return [Array<String>] Widget items
       attr_reader :items
       # @return [String,nil] Default value

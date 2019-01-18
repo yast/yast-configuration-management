@@ -20,6 +20,7 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/form_data"
+require "y2configuration_management/salt/form_element_locator"
 
 describe Y2ConfigurationManagement::Salt::FormData do
   subject(:form_data) { described_class.new(form) }
@@ -31,50 +32,53 @@ describe Y2ConfigurationManagement::Salt::FormData do
   describe "#get" do
     context "when the value has not been set" do
       it "returns the default value" do
-        expect(form_data.get(".root.person.name")).to eq("John Doe")
+        expect(form_data.get(locator_from_string(".root.person.name"))).to eq("John Doe")
       end
 
       context "and it is a collection" do
         it "returns a hash with the default values" do
-          expect(form_data.get(".root.person.computers"))
-            .to eq([{ "brand" => "ACME", "disks" => 1 }])
+          expect(form_data.get(locator_from_string(".root.person.computers")))
+            .to eq([{ "brand" => "ACME", "disks" => [] }])
         end
       end
     end
 
     context "when the value has been set" do
+      let(:locator) { locator_from_string(".root.person.name") }
+
       before do
-        form_data.update(".root.person.name", "Mr. Doe")
+        form_data.update(locator, "Mr. Doe")
       end
 
       it "returns the already set value" do
-        expect(form_data.get(".root.person.name")).to eq("Mr. Doe")
+        expect(form_data.get(locator)).to eq("Mr. Doe")
       end
     end
 
     context "when a collection locator and an index is given" do
+      let(:locator) { locator_from_string(".root.person.computers[0]") }
+
       it "returns the item in the given position" do
-        expect(form_data.get(".root.person.computers", 0)).to eq("brand" => "ACME", "disks" => 1)
+        expect(form_data.get(locator)).to eq("brand" => "ACME", "disks" => [])
       end
     end
   end
 
   describe "#add" do
+    let(:locator) { locator_from_string(".root.person.computers[1]") }
+
     it "adds the element to the collection" do
-      form_data.add_item(".root.person.computers", "brand" => "Dell", "disks" => 2)
-      expect(form_data.get(".root.person.computers")).to eq(
-        [
-          { "brand" => "ACME", "disks" => 1 },
-          { "brand" => "Dell", "disks" => 2 }
-        ]
-      )
+      form_data.add_item(locator.parent, "brand" => "Dell", "disks" => 2)
+      expect(form_data.get(locator)).to eq("brand" => "Dell", "disks" => 2)
     end
   end
 
   describe "#update_item" do
+    let(:locator) { locator_from_string(".root.person.computers[0]") }
+
     it "updates the item in the collection" do
-      form_data.update_item(".root.person.computers", 0, "brand" => "Lenovo", "disks" => 3)
-      expect(form_data.get(".root.person.computers")).to eq(
+      form_data.update_item(locator, "brand" => "Lenovo", "disks" => 3)
+      expect(form_data.get(locator.parent)).to eq(
         [{ "brand" => "Lenovo", "disks" => 3 }]
       )
     end
@@ -82,8 +86,8 @@ describe Y2ConfigurationManagement::Salt::FormData do
 
   describe "#remove_item" do
     it "removes the element from the collection" do
-      form_data.remove_item(".root.person.computers", 0)
-      expect(form_data.get(".root.person.computers")).to be_empty
+      form_data.remove_item(locator_from_string(".root.person.computers[0]"))
+      expect(form_data.get(locator_from_string(".root.person.computers"))).to be_empty
     end
   end
 end

@@ -20,6 +20,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2configuration_management/salt/form_element_locator"
 
 module Y2ConfigurationManagement
   module Widgets
@@ -36,6 +37,8 @@ module Y2ConfigurationManagement
       attr_reader :children
       # @return [Hash] Form values from included widgets when this one is removed from the UI
       attr_reader :result
+      # @return [String] Form title
+      attr_accessor :title
 
       # @example Setting values for included widgets
       #   form.value = { "name" => "John", "surname" => "Doe" }
@@ -43,13 +46,30 @@ module Y2ConfigurationManagement
       #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       attr_accessor :value
 
+      attr_reader :scalar
+
       # Constructor
       #
+      # Usually, a form stores a set of keys and values. However, it is possible to define a
+      # "scalar" form, which holds a single value only.
+      #
+      # @example Regular form
+      #   form.value = { "name" => "John Doe" }
+      #   form.store
+      #   form.result #=> { "name" => "John Doe" }
+      #
+      # @example Scalar form
+      #   form.value = "John Doe"
+      #   form.store
+      #   form.result #=> "John Doe"
+      #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
-      def initialize(children, controller)
-        @children = children
+      # @param scalar [Boolean] Determines whether the form stores are scalar value
+      def initialize(children, controller, scalar: false)
+        @value = scalar ? nil : {}
+        @scalar = scalar
+        add_children(*children)
         @controller = controller
-        @value = {}
         self.handle_all_events = true
         super()
       end
@@ -59,7 +79,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget#init
       def init
-        set_children_contents
+        set_widgets_content
       end
 
       # Widget's content
@@ -76,7 +96,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget
       def store
-        @result = current_values
+        @result = scalar ? current_values.values.first : current_values
       end
 
       # Returns widget's content
@@ -106,7 +126,36 @@ module Y2ConfigurationManagement
         end
       end
 
+      # Add children widgets
+      #
+      # @param widgets [Array<CWM::AbstractWidget>] Widgets to add to the form
+      def add_children(*widgets)
+        @children ||= []
+        widgets.each { |w| w.parent = self }
+        @children.concat(widgets)
+      end
+
+      def relative_locator
+        Y2ConfigurationManagement::Salt::FormElementLocator.new([])
+      end
+
+      def scalar?
+        @scalar
+      end
+
     private
+
+      def set_widgets_content
+        if scalar?
+          set_child_content
+        else
+          set_children_contents
+        end
+      end
+
+      def set_child_content
+        children.first.value = value
+      end
 
       def set_children_contents
         set_children_contents_precond!
@@ -118,7 +167,7 @@ module Y2ConfigurationManagement
       def set_children_contents_precond!
         child_ids = children.map(&:id).sort
         value_keys = value.keys.sort
-        return if child_ids == value_keys
+        return if value_keys.all? { |k| child_ids.include?(k) }
         raise "Form expects ids #{child_ids}, got #{value_keys}"
       end
     end

@@ -38,8 +38,12 @@ module Y2ConfigurationManagement
       # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
       # @return [Y2ConfigurationManagement::Widgets::Form] Form
       def build(form_element)
-        widgets = Array(form_element).map { |e| build_element(e) }
-        Y2ConfigurationManagement::Widgets::Form.new(widgets, controller)
+        scalar = !form_element.respond_to?(:elements)
+        elements = scalar ? [form_element] : form_element.elements
+        widgets = Array(elements).map { |e| build_element(e) }
+        Y2ConfigurationManagement::Widgets::Form.new(
+          widgets, controller, scalar: scalar
+        )
       end
 
     private

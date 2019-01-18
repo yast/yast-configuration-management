@@ -1,4 +1,6 @@
-# Copyright (c) [2018] SUSE LLC
+# encoding: utf-8
+
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -17,30 +19,10 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm/popup"
-
 module Y2ConfigurationManagement
-  module Widgets
-    # This dialog displays a set of widgets in a popup
-    class FormPopup < ::CWM::Popup
-      # @return [String] Popup title
-      attr_reader :title
-
-      # Constructor
-      #
-      # @param title [String] Popup title
-      # @param content [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
-      def initialize(title, content)
-        @inner_content = content
-        @title = title
-      end
-
-      # Widget's content
-      #
-      # @see CWM::AbstractWidget#contents
-      def contents
-        VBox(@inner_content)
-      end
+  module TestHelpers
+    def locator_from_string(string)
+      Y2ConfigurationManagement::Salt::FormElementLocator.from_string(string)
     end
   end
 end

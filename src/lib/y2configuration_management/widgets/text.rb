@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas

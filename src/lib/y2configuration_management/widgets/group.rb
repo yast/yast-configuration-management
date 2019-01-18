@@ -36,8 +36,8 @@ module Y2ConfigurationManagement
         textdomain "configuration_management"
         initialize_base(spec)
         @has_frame = spec.type == :group
-        @children = children
         self.widget_id = "group:#{spec.id}"
+        add_children(*children)
       end
 
       # Widget contents
@@ -83,6 +83,15 @@ module Y2ConfigurationManagement
         children.each do |widget|
           widget.update_visibility(data)
         end
+      end
+
+      # Add children widgets
+      #
+      # @param widgets [Array<CWM::AbstractWidget>] Widgets to add to the group
+      def add_children(*widgets)
+        @children ||= []
+        widgets.each { |w| w.parent = self }
+        @children.concat(widgets)
       end
     end
   end

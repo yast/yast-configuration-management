@@ -17,6 +17,8 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
+require "y2configuration_management/salt/pillar"
+
 module Y2ConfigurationManagement
   module Salt
     # This class holds data for a given Salt Formula Form
@@ -24,7 +26,6 @@ module Y2ConfigurationManagement
     # @todo The support for collections is rather simple and nesting collections is not supported.
     #       We might consider using JSON Patch to modify the data.
     class FormData
-      LOCATOR_DELIMITER = ".".freeze
       # @return [Y2ConfigurationManagement::Salt::Form] Form
       attr_reader :form
       # @return [Y2ConfigurationManagement::Salt::Pillar] Pillar
@@ -43,10 +44,10 @@ module Y2ConfigurationManagement
       # Returns the value of a given element
       #
       # @param locator [String] Locator of the element
-      def get(locator, index = nil)
-        value = @data.dig(*locator_to_parts(locator))
+      def get(locator)
+        value = find_by_locator(@data, locator)
         value = default_for(locator) if value.nil?
-        index ? value.at(index) : value
+        value
       end
 
       # Updates an element's value
@@ -54,11 +55,8 @@ module Y2ConfigurationManagement
       # @param locator  [String] Locator of the collection
       # @param value [Object] New value
       def update(locator, value)
-        parts = locator_to_parts(locator)
-        parent_parts = parts[0..-2]
-        parent = @data
-        parent = parent.dig(* parent_parts) unless parent_parts.empty?
-        parent[parts.last] = value
+        parent = get(locator.parent)
+        parent[locator.last] = value
       end
 
       # Adds an element to a collection
@@ -71,20 +69,18 @@ module Y2ConfigurationManagement
       end
 
       # @param locator  [String]  Locator of the collection
-      # @param index [Integer] Position of the element to remove
       # @param value [Object] New value
-      def update_item(locator, index, value)
-        collection = get(locator)
-        collection[index] = value
+      def update_item(locator, value)
+        collection = get(locator.parent)
+        collection[locator.last] = value
       end
 
       # Removes an element from a collection
       #
       # @param locator  [String]  Locator of the collection
-      # @param index [Integer] Position of the element to remove
-      def remove_item(locator, index)
-        collection = get(locator)
-        collection.delete_at(index)
+      def remove_item(locator)
+        collection = get(locator.parent)
+        collection.delete_at(locator.last)
       end
 
       # Returns a hash containing the form data
@@ -102,13 +98,6 @@ module Y2ConfigurationManagement
       def default_for(locator)
         element = form.find_element_by(locator: locator)
         element ? element.default : nil
-      end
-
-      # Split the locator into different parts
-      #
-      # @param locator [String] Element locator
-      def locator_to_parts(locator)
-        locator[1..-1].split(LOCATOR_DELIMITER)
       end
 
       # Builds a hash to keep the form data
@@ -130,10 +119,20 @@ module Y2ConfigurationManagement
           defaults = element.elements.reduce({}) { |a, e| a.merge(data_for_element(e, data)) }
           { element.id => defaults }
         else
-          # TODO: we probably should remove the .root locator prefix
-          value = data.dig(*locator_to_parts(element.locator.gsub(/^\.(root)?/, "")))
+          value = find_by_locator(data, element.locator.rest) # FIXME: remove '.root'
           { element.id => value.nil? ? element.default : value }
         end
+      end
+
+      # Finds a value
+      #
+      # @param data    [Hash,Array] Data structure to search for the value
+      # @param locator [FormElementLocator] Value locator
+      # @return [Object] Value
+      def find_by_locator(data, locator)
+        return nil if data.nil?
+        return data if locator.first.nil?
+        find_by_locator(data[locator.first], locator.rest)
       end
     end
   end
