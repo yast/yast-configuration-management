@@ -141,9 +141,9 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def locator
-        return FormElementLocator.new([id]) if parent.nil?
+        return FormElementLocator.new([id.to_sym]) if parent.nil?
         return parent.locator if parent.is_a?(Collection)
-        parent.locator.join(id)
+        parent.locator.join(id.to_sym)
       end
 
     private

@@ -135,4 +135,28 @@ end
 
 describe Y2ConfigurationManagement::Salt::Collection do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
+
+  describe "#keyed?" do
+    subject(:collection) { form.find_element_by(locator: locator) }
+
+    let(:form) do
+      Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    end
+
+    context "when it is a collection indexed by a key" do
+      let(:locator) { locator_from_string(".root.person.projects") }
+
+      it "returns true" do
+        expect(collection).to be_keyed
+      end
+    end
+
+    context "when it is a collection indexed by an index" do
+      let(:locator) { locator_from_string(".root.person.computers") }
+
+      it "returns false" do
+        expect(collection).to_not be_keyed
+      end
+    end
+  end
 end

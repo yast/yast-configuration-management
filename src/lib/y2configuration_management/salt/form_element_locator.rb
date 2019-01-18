@@ -51,7 +51,7 @@ module Y2ConfigurationManagement
       private
 
         # @return [Regexp] Regular expression representing a locator part
-        INDEXED_PART = /\A(\w+)\[(\d+)\]\z/
+        INDEXED_PART = /\A(\w+)\[(.+)\]\z/
 
         # Parses a locator part
         #
@@ -59,8 +59,16 @@ module Y2ConfigurationManagement
         # @return [Array<String,Integer>] Locator subparts
         def from_part(string)
           match = INDEXED_PART.match(string)
-          return [string] unless match
-          [match[1], match[2].to_i]
+          return [string.to_sym] unless match
+          path, id = match[1..-1]
+          numeric_id?(id) ? [path.to_sym, id.to_i] : [path.to_sym, id]
+        end
+
+        # Determines whether the id is numeric or not
+        #
+        # @return [Boolean]
+        def numeric_id?(id)
+          id =~ /\A\d+\z/
         end
       end
 

@@ -22,6 +22,19 @@ person:
         - Czech Republic
         - Germany
         - Spain
+  projects:
+    "$type": edit-group
+    "$minItems": 1
+    "$name": Project
+    "$itemName": ${i} project
+    "$prototype":
+      "$type": group
+      "$key":
+        "$type": text
+        "$name": Project name
+      url:
+        "$type": text
+        "$default": https://github.com/
   computers:
     "$type": edit-group
     "$minItems": 1
@@ -54,3 +67,18 @@ person:
               - SSD
           size:
             "$type": text
+  projects:
+    "$type": edit-group
+    "$minItems": 1
+    "$name": Project
+    "$itemName": ${i} project
+    "$default":
+      yast2:
+        url: https://yast.opensuse.org
+    "$prototype":
+      "$type": group
+      "$key":
+        "$type": text
+        "$name": Project name
+      url:
+        "$type": text
