@@ -21,7 +21,6 @@ require "cwm"
 require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a simple time field
     class Time < ::CWM::TimeField
@@ -31,7 +30,7 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
       def initialize(spec)
         initialize_base(spec)
         @default = spec.default

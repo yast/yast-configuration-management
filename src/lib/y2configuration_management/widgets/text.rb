@@ -31,7 +31,7 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
       def initialize(spec)
         initialize_base(spec)
         @default = spec.default.to_s

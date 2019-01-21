@@ -26,7 +26,7 @@ module Y2ConfigurationManagement
     # For further information, see the forms specification at
     # https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html
     class FormBuilder
-      CLASS_WIDGET = {
+      INPUT_WIDGET_CLASS = {
         color:    Y2ConfigurationManagement::Widgets::Color,
         text:     Y2ConfigurationManagement::Widgets::Text,
         number:   Y2ConfigurationManagement::Widgets::Text,
@@ -81,8 +81,7 @@ module Y2ConfigurationManagement
           build_group(element)
         when :"edit-group"
           build_collection(element)
-        when :text, :email, :number, :select, :boolean, :password,
-            :url, :color, :datetime, :date, :time
+        when *INPUT_WIDGET_CLASS.keys
           build_input(element)
         else
           raise "Unknown $type: #{element.type}"
@@ -108,7 +107,7 @@ module Y2ConfigurationManagement
       # @param input_spec [Hash] Group specification
       # @return [Y2ConfigurationManagement::Widgets::Text]
       def build_input(input_spec)
-        klass = CLASS_WIDGET[input_spec.type]
+        klass = INPUT_WIDGET_CLASS[input_spec.type]
         klass.new(input_spec)
       end
 

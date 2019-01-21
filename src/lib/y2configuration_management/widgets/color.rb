@@ -22,16 +22,25 @@
 require "y2configuration_management/widgets/text"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a color text field
     class Color < Text
+      VALID_COLOR_REGEXP = /\A#(\h{3}){1,2}\z/
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
       def initialize(spec)
+        textdomain "configuration_management"
         super
         self.widget_id = "color:#{spec.id}"
+      end
+
+      def validate
+        return true if value.to_s.empty? || value =~ VALID_COLOR_REGEXP
+        # TRANSLATORS: It reports that %s is an invalid HEX color.
+        Yast::Report.Error(_("%s: is not a valid") % label)
+
+        false
       end
     end
   end

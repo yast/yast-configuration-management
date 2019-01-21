@@ -21,13 +21,12 @@ require "y2configuration_management/widgets/text"
 require "uri"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a URL text field
     class URL < Text
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
       def initialize(spec)
         textdomain "configuration_management"
         super
@@ -41,6 +40,7 @@ module Y2ConfigurationManagement
         begin
           return true if URI.parse(value)
         rescue
+          # TRANSLATORS: It reports that %s is an invalid URL.
           Yast::Report.Error(_("%s: is not valid") % label)
         end
 

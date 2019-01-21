@@ -30,8 +30,68 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
 
   let(:spec) { form.find_element_by(locator: locator) }
   let(:locator) { locator_from_string(".root.deadline") }
-
+  let(:yast_release) { "#{yast_release_date} #{yast_release_time}" }
+  let(:yast_release_date) { "1996-05-01" }
+  let(:yast_release_time) { "16:30:00" }
   include_examples "CWM::CustomWidget"
+
+  describe "#init" do
+    context "when the datetime has already a cached value" do
+      before do
+        datetime.instance_variable_set("@value", yast_release)
+      end
+
+      it "inits the widget value with the cached one" do
+        expect(datetime).to receive(:value=).with(yast_release)
+        datetime.init
+      end
+    end
+
+    context "when the datetime does not have a cached value" do
+      it "inits the widget value with the default one" do
+        expect(datetime).to receive(:value=).with("")
+        datetime.init
+      end
+    end
+  end
+
+  describe "value" do
+    it "returns the joined date field and time field values" do
+      date = datetime.send(:date)
+      time = datetime.send(:time)
+
+      allow(date).to receive(:value).and_return(yast_release_date)
+      allow(time).to receive(:value).and_return(yast_release_time)
+
+      expect(datetime.value).to eql(yast_release)
+    end
+  end
+
+  describe "#value=" do
+    let(:value) { yast_release }
+    let(:date) { datetime.send(:date) }
+    let(:time) { datetime.send(:time) }
+
+    before do
+      allow(date).to receive(:value).and_return(yast_release_date)
+      allow(time).to receive(:value).and_return(yast_release_time)
+    end
+
+    it "sets the date field with the parsed date" do
+      expect(date).to receive(:value=).with(yast_release_date)
+      datetime.value = value
+    end
+
+    it "sets the time field with the parsed time" do
+      expect(time).to receive(:value=).with(yast_release_time)
+      subject.value = value
+    end
+
+    it "caches the value of the date and time fields" do
+      subject.value = value
+      expect(subject.instance_variable_get("@value")).to eql(yast_release)
+    end
+  end
 
   describe "#contents" do
     it "contains a DateField and a TimField" do

@@ -32,4 +32,42 @@ describe Y2ConfigurationManagement::Widgets::Time do
   let(:locator) { locator_from_string(".root.start_time") }
 
   include_examples "CWM::TimeField"
+
+  describe "#init" do
+    it "returns if there is no default value" do
+      expect(time).to_not receive(:value=)
+      time.init
+    end
+
+    context "when the time field has already a cached value" do
+      let(:form_spec) { { "start_time" => { "$type" => "time", "$default" => "10:00:00" } } }
+
+      before do
+        time.instance_variable_set("@value", "15:00:00")
+      end
+
+      it "inits the widget value with the cached one" do
+        expect(time).to receive(:value=).with("15:00:00")
+        time.init
+      end
+    end
+
+    context "when the datetime does not have a cached value" do
+      let(:form_spec) { { "start_time" => { "$type" => "time", "$default" => "10:00:00" } } }
+
+      it "inits the widget value with the default one" do
+        expect(time).to receive(:value=).with("10:00:00")
+        time.init
+      end
+    end
+  end
+
+  describe "#value=" do
+    it "caches the given value" do
+      value = "17:30:00"
+      expect(time.instance_variable_get("@value")).to_not eql(value)
+      time.value = value
+      expect(time.instance_variable_get("@value")).to eql(value)
+    end
+  end
 end
