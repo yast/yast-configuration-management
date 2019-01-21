@@ -63,10 +63,25 @@ module Y2ConfigurationManagement
         initialize_invisibility_cloak(spec.visible_if)
       end
 
+      # @return [UITerm]
+      def contents
+        # CWM::ReplacePoint has ReplacePoint(..., Empty) to prevent
+        # alleged double calls of handlers.
+        # But that means a Form#init will be setting values to widgets
+        # that are not there :-/
+        # So let's include the wrapped widget from the start
+        ReplacePoint(Id(widget_id), @inner)
+      end
+
       # @see CWM::AbstractWidget
       def init
+        saved_value = value
         replace(@inner)
-        self.value = default if value.nil? || value.empty?
+        self.value = if saved_value.nil? || saved_value.empty?
+          default
+        else
+          saved_value
+        end
       end
 
       # @see CWM::ValueBasedWidget
