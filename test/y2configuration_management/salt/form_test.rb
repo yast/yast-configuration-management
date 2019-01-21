@@ -131,6 +131,29 @@ describe Y2ConfigurationManagement::Salt::Container do
       expect(container.elements[0].id).to eql("demo")
     end
   end
+
+  describe "#collection_key?" do
+    subject(:form_element) { form.find_element_by(locator: locator) }
+    let(:form) do
+      Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    end
+
+    context "when the element is named '$key'" do
+      let(:locator) { locator_from_string(".root.person.projects.$key") }
+
+      it "returns true" do
+        expect(form_element.collection_key?).to eq(true)
+      end
+    end
+
+    context "when the element is named different from '$key'" do
+      let(:locator) { locator_from_string(".root.person.projects.url") }
+
+      it "returns false" do
+        expect(form_element.collection_key?).to eq(false)
+      end
+    end
+  end
 end
 
 describe Y2ConfigurationManagement::Salt::Collection do
