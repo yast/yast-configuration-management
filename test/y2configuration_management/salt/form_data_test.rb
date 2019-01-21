@@ -106,10 +106,12 @@ describe Y2ConfigurationManagement::Salt::FormData do
 
       it "adds the element to the collection" do
         form_data.add_item(locator, "$key" => "openSUSE", "url" => "https://opensuse.org")
-        expect(form_data.get(locator)).to eq([
-          { "$key" => "yast2", "url" => "https://yast.opensuse.org" },
-          { "$key" => "openSUSE", "url" => "https://opensuse.org" }
-        ])
+        expect(form_data.get(locator)).to eq(
+          [
+            { "$key" => "yast2", "url" => "https://yast.opensuse.org" },
+            { "$key" => "openSUSE", "url" => "https://opensuse.org" }
+          ]
+        )
       end
     end
   end
@@ -129,6 +131,22 @@ describe Y2ConfigurationManagement::Salt::FormData do
     it "removes the element from the collection" do
       form_data.remove_item(locator_from_string(".root.person.computers[0]"))
       expect(form_data.get(locator_from_string(".root.person.computers"))).to be_empty
+    end
+  end
+
+  describe "#to_h" do
+    it "exports array collections as arrays" do
+      computers = form_data.to_h.dig("root", "person", "computers")
+      expect(computers).to eq(
+        [{ "brand" => "ACME", "disks" => [] }]
+      )
+    end
+
+    it "exports hash based collections as hashes" do
+      projects = form_data.to_h.dig("root", "person", "projects")
+      expect(projects).to eq(
+        "yast2" => { "url" => "https://yast.opensuse.org" }
+      )
     end
   end
 end
