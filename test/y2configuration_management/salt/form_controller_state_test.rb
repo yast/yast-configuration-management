@@ -73,4 +73,20 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
       expect(state.form_data).to eq(data)
     end
   end
+
+  describe "#restore_backup" do
+    let(:new_data) do
+      instance_double(Y2ConfigurationManagement::Salt::FormData)
+    end
+
+    before do
+      allow(data).to receive(:copy).and_return(new_data)
+      state.backup_data
+    end
+
+    it "restores the previously version of the form data" do
+      expect { state.restore_backup }.to change { state.form_data }
+        .from(new_data).to(data)
+    end
+  end
 end

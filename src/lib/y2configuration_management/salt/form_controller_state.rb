@@ -24,18 +24,18 @@ module Y2ConfigurationManagement
     # Stores the UI state information
     #
     # This class holds information related to FormController. Basically, it behaves like a stack
-    # which contains informaion about the open widget forms.  This data could have been stored
-    # directly in the FormController instance, but it has been extracted in order to keep the
-    # controller as simple as possible.
+    # which contains informaion about the open widget forms and the current form data. Those items
+    # could have been stored directly in the FormController instance, but they have been extracted
+    # in order to keep the controller as simple as possible.
     class FormControllerState
-      attr_reader :form_data
-
       # Constructor
+      #
+      # @param data [FormData] Initial form data
       def initialize(data)
         @form_widgets = []
         @locators = []
         @actions = []
-        @form_data = data
+        @form_data_instances = [data]
       end
 
       # Registers that a new form has been open
@@ -73,6 +73,9 @@ module Y2ConfigurationManagement
       end
 
       # Replaces the current action/locator
+      #
+      # @param new_action  [Symbol]
+      # @param new_locator [FormElementLocator]
       def replace(new_action, new_locator)
         @actions[-1] = new_action
         @locators[-1] = new_locator
@@ -83,6 +86,28 @@ module Y2ConfigurationManagement
         @form_widgets.pop
         @locators.pop
         @actions.pop
+      end
+
+      # Current form data
+      #
+      # @return [FormData]
+      def form_data
+        @form_data_instances.last
+      end
+
+      # Performs a backup of the current form data
+      def backup_data
+        @form_data_instances << form_data.copy
+      end
+
+      # Restores the last backup of the current form data
+      def restore_backup
+        @form_data_instances.pop unless @form_data_instances.size <= 1
+      end
+
+      # Clears the last backup if it exists
+      def remove_backup
+        @form_data_instances.delete_at(-2) if @form_data_instances.size > 1
       end
     end
   end
