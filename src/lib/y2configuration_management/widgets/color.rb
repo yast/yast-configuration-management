@@ -1,4 +1,6 @@
-# Copyright (c) [2018] SUSE LLC
+# encoding: utf-8
+#
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -17,35 +19,28 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm"
-require "y2configuration_management/widgets/base_mixin"
+require "y2configuration_management/widgets/text"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This class represents a simple text field
-    class Text < ::CWM::InputField
-      include BaseMixin
-
-      attr_reader :default
-
+    # This class represents a color text field
+    class Color < Text
+      VALID_COLOR_REGEXP = /\A#(\h{3}){1,2}\z/
       # Constructor
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
       def initialize(spec)
-        initialize_base(spec)
-        @default = spec.default.to_s
-        self.widget_id = "text:#{spec.id}"
+        textdomain "configuration_management"
+        super
+        self.widget_id = "color:#{spec.id}"
       end
 
-      # @see CWM::AbstractWidget
-      def init
-        self.value = default if value.nil? || value.empty?
-      end
+      def validate
+        return true if value.to_s.empty? || value =~ VALID_COLOR_REGEXP
+        # TRANSLATORS: It reports that %s is an invalid HEX color.
+        Yast::Report.Error(_("%s: is not a valid") % label)
 
-      # @see CWM::ValueBasedWidget
-      def value=(val)
-        super(val.to_s)
+        false
       end
     end
   end

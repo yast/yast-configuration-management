@@ -1,5 +1,7 @@
 person:
     name: Jane Doe
+    birth_date: '1981-07-11'
+    started_working_at: '2014-01-11 09:00:00'
     wants_newsletter: False
     address:
       street: Somewhere

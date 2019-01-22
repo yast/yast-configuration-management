@@ -1,5 +1,5 @@
 #!/usr/bin/env rspec
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -19,33 +19,34 @@
 # find current contact information at www.suse.com.
 
 require_relative "../../spec_helper"
-require "y2configuration_management/widgets/text"
+require "y2configuration_management/widgets/password"
 require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
-describe Y2ConfigurationManagement::Widgets::Text do
-  subject(:text) { described_class.new(spec) }
+describe Y2ConfigurationManagement::Widgets::Password do
+  subject(:password) { described_class.new(spec) }
 
   include_examples "CWM::AbstractWidget"
 
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
+
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.person.name") }
+  let(:locator) { locator_from_string(".root.person.password") }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      text = described_class.new(spec)
-      expect(text.locator).to eq(locator)
-      expect(text.default).to eq("John Doe")
+      password = described_class.new(spec)
+      expect(password.locator).to eq(locator)
+      expect(password.default).to eq("DefaultSecret")
     end
   end
 
   describe "#init" do
     it "initializes the current value to the default one" do
-      expect(text).to receive(:value=).with("John Doe")
-      text.init
+      expect(password).to receive(:value=).with("DefaultSecret")
+      password.init
     end
 
     context "when no default value was given" do
@@ -56,8 +57,8 @@ describe Y2ConfigurationManagement::Widgets::Text do
       end
 
       it "initializes the current value to the empty string" do
-        expect(text).to receive(:value=).with("")
-        text.init
+        expect(password).to receive(:value=).with("")
+        password.init
       end
     end
   end

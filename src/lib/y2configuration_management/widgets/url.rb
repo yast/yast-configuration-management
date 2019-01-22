@@ -1,4 +1,4 @@
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -17,35 +17,34 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm"
-require "y2configuration_management/widgets/base_mixin"
+require "y2configuration_management/widgets/text"
+require "uri"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This class represents a simple text field
-    class Text < ::CWM::InputField
-      include BaseMixin
-
-      attr_reader :default
-
+    # This class represents a URL text field
+    class URL < Text
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
       def initialize(spec)
-        initialize_base(spec)
-        @default = spec.default.to_s
-        self.widget_id = "text:#{spec.id}"
+        textdomain "configuration_management"
+        super
+        self.widget_id = "url:#{spec.id}"
       end
 
-      # @see CWM::AbstractWidget
-      def init
-        self.value = default if value.nil? || value.empty?
-      end
+      def validate
+        return true if value.to_s.empty?
 
-      # @see CWM::ValueBasedWidget
-      def value=(val)
-        super(val.to_s)
+        Yast.import "URL"
+        begin
+          return true if URI.parse(value)
+        rescue
+          # TRANSLATORS: It reports that %s is an invalid URL.
+          Yast::Report.Error(_("%s: is not valid") % label)
+        end
+
+        false
       end
     end
   end

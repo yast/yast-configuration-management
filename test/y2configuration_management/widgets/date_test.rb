@@ -1,4 +1,5 @@
-# Copyright (c) [2018] SUSE LLC
+#!/usr/bin/env rspec
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -17,17 +18,19 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2configuration_management/widgets/base_mixin"
-require "y2configuration_management/widgets/boolean"
-require "y2configuration_management/widgets/color"
-require "y2configuration_management/widgets/collection"
+require_relative "../../spec_helper"
 require "y2configuration_management/widgets/date"
-require "y2configuration_management/widgets/date_time"
-require "y2configuration_management/widgets/email"
-require "y2configuration_management/widgets/form"
-require "y2configuration_management/widgets/group"
-require "y2configuration_management/widgets/password"
-require "y2configuration_management/widgets/select"
-require "y2configuration_management/widgets/text"
-require "y2configuration_management/widgets/time"
-require "y2configuration_management/widgets/url"
+require "y2configuration_management/salt/form"
+require "cwm/rspec"
+
+describe Y2ConfigurationManagement::Widgets::Date do
+  subject(:date) { described_class.new(spec) }
+  let(:form_spec) do
+    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+  end
+
+  let(:spec) { form_spec.find_element_by(locator: locator) }
+  let(:locator) { locator_from_string(".root.person.birth_date") }
+
+  include_examples "CWM::DateField"
+end

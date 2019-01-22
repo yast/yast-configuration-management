@@ -1,4 +1,4 @@
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -21,21 +21,20 @@ require "cwm"
 require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This class represents a simple text field
-    class Text < ::CWM::InputField
+    # This class represents a simple password field
+    class Password < ::CWM::Password
       include BaseMixin
 
       attr_reader :default
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
       def initialize(spec)
         initialize_base(spec)
         @default = spec.default.to_s
-        self.widget_id = "text:#{spec.id}"
+        self.widget_id = "password:#{spec.id}"
       end
 
       # @see CWM::AbstractWidget

@@ -1,4 +1,4 @@
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -21,10 +21,9 @@ require "cwm"
 require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This class represents a simple text field
-    class Text < ::CWM::InputField
+    # This class represents a simple date field
+    class Date < ::CWM::DateField
       include BaseMixin
 
       attr_reader :default
@@ -34,18 +33,21 @@ module Y2ConfigurationManagement
       # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
       def initialize(spec)
         initialize_base(spec)
-        @default = spec.default.to_s
-        self.widget_id = "text:#{spec.id}"
-      end
-
-      # @see CWM::AbstractWidget
-      def init
-        self.value = default if value.nil? || value.empty?
+        @default = spec.default
+        self.widget_id = "date:#{spec.id}"
+        @value = nil
       end
 
       # @see CWM::ValueBasedWidget
       def value=(val)
-        super(val.to_s)
+        @value = val
+        super
+      end
+
+      # @see CWM::AbstractWidget
+      def init
+        return if default.to_s.empty? # date cannot have no value; prevent YUI error
+        self.value = @value || default
       end
     end
   end
