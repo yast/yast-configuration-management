@@ -88,6 +88,13 @@ module Y2ConfigurationManagement
         data_for_pillar(@data)
       end
 
+      # Returns a deep copy of this object
+      #
+      # @return [FormData]
+      def copy
+        Marshal.load(Marshal.dump(self))
+      end
+
     private
 
       # Recursively finds a value

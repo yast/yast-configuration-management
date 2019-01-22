@@ -149,4 +149,12 @@ describe Y2ConfigurationManagement::Salt::FormData do
       )
     end
   end
+
+  describe "#copy" do
+    it "returns a deep-copy of the object" do
+      copy = form_data.copy
+      expect(copy).to_not be(form_data)
+      expect(copy.to_h).to eq(form_data.to_h)
+    end
+  end
 end
