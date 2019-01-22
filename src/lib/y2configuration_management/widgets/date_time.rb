@@ -62,9 +62,11 @@ module Y2ConfigurationManagement
 
       def value=(val)
         t = val.to_s.empty? ? ::Time.new : ::Time.parse(val)
-        date.value = t.strftime("%Y-%m-%d")
-        time.value = t.strftime("%H:%M:%S")
-        @value = value
+        date_value = t.strftime("%Y-%m-%d")
+        time_value = t.strftime("%H:%M:%S")
+        date.value = date_value
+        time.value = time_value
+        @value = "#{date_value} #{time_value}"
       end
 
       def store

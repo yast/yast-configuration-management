@@ -27,18 +27,19 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
   subject(:datetime) { described_class.new(spec) }
   let(:form_spec) { { "deadline" => { "$type" => "datetime" } } }
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
-
   let(:spec) { form.find_element_by(locator: locator) }
   let(:locator) { locator_from_string(".root.deadline") }
   let(:yast_release) { "#{yast_release_date} #{yast_release_time}" }
   let(:yast_release_date) { "1996-05-01" }
   let(:yast_release_time) { "16:30:00" }
+  let(:date) { datetime.send(:date) }
+  let(:time) { datetime.send(:time) }
   include_examples "CWM::CustomWidget"
 
   describe "#init" do
     context "when the datetime has already a cached value" do
       before do
-        datetime.instance_variable_set("@value", yast_release)
+        datetime.value = yast_release
       end
 
       it "inits the widget value with the cached one" do
@@ -56,13 +57,12 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
   end
 
   describe "value" do
-    it "returns the joined date field and time field values" do
-      date = datetime.send(:date)
-      time = datetime.send(:time)
-
+    before do
       allow(date).to receive(:value).and_return(yast_release_date)
       allow(time).to receive(:value).and_return(yast_release_time)
+    end
 
+    it "returns the joined date field and time field values" do
       expect(datetime.value).to eql(yast_release)
     end
   end
@@ -89,7 +89,8 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
 
     it "caches the value of the date and time fields" do
       subject.value = value
-      expect(subject.instance_variable_get("@value")).to eql(yast_release)
+      expect(subject).to_not receive(:default)
+      subject.init
     end
   end
 

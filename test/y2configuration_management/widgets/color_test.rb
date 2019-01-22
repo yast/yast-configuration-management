@@ -1,5 +1,5 @@
 #!/usr/bin/env rspec
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -48,10 +48,8 @@ describe Y2ConfigurationManagement::Widgets::Color do
     end
 
     context "when no default value was given" do
-      let(:spec) do
-        sp = form.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
+      before do
+        allow(spec).to receive(:default).and_return(nil)
       end
 
       it "initializes the current value to the empty string" do
