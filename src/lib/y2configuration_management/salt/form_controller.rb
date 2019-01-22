@@ -59,7 +59,7 @@ module Y2ConfigurationManagement
       def initialize(form, pillar)
         @form = form
         @pillar = pillar
-        data = FormData.new(form, pillar)
+        data = FormData.from_pillar(form, pillar)
         @state = FormControllerState.new(data)
       end
 
