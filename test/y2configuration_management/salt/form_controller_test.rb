@@ -41,7 +41,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
     instance_double(Y2ConfigurationManagement::Widgets::Form, result: result).as_null_object
   end
   let(:result) { nil }
-  let(:state) { Y2ConfigurationManagement::Salt::FormControllerState.new }
+  let(:state) { Y2ConfigurationManagement::Salt::FormControllerState.new(data) }
 
   before do
     allow(Y2ConfigurationManagement::Salt::FormControllerState).to receive(:new)

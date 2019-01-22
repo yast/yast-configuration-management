@@ -28,11 +28,14 @@ module Y2ConfigurationManagement
     # directly in the FormController instance, but it has been extracted in order to keep the
     # controller as simple as possible.
     class FormControllerState
+      attr_reader :form_data
+
       # Constructor
-      def initialize
+      def initialize(data)
         @form_widgets = []
         @locators = []
         @actions = []
+        @form_data = data
       end
 
       # Registers that a new form has been open

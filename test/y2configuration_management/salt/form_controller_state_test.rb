@@ -22,15 +22,17 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_controller_state"
+require "y2configuration_management/salt/form_data"
 require "y2configuration_management/salt/form_element_locator"
 require "y2configuration_management/widgets/form"
 
 describe Y2ConfigurationManagement::Salt::FormControllerState do
-  subject(:state) { described_class.new }
+  subject(:state) { described_class.new(data) }
   let(:form_widget) { instance_double(Y2ConfigurationManagement::Widgets::Form) }
   let(:locator) { instance_double(Y2ConfigurationManagement::Salt::FormElementLocator) }
   let(:form_widget_1) { instance_double(Y2ConfigurationManagement::Widgets::Form) }
   let(:locator_1) { instance_double(Y2ConfigurationManagement::Salt::FormElementLocator) }
+  let(:data) { instance_double(Y2ConfigurationManagement::Salt::FormData) }
 
   describe "#open_form" do
     it "sets action, locator and element" do
@@ -63,6 +65,12 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
     it "removes the information of the most recent form" do
       state.close_form
       expect(state.action).to eq(:add)
+    end
+  end
+
+  describe "#form_data" do
+    it "returns the form data" do
+      expect(state.form_data).to eq(data)
     end
   end
 end
