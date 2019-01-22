@@ -1,4 +1,4 @@
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -17,13 +17,26 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2configuration_management/widgets/visibility_switcher"
-require "y2configuration_management/widgets/salt_visibility_switcher"
+require "cwm"
 
-require "y2configuration_management/widgets/base_mixin"
-require "y2configuration_management/widgets/boolean"
-require "y2configuration_management/widgets/collection"
-require "y2configuration_management/widgets/group"
-require "y2configuration_management/widgets/select"
-require "y2configuration_management/widgets/text"
-require "y2configuration_management/widgets/form"
+module Y2ConfigurationManagement
+  module Widgets
+    # Salt-forms specific visibility switching
+    module SaltVisibilitySwitcher
+      # @return [FormCondition,nil]
+      attr_reader :visible_if
+
+      def initialize_salt_visibility_switcher(visible_if)
+        @visible_if = visible_if
+      end
+
+      # Automatic invisibility: when the form controller asks us,
+      # we evaluate a condition and update our visibility
+      # @param data [FormData]
+      def update_visibility(data)
+        return unless @visible_if
+        self.visible = @visible_if.evaluate(data)
+      end
+    end
+  end
+end

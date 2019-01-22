@@ -31,7 +31,7 @@ module Y2ConfigurationManagement
       # @return [String,nil] Default value
       attr_reader :default
 
-      include InvisibilityCloak
+      include SaltVisibilitySwitcher
 
       # Constructor
       #

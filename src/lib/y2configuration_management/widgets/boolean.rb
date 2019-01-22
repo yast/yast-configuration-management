@@ -24,16 +24,13 @@ module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a boolean (checkbox) field. TODO: is tristate possible?
-    class Boolean < ::CWM::ReplacePoint
+    class Boolean < VisibilitySwitcher
       include BaseMixin
 
       # @return [Boolean] Default value
       attr_reader :default
 
-      extend Forwardable
-      def_delegators :@inner, :value, :value=
-
-      include InvisibilityCloak
+      include SaltVisibilitySwitcher
 
       # A helper to go inside a ReplacePoint
       class CheckBox < ::CWM::CheckBox
@@ -58,25 +55,14 @@ module Y2ConfigurationManagement
         initialize_base(spec)
         @default = spec.default == true # nil -> false
 
-        @inner = CheckBox.new(id: "boolean:#{spec.id}", label: spec.label)
-        super(id: "vis:#{spec.id}", widget: @inner)
-        initialize_invisibility_cloak(spec.visible_if)
+        inner = CheckBox.new(id: "boolean:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
       end
 
       # @see CWM::AbstractWidget
       def init
-        replace(@inner)
-        self.value = default
-      end
-
-      # Fixup for CWM::ReplacePoint which defaults to non unique ids
-      # @return [UITerm]
-      def contents
-        # In `contents` we must use an Empty Term, otherwise CWMClass
-        # would see an {AbstractWidget} and handle events itself,
-        # which result in double calling of methods like {handle} or {store} for
-        # initial widget.
-        ReplacePoint(Id(widget_id), Empty(Id("empty:#{widget_id}")))
+        super(default)
       end
     end
   end

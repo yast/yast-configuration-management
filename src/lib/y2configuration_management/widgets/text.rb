@@ -24,16 +24,13 @@ module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a simple text field
-    class Text < CWM::ReplacePoint
+    class Text < VisibilitySwitcher
       # @return [String] Default value
       attr_reader :default
 
       include BaseMixin
 
-      extend Forwardable
-      def_delegators :@inner, :value, :value=
-
-      include InvisibilityCloak
+      include SaltVisibilitySwitcher
 
       # A helper to go inside a ReplacePoint
       class InputField < ::CWM::InputField
@@ -58,25 +55,15 @@ module Y2ConfigurationManagement
         initialize_base(spec)
         @default = spec.default.to_s
 
-        @inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
-        super(id: "vis:#{spec.id}", widget: @inner)
-        initialize_invisibility_cloak(spec.visible_if)
-      end
-
-      # @return [UITerm]
-      def contents
-        # CWM::ReplacePoint has ReplacePoint(..., Empty) to prevent
-        # alleged double calls of handlers.
-        # But that means a Form#init will be setting values to widgets
-        # that are not there :-/
-        # So let's include the wrapped widget from the start
-        ReplacePoint(Id(widget_id), @inner)
+        inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
       end
 
       # @see CWM::AbstractWidget
       def init
         saved_value = value
-        replace(@inner)
+        replace(inner)
         self.value = if saved_value.nil? || saved_value.empty?
           default
         else
@@ -86,9 +73,7 @@ module Y2ConfigurationManagement
 
       # @see CWM::ValueBasedWidget
       def value=(val)
-        # FIXME: clashes with forwarding to @inner
-        # super(val.to_s)
-        @inner.value = val.to_s
+        super(val.to_s)
       end
     end
   end

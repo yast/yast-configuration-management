@@ -23,15 +23,29 @@ module Y2ConfigurationManagement
   module Widgets
     # Widgets that can become invisible via the {visible=} method.
     # TODO: the value is discarded; check how it feels, maybe we want to save/restore it.
-    module VisibilitySwitching
+    class VisibilitySwitcher < ::CWM::ReplacePoint
       EMPTY_WIDGET = CWM::Empty.new("ic_empty")
 
+      # @return [Boolean]
       attr_reader :visible
 
-      def initialize_visibility_switching
+      # @return [CWM::AbstractWidget] The wrapped widget
+      attr_reader :inner
+
+      def initialize(id:, widget:)
+        self.widget_id = id
+        @inner = widget
         @visible = true
+
+        # Allow #value= before #init.
+        # Wrap the :value accessor to add an "uninitialized" state
+        # (which the YUI/CWM widget does not have)
+        # so that we can give it a default
+        @value = nil
       end
 
+      # Show or hide the widget, make it visible/invisible
+      # @param visible [Boolean]
       def visible=(visible)
         return if @visible == visible
         @visible = visible
@@ -41,26 +55,29 @@ module Y2ConfigurationManagement
           replace(EMPTY_WIDGET)
         end
       end
-    end
 
-    # Salt forms specific visibility switching
-    module InvisibilityCloak
-      include VisibilitySwitching
-
-      # @return [FormCondition,nil]
-      attr_reader :visible_if
-
-      def initialize_invisibility_cloak(visible_if)
-        initialize_visibility_switching
-        @visible_if = visible_if
+      def value
+        @value = @inner.value
       end
 
-      # Automatic invisibility: when the form controller asks us,
-      # we evaluate a condition and update our visibility
-      # @param data [FormData]
-      def update_visibility(data)
-        return unless @visible_if
-        self.visible = @visible_if.evaluate(data)
+      def value=(value)
+        @value = value
+        @inner.value = value
+      end
+
+      # @return [UITerm]
+      def contents
+        # CWM::ReplacePoint has ReplacePoint(..., Empty) to prevent
+        # alleged double calls of handlers.
+        # But that means a Form#init will be setting values to widgets
+        # that are not there :-/
+        # So let's include the wrapped widget from the start
+        ReplacePoint(Id(widget_id), @inner)
+      end
+
+      def init(value = nil)
+        replace(@inner)
+        self.value = value.nil? ? @value : value
       end
     end
   end
