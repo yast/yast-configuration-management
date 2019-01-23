@@ -24,15 +24,18 @@ require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_controller_state"
 require "y2configuration_management/salt/form_data"
 require "y2configuration_management/salt/form_element_locator"
+require "y2configuration_management/salt/pillar"
 require "y2configuration_management/widgets/form"
 
 describe Y2ConfigurationManagement::Salt::FormControllerState do
   subject(:state) { described_class.new(data) }
   let(:form_widget) { instance_double(Y2ConfigurationManagement::Widgets::Form) }
-  let(:locator) { instance_double(Y2ConfigurationManagement::Salt::FormElementLocator) }
   let(:form_widget_1) { instance_double(Y2ConfigurationManagement::Widgets::Form) }
-  let(:locator_1) { instance_double(Y2ConfigurationManagement::Salt::FormElementLocator) }
-  let(:data) { instance_double(Y2ConfigurationManagement::Salt::FormData) }
+  let(:locator) { locator_from_string(".root.person") }
+  let(:locator_1) { locator_from_string(".root.person.computers[0].brand") }
+  let(:form) { Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml")) }
+  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new }
+  let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
 
   describe "#open_form" do
     it "sets action, locator and element" do
@@ -66,27 +69,27 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
       state.close_form
       expect(state.action).to eq(:add)
     end
+
+    context "when asked for rollback" do
+      it "restores the form data backup" do
+        state.form_data.update(locator_1, "Dell")
+        state.close_form(rollback: true)
+        expect(state.form_data.get(locator_1)).to eq("ACME")
+      end
+    end
+
+    context "when not asked for rollback" do
+      it "keeps the most recent form data" do
+        state.form_data.update(locator_1, "ACME")
+        state.close_form(rollback: false)
+        expect(state.form_data.get(locator_1)).to eq("ACME")
+      end
+    end
   end
 
   describe "#form_data" do
     it "returns the form data" do
       expect(state.form_data).to eq(data)
-    end
-  end
-
-  describe "#restore_backup" do
-    let(:new_data) do
-      instance_double(Y2ConfigurationManagement::Salt::FormData)
-    end
-
-    before do
-      allow(data).to receive(:copy).and_return(new_data)
-      state.backup_data
-    end
-
-    it "restores the previously version of the form data" do
-      expect { state.restore_backup }.to change { state.form_data }
-        .from(new_data).to(data)
     end
   end
 end
