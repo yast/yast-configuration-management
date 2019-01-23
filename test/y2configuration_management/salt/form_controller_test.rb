@@ -215,8 +215,10 @@ describe Y2ConfigurationManagement::Salt::FormController do
     let(:element_locator) { locator_from_string(".person.computers[1]") }
 
     it "removes an element" do
-      expect(data).to receive(:remove_item).with(locator_from_string(".root.person.computers[1]"))
-      controller.remove(element_locator)
+      expect { controller.remove(element_locator) }
+        .to change { controller.get(locator_from_string(".root.person.computers[1]")) }
+        .from(Hash)
+        .to(nil)
     end
   end
 
