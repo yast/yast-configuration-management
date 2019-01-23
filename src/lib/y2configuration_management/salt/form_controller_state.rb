@@ -115,6 +115,8 @@ module Y2ConfigurationManagement
 
       # Clears the last backup if it exists
       def remove_backup
+        # This is another way of saying `top = @fdi.pop; @fdi.last = top`,
+        # or "shorten the snapshot stack but commit the last element"
         @form_data_instances.delete_at(-2)
       end
     end
