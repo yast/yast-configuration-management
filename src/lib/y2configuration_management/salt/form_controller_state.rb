@@ -35,7 +35,7 @@ module Y2ConfigurationManagement
         @form_widgets = []
         @locators = []
         @actions = []
-        @form_data_instances = [data]
+        @form_data_snapshots = [data]
       end
 
       # Registers that a new form has been open
@@ -98,26 +98,29 @@ module Y2ConfigurationManagement
       #
       # @return [FormData]
       def form_data
-        @form_data_instances.last
+        @form_data_snapshots.last
       end
 
     private
 
       # Performs a backup of the current form data
       def backup_data
-        @form_data_instances << form_data.copy
+        @form_data_snapshots << form_data.copy
       end
 
       # Restores the last backup of the current form data by removing the current snapshot
       def restore_backup
-        @form_data_instances.pop
+        @form_data_snapshots.pop
       end
+
+      # @return [Integer] Position of the previous backup
+      PREVIOUS_SNAPSHOT_POSITION = -2
 
       # Clears the last backup if it exists
       def remove_backup
         # This is another way of saying `top = @fdi.pop; @fdi.last = top`,
         # or "shorten the snapshot stack but commit the last element"
-        @form_data_instances.delete_at(-2)
+        @form_data_snapshots.delete_at(PREVIOUS_SNAPSHOT_POSITION)
       end
     end
   end
