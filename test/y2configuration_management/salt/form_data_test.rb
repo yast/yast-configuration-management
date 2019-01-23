@@ -154,8 +154,15 @@ describe Y2ConfigurationManagement::Salt::FormData do
   describe "#copy" do
     it "returns a deep-copy of the object" do
       copy = form_data.copy
-      expect(copy).to_not be(form_data)
+      # the copy looks the same
       expect(copy.to_h).to eq(form_data.to_h)
+      # but *is* not the same at the top
+      expect(copy).to_not be(form_data)
+      # ... nor at a lower level
+      locator = locator_from_string(".root.person.name")
+      malkovich = "John Malkovich"
+      form_data.update_item(locator, malkovich)
+      expect(copy.get(locator)).to_not eq(malkovich)
     end
   end
 end
