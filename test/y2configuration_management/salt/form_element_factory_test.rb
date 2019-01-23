@@ -52,7 +52,7 @@ describe Y2ConfigurationManagement::Salt::FormElementFactory do
       let(:spec) do
         {
           "$type" => "group",
-          "name" => { "$type" => "text" }
+          "name"  => { "$type" => "text" }
         }
       end
 
@@ -67,7 +67,7 @@ describe Y2ConfigurationManagement::Salt::FormElementFactory do
       let(:spec) do
         {
           "$type" => "namespace",
-          "name" => { "$type" => "text" }
+          "name"  => { "$type" => "text" }
         }
       end
 
@@ -81,9 +81,9 @@ describe Y2ConfigurationManagement::Salt::FormElementFactory do
     context "when the type is not specified" do
       context "and more than 1 field is defined" do
         let(:spec) do
-          { 
+          {
 
-            "name" => { "$type" => "text" },
+            "name"  => { "$type" => "text" },
             "email" => { "$type" => "text" }
           }
         end
@@ -107,4 +107,3 @@ describe Y2ConfigurationManagement::Salt::FormElementFactory do
     end
   end
 end
-
