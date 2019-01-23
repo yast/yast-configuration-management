@@ -54,9 +54,9 @@ module Y2ConfigurationManagement
             context = context.parent
           end
         else
-          context = FormElementLocator.new(["root"])
+          context = FormElementLocator.new([:root])
         end
-        s_parts = s.split "#"
+        s_parts = s.split("#").map(&:to_sym)
         context.join(* s_parts)
       end
 

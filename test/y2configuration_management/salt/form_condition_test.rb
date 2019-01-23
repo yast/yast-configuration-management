@@ -25,7 +25,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
     Y2ConfigurationManagement::Salt::FormElementLocator.new(*args)
   end
 
-  let(:context) { locator_new(["root", "foo", "bar"]) }
+  let(:context) { locator_new([:root, :foo, :bar]) }
 
   describe ".parse" do
     it "parses the empty string as a nil condition" do
@@ -40,12 +40,12 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
   describe ".parse_locator" do
     it "parses a .relative locator" do
       expect(described_class.parse_locator(".baz", context))
-        .to eq(locator_new(["root", "foo", "baz"]))
+        .to eq(locator_new([:root, :foo, :baz]))
     end
 
     it "parses a ..relative locator" do
       expect(described_class.parse_locator("..qux", context))
-        .to eq(locator_new(["root", "qux"]))
+        .to eq(locator_new([:root, :qux]))
     end
   end
 
@@ -72,7 +72,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
       it "compares the string representations" do
         cond = described_class.parse("myform#mywidget == '42'", context: context)
         data = double("form data")
-        expect(data).to receive(:get).with(locator_new(["root", "myform", "mywidget"]))
+        expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
           .and_return(42)
         expect(cond.evaluate(data)).to eq(true)
       end
@@ -84,7 +84,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
       it "compares the string representations" do
         cond = described_class.parse("myform#mywidget != '42'", context: context)
         data = double("form data")
-        expect(data).to receive(:get).with(locator_new(["root", "myform", "mywidget"]))
+        expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
           .and_return(42)
         expect(cond.evaluate(data)).to eq(false)
       end
