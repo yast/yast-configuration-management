@@ -1,4 +1,4 @@
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -21,54 +21,25 @@ require "cwm"
 require "y2configuration_management/widgets/base_mixin"
 
 module Y2ConfigurationManagement
-  # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
-    # This class represents a simple text field
-    class Text < VisibilitySwitcher
-      # @return [String] Default value
-      attr_reader :default
-
+    # This class represents a simple password field
+    class Password < ::CWM::Password
       include BaseMixin
 
-      include SaltVisibilitySwitcher
-
-      # A helper to go inside a ReplacePoint
-      class InputField < ::CWM::InputField
-        # @return [String] Widget label
-        attr_reader :label
-
-        def initialize(id:, label:)
-          self.widget_id = id
-          @label = label
-        end
-
-        # TODO: only if I am mentioned in a visible_if
-        def opt
-          [:notify]
-        end
-      end
+      attr_reader :default
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
+      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
       def initialize(spec)
         initialize_base(spec)
         @default = spec.default.to_s
-
-        inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
-        super(id: "vis:#{spec.id}", widget: inner)
-        initialize_salt_visibility_switcher(spec.visible_if)
+        self.widget_id = "password:#{spec.id}"
       end
 
       # @see CWM::AbstractWidget
       def init
-        saved_value = value
-        replace(inner)
-        self.value = if saved_value.nil? || saved_value.empty?
-          default
-        else
-          saved_value
-        end
+        self.value = default if value.nil? || value.empty?
       end
 
       # @see CWM::ValueBasedWidget

@@ -26,6 +26,20 @@ module Y2ConfigurationManagement
     # For further information, see the forms specification at
     # https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html
     class FormBuilder
+      INPUT_WIDGET_CLASS = {
+        color:    Y2ConfigurationManagement::Widgets::Color,
+        text:     Y2ConfigurationManagement::Widgets::Text,
+        number:   Y2ConfigurationManagement::Widgets::Text,
+        email:    Y2ConfigurationManagement::Widgets::Email,
+        password: Y2ConfigurationManagement::Widgets::Password,
+        url:      Y2ConfigurationManagement::Widgets::URL,
+        select:   Y2ConfigurationManagement::Widgets::Select,
+        boolean:  Y2ConfigurationManagement::Widgets::Boolean,
+        date:     Y2ConfigurationManagement::Widgets::Date,
+        datetime: Y2ConfigurationManagement::Widgets::DateTime,
+        time:     Y2ConfigurationManagement::Widgets::Time
+      }.freeze
+
       # Constructor
       #
       # @param controller [FormController] Controller to inject in widgets
@@ -67,10 +81,8 @@ module Y2ConfigurationManagement
           build_group(element)
         when :"edit-group"
           build_collection(element)
-        when :text, :email, :number, :select, :boolean
+        when *INPUT_WIDGET_CLASS.keys
           build_input(element)
-        when :password, :url, :date, :time, :datetime, :color
-          raise "Known but unimplemented $type: #{element.type}, sorry"
         else
           raise "Unknown $type: #{element.type}"
         end
@@ -94,15 +106,7 @@ module Y2ConfigurationManagement
       # @param input_spec [Hash] Group specification
       # @return [Y2ConfigurationManagement::Widgets::Text]
       def build_input(input_spec)
-        klass =
-          case input_spec.type
-          when :text, :email, :number
-            Y2ConfigurationManagement::Widgets::Text
-          when :select
-            Y2ConfigurationManagement::Widgets::Select
-          when :boolean
-            Y2ConfigurationManagement::Widgets::Boolean
-          end
+        klass = INPUT_WIDGET_CLASS[input_spec.type]
         klass.new(input_spec)
       end
 
