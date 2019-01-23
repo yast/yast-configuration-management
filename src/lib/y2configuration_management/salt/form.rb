@@ -20,6 +20,7 @@
 require "yaml"
 require "yast"
 require "y2configuration_management/salt/form_element_locator"
+require "y2configuration_management/salt/form_element_factory"
 
 module Y2ConfigurationManagement
   module Salt
@@ -71,32 +72,6 @@ module Y2ConfigurationManagement
       # @return [FormElement, nil]
       def find_element_by(arg)
         root.find_element_by(arg)
-      end
-    end
-
-    # It builds new {FormElement}s depending on its specification type
-    class FormElementFactory
-      # Builds a new FormElement object based on the element specification and
-      # maintaining a reference to its parent
-      #
-      # @param id [String]
-      # @param spec [Hash]
-      # @param parent [FormElement]
-      def self.build(id, spec, parent:)
-        class_for(spec["$type"]).new(id, spec, parent: parent)
-      end
-
-      # @param type [String]
-      # @return [FormElement]
-      def self.class_for(type)
-        case type
-        when "namespace", "hidden-group", "group"
-          Container
-        when "edit-group"
-          Collection
-        else
-          FormInput
-        end
       end
     end
 
