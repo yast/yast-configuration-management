@@ -17,33 +17,36 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2configuration_management/salt/pillar"
+require "y2configuration_management/salt/form_data_reader"
 
 module Y2ConfigurationManagement
   module Salt
     # This class holds data for a given Salt Formula Form
-    #
-    # @todo The support for collections is rather simple and nesting collections is not supported.
-    #       We might consider using JSON Patch to modify the data.
     class FormData
       # @return [Y2ConfigurationManagement::Salt::Form] Form
       attr_reader :form
-      # @return [Y2ConfigurationManagement::Salt::Pillar] Pillar
-      attr_reader :pillar
+
+      class << self
+        # @param form   [Form] Form definition
+        # @param pillar [Pillar] Pillar to read the data from
+        # @return [FormData] Form data merging defaults and pillar values
+        def from_pillar(form, pillar)
+          FormDataReader.new(form, pillar).form_data
+        end
+      end
 
       # Constructor
       #
-      # @param form [Y2ConfigurationManagement::Salt::Form] Form
-      # @param pillar [Y2ConfigurationManagement::Salt::Form] Pillar
-      def initialize(form, pillar = Pillar.new(data: {}))
-        @data = data_for_form(form, pillar.data)
+      # @param form [Form] Form definition
+      # @param data [Hash] Initial data in hash form
+      def initialize(form, initial = {})
         @form = form
-        @pillar = pillar
+        @data = initial
       end
 
       # Returns the value of a given element
       #
-      # @param locator [String] Locator of the element
+      # @param locator [FormElementLocator] Locator of the element
       def get(locator)
         find_by_locator(@data, locator) || default_for(locator)
       end
@@ -88,13 +91,20 @@ module Y2ConfigurationManagement
         data_for_pillar(@data)
       end
 
+      # Returns a copy of this object
+      #
+      # @return [FormData]
+      def copy
+        self.class.new(form, Marshal.load(Marshal.dump(@data)))
+      end
+
     private
 
       # Recursively finds a value
       #
       # @param data    [Hash,Array] Data structure to search for the value
       # @param locator [FormElementLocator] Value locator
-      # @return [Object] Value
+      # @return [Object,nil] Found value; nil if no value was found for the given locator
       def find_by_locator(data, locator)
         return nil if data.nil?
         return data if locator.first.nil?
@@ -114,62 +124,6 @@ module Y2ConfigurationManagement
       def default_for(locator)
         element = form.find_element_by(locator: locator)
         element ? element.default : nil
-      end
-
-      # Builds a hash to keep the form data
-      #
-      # @param form [Y2ConfigurationManagement::Salt::Form]
-      # @param data [Hash] Pillar data
-      # @return [Hash]
-      def data_for_form(form, data)
-        data_for_element(form.root, data)
-      end
-
-      # Builds a hash to keep the form element data
-      #
-      # @param element [Y2ConfigurationManagement::Salt::FormElement]
-      # @param data [Hash] Pillar data
-      # @return [Hash]
-      def data_for_element(element, data)
-        if element.is_a?(Container)
-          defaults = element.elements.reduce({}) { |a, e| a.merge(data_for_element(e, data)) }
-          { element.id => defaults }
-        else
-          value = find_in_pillar_data(data, element.locator.rest) # FIXME: remove '.root'
-          value ||= element.default
-          { element.id => data_from_pillar_collection(value, element) }
-        end
-      end
-
-      # Converts from a Pillar collection into form data
-      #
-      # Basically, a collection might be an array or a hash. The internal representation, however,
-      # is always an array, so it is needed to do the conversion.
-      #
-      # @param element [Y2ConfigurationManagement::Salt::FormElement]
-      # @param value   [Array,Hash]
-      # @return
-      def data_from_pillar_collection(collection, element)
-        return nil if collection.nil?
-        return collection unless element.respond_to?(:keyed?) && element.keyed?
-        collection.map do |k, v|
-          { "$key" => k }.merge(v)
-        end
-      end
-
-      # Finds a value within a Pillar
-      #
-      # @todo This API might be available through the Pillar class.
-      #
-      # @param data    [Hash,Array] Data structure from the Pillar
-      # @param locator [FormElementLocator] Value locator
-      # @return [Object] Value
-      def find_in_pillar_data(data, locator)
-        return nil if data.nil?
-        return data if locator.first.nil?
-        key = locator.first
-        key = key.is_a?(Symbol) ? key.to_s : key
-        find_in_pillar_data(data[key], locator.rest)
       end
 
       # Returns data in a format to be used by the Pillar

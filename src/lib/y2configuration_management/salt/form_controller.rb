@@ -57,10 +57,10 @@ module Y2ConfigurationManagement
       # @param form [Y2ConfigurationManagement::Salt::Form]
       # @param pillar [Y2ConfigurationManagement::Salt::Pillar]
       def initialize(form, pillar)
-        @data = FormData.new(form, pillar)
         @form = form
         @pillar = pillar
-        @state = FormControllerState.new
+        data = FormData.from_pillar(form, pillar)
+        @state = FormControllerState.new(data)
       end
 
       # Renders the main form's dialog
@@ -83,7 +83,7 @@ module Y2ConfigurationManagement
       #
       # @param locator [String] Locator of the element
       def get(locator)
-        @data.get(locator)
+        form_data.get(locator)
       end
 
       # Opens a new dialog in order to add a new element to a collection
@@ -105,7 +105,7 @@ module Y2ConfigurationManagement
       # @param relative_locator [FormElementLocator] Elements's locator
       def remove(relative_locator)
         locator = state.locator.join(relative_locator)
-        @data.remove_item(locator)
+        form_data.remove_item(locator)
         refresh_top_form
       end
 
@@ -149,8 +149,8 @@ module Y2ConfigurationManagement
       #   version.
       def next_handler
         state.form_widget.store
-        data.update(form.root.locator, state.form_widget.result)
-        pillar.data = data.to_h.fetch("root", {})
+        form_data.update(form.root.locator, state.form_widget.result)
+        pillar.data = form_data.to_h.fetch("root", {})
         puts pillar.dump
         true
       end
@@ -167,7 +167,7 @@ module Y2ConfigurationManagement
         add_or_update_parent
         result = run_popup(action, relative_locator)
         update_form_data(result)
-        state.close_form
+        state.close_form(rollback: result.nil?)
         refresh_top_form
       end
 
@@ -186,13 +186,16 @@ module Y2ConfigurationManagement
 
       # Updates the form data depending on the action
       #
+      # When result is `nil`, it just restores the backup.
+      #
       # @param result [Hash,nil] Result to process
       def update_form_data(result)
-        return if result.nil?
+        return nil if result.nil?
+
         if state.action == :add
-          @data.add_item(state.locator, result)
+          form_data.add_item(state.locator, result)
         else
-          @data.update(state.locator, result)
+          form_data.update(state.locator, result)
         end
       end
 
@@ -205,9 +208,9 @@ module Y2ConfigurationManagement
         parent = state.form_widget.result
 
         if state.action == :edit
-          @data.update(state.locator, parent)
+          form_data.update(state.locator, parent)
         else
-          @data.add_item(state.locator, parent)
+          form_data.add_item(state.locator, parent)
           locator = state.locator.join(get(state.locator).size - 1)
           state.replace(:edit, locator)
         end
@@ -222,6 +225,13 @@ module Y2ConfigurationManagement
         form_widget = form_builder.build(element.prototype)
         form_widget.title = element.name
         form_widget
+      end
+
+      # Returns the current form data
+      #
+      # @return [FormData] Form data
+      def form_data
+        @state.form_data
       end
     end
   end

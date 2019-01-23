@@ -53,6 +53,11 @@ describe Y2ConfigurationManagement::Widgets::Form do
     it "sets the widget's value" do
       expect { form.refresh(new_val) }.to change { form.value }.to(new_val)
     end
+
+    it "resets the widget's result" do
+      form.store
+      expect { form.refresh(new_val) }.to change { form.result }.from(Hash).to(nil)
+    end
   end
 
   describe "#store" do

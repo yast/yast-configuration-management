@@ -109,6 +109,7 @@ module Y2ConfigurationManagement
       # @param values [Hash] New values
       def refresh(values)
         self.value = values
+        @result = nil
         set_children_contents
       end
 
