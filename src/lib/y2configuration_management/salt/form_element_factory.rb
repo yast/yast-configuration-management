@@ -26,19 +26,25 @@ module Y2ConfigurationManagement
   module Salt
     # It builds new {FormElement}s depending on its specification type
     class FormElementFactory
+      class << self
+        def build(id, spec, parent: nil)
+          new.build(id, spec, parent: parent)
+        end
+      end
+
       # Builds a new FormElement object based on the element specification and
       # maintaining a reference to its parent
       #
       # @param id [String]
       # @param spec [Hash]
       # @param parent [FormElement]
-      def self.build(id, spec, parent:)
+      def build(id, spec, parent: nil)
         class_for(spec["$type"]).new(id, spec, parent: parent)
       end
 
       # @param type [String]
       # @return [FormElement]
-      def self.class_for(type)
+      def class_for(type)
         case type
         when "namespace", "hidden-group", "group"
           Container
