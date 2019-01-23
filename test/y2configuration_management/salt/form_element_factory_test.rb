@@ -77,6 +77,34 @@ describe Y2ConfigurationManagement::Salt::FormElementFactory do
         expect(element.id).to eq("field")
       end
     end
+
+    context "when the type is not specified" do
+      context "and more than 1 field is defined" do
+        let(:spec) do
+          { 
+
+            "name" => { "$type" => "text" },
+            "email" => { "$type" => "text" }
+          }
+        end
+
+        it "returns a container element" do
+          element = factory.build("field", spec)
+          expect(element).to be_a(Y2ConfigurationManagement::Salt::Container)
+        end
+      end
+
+      context "and just 1 field is defined" do
+        let(:spec) do
+          { "name" => { "$type" => "text" } }
+        end
+
+        it "returns a FormInput element" do
+          element = factory.build("field", spec)
+          expect(element).to be_a(Y2ConfigurationManagement::Salt::FormInput)
+        end
+      end
+    end
   end
 end
 

@@ -21,12 +21,20 @@
 
 require "yast"
 require "y2configuration_management/salt/form"
+require "y2configuration_management/salt/form_element_helpers"
 
 module Y2ConfigurationManagement
   module Salt
     # It builds new {FormElement}s depending on its specification type
     class FormElementFactory
+      include FormElementHelpers
+
       class << self
+        # Builds a new FormElement object based on the element specification
+        #
+        # This is a convenience method which relies on {FormElementFactory#build}.
+        #
+        # @see FormElementFactory#build
         def build(id, spec, parent: nil)
           new.build(id, spec, parent: parent)
         end
@@ -39,8 +47,11 @@ module Y2ConfigurationManagement
       # @param spec [Hash]
       # @param parent [FormElement]
       def build(id, spec, parent: nil)
-        class_for(spec["$type"]).new(id, spec, parent: parent)
+        type = type_for(spec)
+        class_for(type).new(id, spec, parent: parent)
       end
+
+    private
 
       # @param type [String]
       # @return [FormElement]
@@ -53,6 +64,17 @@ module Y2ConfigurationManagement
         else
           FormInput
         end
+      end
+
+      # Returns the type for a given form element specification
+      #
+      # When no type is specified, it tries to infer the right one.
+      #
+      # @param spec [Hash] Form element specification
+      # @return [String] Form element type
+      def type_for(spec)
+        return spec["$type"] if spec.key?("$type")
+        form_elements_in(spec).size > 1 ? "group" : "text"
       end
     end
   end
