@@ -81,7 +81,7 @@ module Y2ConfigurationManagement
 
       def update_visibility(data)
         children.each do |widget|
-          widget.update_visibility(data)
+          widget.update_visibility(data) if widget.respond_to? :update_visibility
         end
       end
 
