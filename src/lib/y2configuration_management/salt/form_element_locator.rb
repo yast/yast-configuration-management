@@ -25,12 +25,22 @@ module Y2ConfigurationManagement
   module Salt
     # Represent the locator to a form element
     #
-    # The locator can be seen as a path to the form element.
+    # The locator can be seen as a path to the form element. In a human readable form, the locator
+    # looks like: ".root.person.computers[1]" or ".root.hosts[router]".
     #
-    # @example Building a locator from a string
+    # @example Building a locator from a string for an array based collection
     #   locator = FormElementLocator.from_string(".root.person.computers[1]")
     #   locator.to_s  #=> ".root.person.computers[1]"
-    #   locator.parts #=> ["root", "person", "computers", 1]
+    #   locator.parts #=> [:root, :person, :computers, 1]
+    #
+    # @example Building a locator from a string for a hash based collection
+    #   locator = FormElementLocator.from_string(".root.hosts[router]")
+    #   locator.to_s  #=> ".root.hosts[router]"
+    #   locator.parts #=> [:root, :hosts, "router"]
+    #
+    # @example Building a locator from its parts
+    #   locator = FormElementLocator.new(:root, :hosts, "router")
+    #   locator.to_s #=> ".root.hosts[router]"
     class FormElementLocator
       extend Forwardable
 
@@ -38,6 +48,8 @@ module Y2ConfigurationManagement
 
       class << self
         # Builds a locator from a string
+        #
+        # @todo Support specifying dots within hash keys (e.g. `.hosts[download.opensuse.org]`).
         #
         # @param string [String] String representing an element locator
         # @return [FormElementLocator]
@@ -51,25 +63,33 @@ module Y2ConfigurationManagement
       private
 
         # @return [Regexp] Regular expression representing a locator part
-        INDEXED_PART = /\A(\w+)\[(\d+)\]\z/
+        INDEXED_PART = /\A(\w+)\[(.+)\]\z/
 
         # Parses a locator part
         #
         # @param string [String]
-        # @return [Array<String,Integer>] Locator subparts
+        # @return [Array<Integer,String,Symbol>] Locator subparts
         def from_part(string)
           match = INDEXED_PART.match(string)
-          return [string] unless match
-          [match[1], match[2].to_i]
+          return [string.to_sym] unless match
+          path, id = match[1..-1]
+          numeric_id?(id) ? [path.to_sym, id.to_i] : [path.to_sym, id]
+        end
+
+        # Determines whether the id is numeric or not
+        #
+        # @return [Boolean]
+        def numeric_id?(id)
+          id =~ /\A\d+\z/
         end
       end
 
-      # @return [Array<Integer,String>] Locator parts
+      # @return [Array<Integer,String,Symbol>] Locator parts
       attr_reader :parts
 
       # Constructor
       #
-      # @param parts [Array<Integer,String>] Locator parts
+      # @param parts [Array<Integer,String,Symbol>] Locator parts
       def initialize(parts)
         @parts = parts
       end
@@ -100,7 +120,8 @@ module Y2ConfigurationManagement
 
       # Extends a locator
       #
-      # @param locators_or_parts [FormElementLocator,String,Integer] Parts or locators to join
+      # @param locators_or_parts [FormElementLocator,Integer,String,Symbol] Parts or locators
+      #   to join
       # @return [Locator] Augmented locator
       def join(*locators_or_parts)
         new_parts = locators_or_parts.reduce([]) do |all, item|

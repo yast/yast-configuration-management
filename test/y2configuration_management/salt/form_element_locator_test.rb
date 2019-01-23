@@ -24,13 +24,13 @@ require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_element_locator"
 
 describe Y2ConfigurationManagement::Salt::FormElementLocator do
-  subject(:locator) { described_class.new(["root", "hosts", 1, "interfaces", 3]) }
+  subject(:locator) { described_class.new([:root, :hosts, 1, :interfaces, 3]) }
 
   describe "#from_string" do
     it "extracts the parts" do
-      locator = described_class.from_string(".root.person.computers[2].model")
+      locator = described_class.from_string(".root.person.computers[2].interfaces[eth0]")
       expect(locator.parts).to eq(
-        ["root", "person", "computers", 2, "model"]
+        [:root, :person, :computers, 2, :interfaces, "eth0"]
       )
     end
   end
@@ -43,7 +43,7 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
   describe "#first" do
     it "returns the first part of the locator" do
-      expect(locator.first).to eq("root")
+      expect(locator.first).to eq(:root)
     end
   end
 
@@ -61,13 +61,13 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
   describe "#join" do
     it "returns a new locator including the given parts" do
-      address_locator = locator.join("address", "type")
-      expect(address_locator.parts).to eq(["root", "hosts", 1, "interfaces", 3, "address", "type"])
+      address_locator = locator.join(:address, :type)
+      expect(address_locator.parts).to eq([:root, :hosts, 1, :interfaces, 3, :address, :type])
     end
 
     it "returns a new locator adding the given locator" do
       address_locator = locator.join(locator_from_string(".address.type"))
-      expect(address_locator.parts).to eq(["root", "hosts", 1, "interfaces", 3, "address", "type"])
+      expect(address_locator.parts).to eq([:root, :hosts, 1, :interfaces, 3, :address, :type])
     end
   end
 
