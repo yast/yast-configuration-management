@@ -43,7 +43,7 @@ module Y2ConfigurationManagement
       #
       # @return [FormElementLocator] Form element locator
       def relative_locator
-        return parent.relative_locator.join(id) if respond_to?(:parent) && parent
+        return parent.relative_locator.join(id.to_sym) if respond_to?(:parent) && parent
         Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
     end

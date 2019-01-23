@@ -141,9 +141,9 @@ module Y2ConfigurationManagement
       #
       # @return [String]
       def locator
-        return FormElementLocator.new([id]) if parent.nil?
+        return FormElementLocator.new([id.to_sym]) if parent.nil?
         return parent.locator if parent.is_a?(Collection)
-        parent.locator.join(id)
+        parent.locator.join(id.to_sym)
       end
 
     private
@@ -187,6 +187,16 @@ module Y2ConfigurationManagement
         return self if arg.any? { |k, v| public_send(k) == v }
         nil
       end
+
+      # Determines whether the input is a collection key
+      #
+      # In hash based collections, there is an special attribute called `$key` whose value is used
+      # as collection index.
+      #
+      # @return [Boolean]
+      def collection_key?
+        id == "$key"
+      end
     end
 
     # Container Element
@@ -228,9 +238,20 @@ module Y2ConfigurationManagement
 
       # @param spec [Hash] form element specification
       def build_elements(spec)
-        spec.select { |k, _v| !k.start_with?("$") }.each do |id, nested_spec|
+        form_elements_in(spec).each do |id, nested_spec|
           @elements << FormElementFactory.build(id, nested_spec, parent: self)
         end
+      end
+
+      # Determines which part of the given spec refers to a form element
+      #
+      # Usually, all elements whose name starts with `$` are supposed to be metadata, except the
+      # special `$key` element which is considered an form input.
+      #
+      # @param spec [Hash] form element specification
+      # @return [Array<Hash>]
+      def form_elements_in(spec)
+        spec.select { |k, _v| !k.start_with?("$") || k == "$key" }
       end
     end
 
@@ -279,6 +300,14 @@ module Y2ConfigurationManagement
         end
 
         nil
+      end
+
+      # Determines whether the collection is indexed by a key (instead of a numeric index)
+      #
+      # @return [Boolean] true if the collection uses a key; false otherwise
+      def keyed?
+        return false if prototype.nil? || !prototype.respond_to?(:elements)
+        prototype.elements.any? { |e| e.respond_to?(:collection_key?) && e.collection_key? }
       end
 
     private

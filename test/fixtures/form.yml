@@ -65,3 +65,18 @@ person:
               - SSD
           size:
             "$type": text
+  projects:
+    "$type": edit-group
+    "$minItems": 1
+    "$name": Project
+    "$itemName": ${i} project
+    "$default":
+      yast2:
+        url: https://yast.opensuse.org
+    "$prototype":
+      "$type": group
+      "$key":
+        "$type": text
+        "$name": Project name
+      url:
+        "$type": text
