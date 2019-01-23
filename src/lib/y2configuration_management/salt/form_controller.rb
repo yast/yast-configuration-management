@@ -165,10 +165,9 @@ module Y2ConfigurationManagement
       # @return [Hash,nil] edited data; `nil` when the user cancels the dialog
       def add_or_edit_item(action, relative_locator)
         add_or_update_parent
-        state.backup_data
         result = run_popup(action, relative_locator)
         update_form_data(result)
-        state.close_form
+        state.close_form(rollback: result.nil?)
         refresh_top_form
       end
 
@@ -191,18 +190,13 @@ module Y2ConfigurationManagement
       #
       # @param result [Hash,nil] Result to process
       def update_form_data(result)
-        if result.nil?
-          state.restore_backup
-          return nil
-        end
+        return nil if result.nil?
 
         if state.action == :add
           form_data.add_item(state.locator, result)
         else
           form_data.update(state.locator, result)
         end
-
-        state.remove_backup
       end
 
       # Adds or updates the parent of a collection item

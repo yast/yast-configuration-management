@@ -49,6 +49,7 @@ module Y2ConfigurationManagement
         @form_widgets << form_widget
         @locators << locator
         @actions << action
+        backup_data
       end
 
       # Most recently open form widget
@@ -82,10 +83,15 @@ module Y2ConfigurationManagement
       end
 
       # Removes the information related to the most recently open form widget
-      def close_form
+      def close_form(rollback: false)
         @form_widgets.pop
         @locators.pop
         @actions.pop
+        if rollback
+          restore_backup
+        else
+          remove_backup
+        end
       end
 
       # Current form data
@@ -95,19 +101,21 @@ module Y2ConfigurationManagement
         @form_data_instances.last
       end
 
+    private
+
       # Performs a backup of the current form data
       def backup_data
         @form_data_instances << form_data.copy
       end
 
-      # Restores the last backup of the current form data
+      # Restores the last backup of the current form data by removing the current snapshot
       def restore_backup
-        @form_data_instances.pop unless @form_data_instances.size <= 1
+        @form_data_instances.pop
       end
 
       # Clears the last backup if it exists
       def remove_backup
-        @form_data_instances.delete_at(-2) if @form_data_instances.size > 1
+        @form_data_instances.delete_at(-2)
       end
     end
   end
