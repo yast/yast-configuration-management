@@ -27,6 +27,7 @@ module Y2ConfigurationManagement
 
       # @param s [String]
       # @param context [FormElementLocator] for resolving relative expressions
+      # @return [FormCondition,nil]
       def self.parse(s, context:)
         if s.empty?
           nil
@@ -47,6 +48,9 @@ module Y2ConfigurationManagement
         end
       end
 
+      # @param s [String]
+      # @param context [FormElementLocator] for resolving relative expressions
+      # @return [FormElementLocator]
       def self.parse_locator(s, context)
         if s.start_with? "."
           while s.start_with? "."
@@ -60,6 +64,8 @@ module Y2ConfigurationManagement
         context.join(* s_parts)
       end
 
+      # @param s [String]
+      # @return [String] (conditions compare stringified values)
       def self.parse_value(s)
         if (s[0] == "'" && s[-1] == "'") || (s[0] == "\"" && s[-1] == "\"")
           s[1..-2]
