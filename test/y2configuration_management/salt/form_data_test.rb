@@ -20,14 +20,15 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/form_data"
-require "y2configuration_management/salt/form_element_locator"
+require "y2configuration_management/salt/pillar"
 
 describe Y2ConfigurationManagement::Salt::FormData do
-  subject(:form_data) { described_class.new(form) }
+  subject(:form_data) { described_class.from_pillar(form, pillar) }
 
   let(:form) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
+  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new(data: {}) }
 
   describe "#get" do
     context "when the value has not been set" do
@@ -147,6 +148,21 @@ describe Y2ConfigurationManagement::Salt::FormData do
       expect(projects).to eq(
         "yast2" => { "url" => "https://yast.opensuse.org" }
       )
+    end
+  end
+
+  describe "#copy" do
+    it "returns a deep-copy of the object" do
+      copy = form_data.copy
+      # the copy looks the same
+      expect(copy.to_h).to eq(form_data.to_h)
+      # but *is* not the same at the top
+      expect(copy).to_not be(form_data)
+      # ... nor at a lower level
+      locator = locator_from_string(".root.person.name")
+      malkovich = "John Malkovich"
+      form_data.update_item(locator, malkovich)
+      expect(copy.get(locator)).to_not eq(malkovich)
     end
   end
 end

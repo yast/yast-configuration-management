@@ -21,6 +21,8 @@ require "yaml"
 require "yast"
 require "y2configuration_management/salt/form_condition"
 require "y2configuration_management/salt/form_element_locator"
+require "y2configuration_management/salt/form_element_factory"
+require "y2configuration_management/salt/form_element_helpers"
 
 module Y2ConfigurationManagement
   module Salt
@@ -72,32 +74,6 @@ module Y2ConfigurationManagement
       # @return [FormElement, nil]
       def find_element_by(arg)
         root.find_element_by(arg)
-      end
-    end
-
-    # It builds new {FormElement}s depending on its specification type
-    class FormElementFactory
-      # Builds a new FormElement object based on the element specification and
-      # maintaining a reference to its parent
-      #
-      # @param id [String]
-      # @param spec [Hash]
-      # @param parent [FormElement]
-      def self.build(id, spec, parent:)
-        class_for(spec["$type"]).new(id, spec, parent: parent)
-      end
-
-      # @param type [String]
-      # @return [FormElement]
-      def self.class_for(type)
-        case type
-        when "namespace", "hidden-group", "group"
-          Container
-        when "edit-group"
-          Collection
-        else
-          FormInput
-        end
       end
     end
 
@@ -205,6 +181,8 @@ module Y2ConfigurationManagement
 
     # Container Element
     class Container < FormElement
+      include FormElementHelpers
+
       # @return [Array<FormElement>]
       attr_reader :elements
 
@@ -245,17 +223,6 @@ module Y2ConfigurationManagement
         form_elements_in(spec).each do |id, nested_spec|
           @elements << FormElementFactory.build(id, nested_spec, parent: self)
         end
-      end
-
-      # Determines which part of the given spec refers to a form element
-      #
-      # Usually, all elements whose name starts with `$` are supposed to be metadata, except the
-      # special `$key` element which is considered an form input.
-      #
-      # @param spec [Hash] form element specification
-      # @return [Array<Hash>]
-      def form_elements_in(spec)
-        spec.select { |k, _v| !k.start_with?("$") || k == "$key" }
       end
     end
 

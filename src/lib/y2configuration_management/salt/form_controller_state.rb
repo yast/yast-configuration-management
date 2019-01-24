@@ -24,15 +24,18 @@ module Y2ConfigurationManagement
     # Stores the UI state information
     #
     # This class holds information related to FormController. Basically, it behaves like a stack
-    # which contains informaion about the open widget forms.  This data could have been stored
-    # directly in the FormController instance, but it has been extracted in order to keep the
-    # controller as simple as possible.
+    # which contains informaion about the open widget forms and the current form data. Those items
+    # could have been stored directly in the FormController instance, but they have been extracted
+    # in order to keep the controller as simple as possible.
     class FormControllerState
       # Constructor
-      def initialize
+      #
+      # @param data [FormData] Initial form data
+      def initialize(data)
         @form_widgets = []
         @locators = []
         @actions = []
+        @form_data_snapshots = [data]
       end
 
       # Registers that a new form has been open
@@ -46,6 +49,7 @@ module Y2ConfigurationManagement
         @form_widgets << form_widget
         @locators << locator
         @actions << action
+        backup_data
       end
 
       # Most recently open form widget
@@ -70,16 +74,53 @@ module Y2ConfigurationManagement
       end
 
       # Replaces the current action/locator
+      #
+      # @param new_action  [Symbol]
+      # @param new_locator [FormElementLocator]
       def replace(new_action, new_locator)
         @actions[-1] = new_action
         @locators[-1] = new_locator
       end
 
       # Removes the information related to the most recently open form widget
-      def close_form
+      def close_form(rollback: false)
         @form_widgets.pop
         @locators.pop
         @actions.pop
+        if rollback
+          restore_backup
+        else
+          remove_backup
+        end
+      end
+
+      # Current form data
+      #
+      # @return [FormData]
+      def form_data
+        @form_data_snapshots.last
+      end
+
+    private
+
+      # Performs a backup of the current form data
+      def backup_data
+        @form_data_snapshots << form_data.copy
+      end
+
+      # Restores the last backup of the current form data by removing the current snapshot
+      def restore_backup
+        @form_data_snapshots.pop
+      end
+
+      # @return [Integer] Position of the previous backup
+      PREVIOUS_SNAPSHOT_POSITION = -2
+
+      # Clears the last backup if it exists
+      def remove_backup
+        # This is another way of saying `top = @fdi.pop; @fdi.last = top`,
+        # or "shorten the snapshot stack but commit the last element"
+        @form_data_snapshots.delete_at(PREVIOUS_SNAPSHOT_POSITION)
       end
     end
   end

@@ -33,7 +33,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
   let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
-  let(:data) { Y2ConfigurationManagement::Salt::FormData.new(form, pillar) }
+  let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
   let(:locator) { locator_from_string(".root.person.computers") }
   let(:collection_locator) { locator_from_string(".person.computers") }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
@@ -41,13 +41,11 @@ describe Y2ConfigurationManagement::Salt::FormController do
     instance_double(Y2ConfigurationManagement::Widgets::Form, result: result).as_null_object
   end
   let(:result) { nil }
-  let(:state) { Y2ConfigurationManagement::Salt::FormControllerState.new }
+  let(:state) { Y2ConfigurationManagement::Salt::FormControllerState.new(data) }
 
   before do
     allow(Y2ConfigurationManagement::Salt::FormControllerState).to receive(:new)
       .and_return(state)
-    allow(Y2ConfigurationManagement::Salt::FormData).to receive(:new)
-      .and_return(data)
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
@@ -114,8 +112,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
       let(:result) { { "brand" => "Lenovo", "disks" => [] } }
 
       it "updates the form data" do
-        expect(data).to receive(:add_item).with(locator, "brand" => "Lenovo", "disks" => [])
         controller.add(collection_locator)
+        expect(controller.get(locator)).to eq([result])
       end
     end
 
@@ -146,9 +144,9 @@ describe Y2ConfigurationManagement::Salt::FormController do
         let(:result) { { "type" => "HDD", "size" => "1TiB" } }
 
         it "updates the form data" do
-          expect(data).to receive(:add_item)
-            .with(locator_from_string(".root.person.computers[2].disks"), result)
           controller.add(collection_locator)
+          collection = controller.get(locator_from_string(".root.person.computers[2].disks"))
+          expect(collection).to eq([result])
         end
       end
     end
@@ -173,9 +171,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
       let(:result) { { "brand" => "Lenovo", "disks" => [] } }
 
       it "updates the form data" do
-        expect(data).to receive(:update)
-          .with(locator.join(0), "brand" => "Lenovo", "disks" => [])
         controller.edit(collection_locator.join(0))
+        expect(controller.get(locator.join(0))).to include(result)
       end
     end
 
@@ -204,11 +201,11 @@ describe Y2ConfigurationManagement::Salt::FormController do
       context "when the user accepts the dialog" do
         let(:collection_locator) { locator_from_string(".disks") }
         let(:result) { { "type" => "HDD", "size" => "1TiB" } }
+        let(:disks_locator) { locator_from_string(".root.person.computers[1].disks") }
 
         it "updates the form data" do
-          expect(data).to receive(:add_item)
-            .with(locator_from_string(".root.person.computers[1].disks"), result)
           controller.add(collection_locator)
+          expect(controller.get(disks_locator)).to include(result)
         end
       end
     end
@@ -218,8 +215,10 @@ describe Y2ConfigurationManagement::Salt::FormController do
     let(:element_locator) { locator_from_string(".person.computers[1]") }
 
     it "removes an element" do
-      expect(data).to receive(:remove_item).with(locator_from_string(".root.person.computers[1]"))
-      controller.remove(element_locator)
+      expect { controller.remove(element_locator) }
+        .to change { controller.get(locator_from_string(".root.person.computers[1]")) }
+        .from(Hash)
+        .to(nil)
     end
   end
 
