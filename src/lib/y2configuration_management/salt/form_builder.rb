@@ -37,7 +37,8 @@ module Y2ConfigurationManagement
         boolean:  Y2ConfigurationManagement::Widgets::Boolean,
         date:     Y2ConfigurationManagement::Widgets::Date,
         datetime: Y2ConfigurationManagement::Widgets::DateTime,
-        time:     Y2ConfigurationManagement::Widgets::Time
+        time:     Y2ConfigurationManagement::Widgets::Time,
+        key_value: Y2ConfigurationManagement::Widgets::KeyValue
       }.freeze
 
       # Constructor
