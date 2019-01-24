@@ -25,26 +25,26 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
     Y2ConfigurationManagement::Salt::FormElementLocator.new(*args)
   end
 
-  let(:context) { locator_new([:root, :foo, :bar]) }
+  let(:context_loc) { locator_new([:root, :foo, :bar]) }
 
   describe ".parse" do
     it "parses the empty string as a nil condition" do
-      expect(described_class.parse("", context: context)).to eq(nil)
+      expect(described_class.parse("", context: nil)).to eq(nil)
     end
 
     it "raises on an unparsable string" do
-      expect { described_class.parse("***", context: context) }.to raise_error(RuntimeError)
+      expect { described_class.parse("***", context: nil) }.to raise_error(RuntimeError)
     end
   end
 
   describe ".parse_locator" do
     it "parses a .relative locator" do
-      expect(described_class.parse_locator(".baz", context))
+      expect(described_class.parse_locator(".baz", context_loc))
         .to eq(locator_new([:root, :foo, :baz]))
     end
 
     it "parses a ..relative locator" do
-      expect(described_class.parse_locator("..qux", context))
+      expect(described_class.parse_locator("..qux", context_loc))
         .to eq(locator_new([:root, :qux]))
     end
   end
@@ -70,6 +70,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
   describe Y2ConfigurationManagement::Salt::EqualCondition do
     describe "#evaluate" do
       it "compares the string representations" do
+        context = double("form element", locator: context_loc)
         cond = described_class.parse("myform#mywidget == '42'", context: context)
         data = double("form data")
         expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
@@ -82,6 +83,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
   describe Y2ConfigurationManagement::Salt::NotEqualCondition do
     describe "#evaluate" do
       it "compares the string representations" do
+        context = double("form element", locator: context_loc)
         cond = described_class.parse("myform#mywidget != '42'", context: context)
         data = double("form data")
         expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))

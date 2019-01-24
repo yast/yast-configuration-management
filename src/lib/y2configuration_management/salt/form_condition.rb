@@ -26,7 +26,7 @@ module Y2ConfigurationManagement
       end
 
       # @param s [String]
-      # @param context [FormElementLocator] for resolving relative expressions
+      # @param context [FormElement] for resolving relative expressions
       # @return [FormCondition,nil]
       def self.parse(s, context:)
         if s.empty?
@@ -35,12 +35,12 @@ module Y2ConfigurationManagement
         # TODO: specify it better
         elsif s.include?("==")
           parts = s.split("==").map(&:strip)
-          locator = parse_locator(parts[0].strip, context)
+          locator = parse_locator(parts[0].strip, context.locator)
           value = parse_value(parts[1].strip)
           EqualCondition.new(locator: locator, value: value)
         elsif s.include?("!=")
           parts = s.split("!=").map(&:strip)
-          locator = parse_locator(parts[0], context)
+          locator = parse_locator(parts[0], context.locator)
           value = parse_value(parts[1])
           NotEqualCondition.new(locator: locator, value: value)
         else
@@ -49,19 +49,20 @@ module Y2ConfigurationManagement
       end
 
       # @param s [String]
-      # @param context [FormElementLocator] for resolving relative expressions
+      # @param context_loc [FormElementLocator] for resolving relative expressions
       # @return [FormElementLocator]
-      def self.parse_locator(s, context)
+      def self.parse_locator(s, context_loc)
         if s.start_with? "."
           while s.start_with? "."
             s = s[1..-1]
-            context = context.parent
+            context_loc = context_loc.parent
           end
+          parent_loc = context_loc
         else
-          context = FormElementLocator.new([:root])
+          parent_loc = FormElementLocator.new([:root])
         end
         s_parts = s.split("#").map(&:to_sym)
-        context.join(* s_parts)
+        parent_loc.join(* s_parts)
       end
 
       # @param s [String]
