@@ -34,16 +34,20 @@ module Y2ConfigurationManagement
       #
       # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
       def initialize(spec)
+        textdomain "configuration_management"
+
         initialize_base(spec)
         @default = spec.default
         self.widget_id = "key_value:#{spec.id}"
         @value = nil
       end
 
+      # @see CWM::AbstractWidget
       def init
-        self.value = @value || default || {}
+        self.value = @value || default
       end
 
+      # @see CWM::AbstractWidget
       def contents
         VBox(
           key_widget,
@@ -51,26 +55,46 @@ module Y2ConfigurationManagement
         )
       end
 
+      # @see CWM::AbstractWidget
+      # @return [Hash<String,String>]
       def value
-        return {} if key_widget.value.nil?
+        return {} if key_widget.value.to_s.empty?
 
         { "$key" => key_widget.value, "$value" => value_widget.value }
       end
 
+      # @see CWM::AbstractWidget
+      # @param val [Hash<String, String>]
       def value=(val)
         key_widget.value = (val || {}).dig("$key")
         value_widget.value = (val || {}).dig("$value")
-        @value = value
+        @value = val
+      end
+
+      # It returns false and report an error if the $key input is empty
+      #
+      # @see CWM::AbstractWidget
+      # @return [Boolean] true if at least the $key input is not empty
+      def validate
+        if key_widget.value.to_s.empty?
+          # TRANSLATORS: It reports that %s cannot be empty.
+          Yast::Report.Error(_("%s: cannot be empty.") % label)
+          return false
+        end
+
+        true
       end
 
     private
 
+      # Input field for the hash $key
       class Key < ::CWM::InputField
         def label
           "$key"
         end
       end
 
+      # Input field for the hash $value
       class Value < ::CWM::InputField
         def label
           "$value"
@@ -87,4 +111,3 @@ module Y2ConfigurationManagement
     end
   end
 end
-

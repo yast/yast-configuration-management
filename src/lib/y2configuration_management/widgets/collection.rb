@@ -129,11 +129,7 @@ module Y2ConfigurationManagement
       # @return [Array<Array<String|Yast::Term>>]
       def format_items(items_list)
         items_list.each_with_index.map do |item, index|
-          values = if item.is_a? Hash
-            headers_ids.map { |h| item[h] || item }
-          else
-            [item]
-          end
+          values = item.is_a?(Hash) ? format_hash_item(item) : [item]
           formatted_values = values.map { |v| format_value(v) }
           Item(Id(index.to_s), *formatted_values)
         end
@@ -166,6 +162,20 @@ module Y2ConfigurationManagement
         return _("No items") if val.empty?
         # TRANSLATORS: items count in a list
         format(n_("%s item", "%s items", val.size), val.size)
+      end
+
+      # Returns a list of the hash values to be shown in the table
+      #
+      # When it is a text dictionary it returns a formatted string with the
+      # $key and the $value
+      #
+      # @return [Array<String>]
+      def format_hash_item(item)
+        if item.keys == ["$key", "$value"]
+          ["#{item["$key"]}: #{item["$value"]}"]
+        else
+          headers_ids.map { |h| item[h] }
+        end
       end
     end
   end
