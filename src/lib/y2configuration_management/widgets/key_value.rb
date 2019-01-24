@@ -46,22 +46,21 @@ module Y2ConfigurationManagement
 
       def contents
         VBox(
-          key,
-          key_value
+          key_widget,
+          value_widget
         )
       end
 
       def value
-        return {} if key.value.nil?
+        return {} if key_widget.value.nil?
 
-        { key.value => key_value.value}
+        { "$key" => key_widget.value, "$value" => value_widget.value }
       end
 
       def value=(val)
-        k, v = (val || {}).first
-        key.value = k
-        key_value.value = v
-        @value = val
+        key_widget.value = (val || {}).dig("$key")
+        value_widget.value = (val || {}).dig("$value")
+        @value = value
       end
 
     private
@@ -78,11 +77,11 @@ module Y2ConfigurationManagement
         end
       end
 
-      def key
+      def key_widget
         @key ||= Key.new
       end
 
-      def key_value
+      def value_widget
         @key_value ||= Value.new
       end
     end

@@ -130,7 +130,7 @@ module Y2ConfigurationManagement
       def format_items(items_list)
         items_list.each_with_index.map do |item, index|
           values = if item.is_a? Hash
-            headers_ids.map { |h| item[h] }
+            headers_ids.map { |h| item[h] || item }
           else
             [item]
           end
