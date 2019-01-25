@@ -27,17 +27,18 @@ module Y2ConfigurationManagement
     # https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html
     class FormBuilder
       INPUT_WIDGET_CLASS = {
-        color:    Y2ConfigurationManagement::Widgets::Color,
-        text:     Y2ConfigurationManagement::Widgets::Text,
-        number:   Y2ConfigurationManagement::Widgets::Text,
-        email:    Y2ConfigurationManagement::Widgets::Email,
-        password: Y2ConfigurationManagement::Widgets::Password,
-        url:      Y2ConfigurationManagement::Widgets::URL,
-        select:   Y2ConfigurationManagement::Widgets::Select,
-        boolean:  Y2ConfigurationManagement::Widgets::Boolean,
-        date:     Y2ConfigurationManagement::Widgets::Date,
-        datetime: Y2ConfigurationManagement::Widgets::DateTime,
-        time:     Y2ConfigurationManagement::Widgets::Time
+        color:     Y2ConfigurationManagement::Widgets::Color,
+        text:      Y2ConfigurationManagement::Widgets::Text,
+        number:    Y2ConfigurationManagement::Widgets::Text,
+        email:     Y2ConfigurationManagement::Widgets::Email,
+        password:  Y2ConfigurationManagement::Widgets::Password,
+        url:       Y2ConfigurationManagement::Widgets::URL,
+        select:    Y2ConfigurationManagement::Widgets::Select,
+        boolean:   Y2ConfigurationManagement::Widgets::Boolean,
+        date:      Y2ConfigurationManagement::Widgets::Date,
+        datetime:  Y2ConfigurationManagement::Widgets::DateTime,
+        time:      Y2ConfigurationManagement::Widgets::Time,
+        key_value: Y2ConfigurationManagement::Widgets::KeyValue
       }.freeze
 
       # Constructor

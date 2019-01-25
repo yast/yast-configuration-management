@@ -55,5 +55,38 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
         expect(form_data.get(locator)).to eq("somebody@example.net")
       end
     end
+
+    context "when a hash based collection is given" do
+      let(:locator) { locator_from_string(".root.person.projects") }
+
+      it "converts it to an array of hashes adding a '$key' key" do
+        form_data = reader.form_data
+        projects = form_data.get(locator)
+        expect(projects).to be_a(Array)
+        expect(projects[0]).to include("$key" => "yast2")
+      end
+    end
+
+    context "when a simple hash based collection is given" do
+      let(:locator) { locator_from_string(".root.person.projects[0].properties") }
+
+      it "converts it to an array of hashes adding '$key' and '$value' keys" do
+        form_data = reader.form_data
+        expect(form_data.get(locator)).to eq(
+          [
+            { "$key" => "license", "$value" => "GPL-2.0-only" }
+          ]
+        )
+      end
+    end
+
+    context "when a simple values based collection is given" do
+      let(:locator) { locator_from_string(".root.person.projects[0].platforms") }
+
+      it "keeps it as an array" do
+        form_data = reader.form_data
+        expect(form_data.get(locator)).to eq(["Linux"])
+      end
+    end
   end
 end

@@ -80,3 +80,23 @@ person:
         "$name": Project name
       url:
         "$type": text
+      properties:
+        "$type": edit-group
+        "$minItems": 0
+        "$name": Properties
+        "$default":
+          license:
+            GPL
+        "$prototype":
+          "$type": text
+          "$name": Property
+          "$key":
+            "$type": text
+      platforms:
+        "$type": edit-group
+        "$minItems": 0
+        "$name": Platforms
+        "$default":
+          - Linux
+        "$prototype":
+          "$type": text

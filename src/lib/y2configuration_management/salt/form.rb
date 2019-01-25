@@ -81,6 +81,7 @@ module Y2ConfigurationManagement
     #
     # scalar values, groups and collections
     class FormElement
+      include FormElementHelpers
       # @return [String] the key for the pillar
       attr_reader :id
       # @return [Symbol]
@@ -107,7 +108,7 @@ module Y2ConfigurationManagement
       def initialize(id, spec, parent:)
         @id = id
         @name = spec.fetch("$name", humanize(id))
-        @type = spec.fetch("$type", "text").to_sym
+        @type = type_for(spec)
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
         @optional = spec["$optional"] if spec["$optional"]
@@ -132,6 +133,18 @@ module Y2ConfigurationManagement
       # "suse--fancy_salt_test" -> "Suse Fancy Salt Test"
       def humanize(s)
         s.split(/[-_]/).reject(&:empty?).map(&:capitalize).join(" ")
+      end
+
+      # Returns the type for a given form element specification
+      #
+      # @param spec [Hash] Form element specification
+      # @return [Symbol] Form element type
+      def type_for(spec)
+        if spec["$type"] == "text" && spec.key?("$key") && form_elements_in(spec).size <= 1
+          :key_value
+        else
+          spec.fetch("$type", "text").to_sym
+        end
       end
     end
 
@@ -181,8 +194,6 @@ module Y2ConfigurationManagement
 
     # Container Element
     class Container < FormElement
-      include FormElementHelpers
-
       # @return [Array<FormElement>]
       attr_reader :elements
 

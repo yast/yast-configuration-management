@@ -50,6 +50,7 @@ end
 
 RSpec.configure do |config|
   config.include Y2ConfigurationManagement::TestHelpers
+  config.include Yast::I18n
 
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
