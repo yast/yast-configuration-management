@@ -72,6 +72,8 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
   end
 
   describe "#unbounded" do
+    let(:locator) { locator_from_string(".root.hosts[1].interfaces[eth0]") }
+
     it "removes specific elements" do
       expect(locator.unbounded.to_s).to eq(".root.hosts.interfaces")
     end

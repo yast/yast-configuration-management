@@ -143,7 +143,7 @@ module Y2ConfigurationManagement
       #
       # @return [FormElementLocator]
       def unbounded
-        self.class.new(parts.reject { |i| i.is_a?(Integer) })
+        self.class.new(parts.select { |i| i.is_a?(Symbol) })
       end
     end
   end
