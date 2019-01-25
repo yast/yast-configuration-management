@@ -87,26 +87,29 @@ module Y2ConfigurationManagement
 
     private
 
-      # Input field for the hash $key
-      class Key < ::CWM::InputField
-        def label
-          "$key"
+      # Input field for the key/value widget
+      class KeyValueField < ::CWM::InputField
+        attr_reader :label
+
+        def initialize(id, label)
+          @label = label
+          self.widget_id = "key_value:#{id}"
+          super()
         end
       end
 
-      # Input field for the hash $value
-      class Value < ::CWM::InputField
-        def label
-          "$value"
-        end
-      end
-
+      # Widget for the $key field
+      #
+      # @return [KeyValueField]
       def key_widget
-        @key ||= Key.new
+        @key ||= KeyValueField.new("#{id}:key", label)
       end
 
+      # Widget for the $value field
+      #
+      # @return [KeyValueField]
       def value_widget
-        @key_value ||= Value.new
+        @key_value ||= KeyValueField.new("#{id}:value", _("Value"))
       end
     end
   end

@@ -89,6 +89,7 @@ person:
             GPL
         "$prototype":
           "$type": text
+          "$name": Property
           "$key":
             "$type": text
       platforms:
