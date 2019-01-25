@@ -179,7 +179,8 @@ module Y2ConfigurationManagement
         collection.reduce({}) do |all, item|
           new_item = item.clone
           key = new_item.delete("$key")
-          all.merge(key => data_for_pillar(new_item))
+          val = new_item.delete("$value") || data_for_pillar(new_item)
+          all.merge(key => val)
         end
       end
 

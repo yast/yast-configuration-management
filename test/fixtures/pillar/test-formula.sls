@@ -17,3 +17,10 @@ person:
         disks: 
            - type: HDD
              size: 1TB
+    projects:
+      yast2:
+        url: https://yast.opensuse.org
+        properties:
+          license: GPL-2.0-only
+        platforms:
+          - Linux
