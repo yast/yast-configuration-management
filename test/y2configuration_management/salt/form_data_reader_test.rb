@@ -75,7 +75,8 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
         expect(form_data.get(locator)).to eq(
           [
             { "$key" => "license", "$value" => "GPL-2.0-only" }
-          ])
+          ]
+        )
       end
     end
 
