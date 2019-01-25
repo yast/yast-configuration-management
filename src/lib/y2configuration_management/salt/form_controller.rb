@@ -110,11 +110,11 @@ module Y2ConfigurationManagement
       end
 
       def update_visibility
+        state.send(:backup_data)
         state.form_widget.store
-        form_result = state.form_widget.result
-        local_data = FormData.new(form)
-        local_data.update(state.locator, form_result)
-        state.form_widget.update_visibility(local_data)
+        form_data.update(state.locator, state.form_widget.result)
+        state.form_widget.update_visibility(form_data)
+        state.send(:restore_backup)
       end
 
     private
