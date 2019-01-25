@@ -95,7 +95,7 @@ person:
         "$type": edit-group
         "$minItems": 0
         "$name": Platforms
+        "$default":
+          - Linux
         "$prototype":
           "$type": text
-          "$default":
-            - Linux
