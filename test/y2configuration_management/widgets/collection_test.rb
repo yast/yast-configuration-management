@@ -34,7 +34,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
-  let(:form) { Y2ConfigurationManagement::Widgets::Form.new([]) }
+  let(:form) { Y2ConfigurationManagement::Widgets::Form.new([], controller) }
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { locator_from_string(".root.person.computers") }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }

@@ -48,7 +48,9 @@ module Y2ConfigurationManagement
       #
       # @param locator [FormElementLocator] Locator of the element
       def get(locator)
-        find_by_locator(@data, locator) || default_for(locator)
+        value = find_by_locator(@data, locator)
+        value = default_for(locator) if value.nil?
+        value
       end
 
       # Updates an element's value

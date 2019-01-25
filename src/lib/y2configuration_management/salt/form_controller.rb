@@ -109,6 +109,14 @@ module Y2ConfigurationManagement
         refresh_top_form
       end
 
+      def update_visibility
+        state.form_widget.store
+        form_result = state.form_widget.result
+        local_data = FormData.new(form)
+        local_data.update(state.locator, form_result)
+        state.form_widget.update_visibility(local_data)
+      end
+
     private
 
       # @return [Form]
@@ -133,6 +141,7 @@ module Y2ConfigurationManagement
       # Refreshes the most recently open form widget
       def refresh_top_form
         state.form_widget.refresh(get(state.locator))
+        state.form_widget.update_visibility(data)
       end
 
       # Displays a popup

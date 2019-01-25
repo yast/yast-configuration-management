@@ -56,7 +56,7 @@ module Y2ConfigurationManagement
         elements = scalar ? [form_element] : form_element.elements
         widgets = Array(elements).map { |e| build_element(e) }
         Y2ConfigurationManagement::Widgets::Form.new(
-          widgets, scalar: scalar
+          widgets, controller, scalar: scalar
         )
       end
 
@@ -96,7 +96,6 @@ module Y2ConfigurationManagement
         children = group.elements.map do |element_spec|
           build_element(element_spec)
         end
-        _visible = group.type == :group # FIXME: use this
         Y2ConfigurationManagement::Widgets::Group.new(group, children)
       end
 

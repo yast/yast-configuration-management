@@ -39,6 +39,8 @@ module Y2ConfigurationManagement
       # @return [Array<Object>] List of objects which are included in the collection
       attr_accessor :value
 
+      include SaltVisibilitySwitcher
+
       # @return [Array<CWM::AbstractWidget>] Parent widget
       attr_accessor :parent
 

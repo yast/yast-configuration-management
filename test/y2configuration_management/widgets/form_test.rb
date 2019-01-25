@@ -25,7 +25,7 @@ require "y2configuration_management/widgets/form"
 require "y2configuration_management/widgets/text"
 
 describe Y2ConfigurationManagement::Widgets::Form do
-  subject(:form) { described_class.new(widget) }
+  subject(:form) { described_class.new(widget, double("controller")) }
 
   let(:widget) do
     instance_double(
@@ -74,7 +74,7 @@ describe Y2ConfigurationManagement::Widgets::Form do
     end
 
     context "when using an scalar form" do
-      subject(:form) { described_class.new(widget, scalar: true) }
+      subject(:form) { described_class.new(widget, double("controller"), scalar: true) }
 
       it "returns just a scalar value" do
         expect(form.result).to eq("foobar")

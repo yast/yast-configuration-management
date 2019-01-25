@@ -19,6 +19,7 @@
 
 require "yaml"
 require "yast"
+require "y2configuration_management/salt/form_condition"
 require "y2configuration_management/salt/form_element_locator"
 require "y2configuration_management/salt/form_element_factory"
 require "y2configuration_management/salt/form_element_helpers"
@@ -96,6 +97,8 @@ module Y2ConfigurationManagement
       attr_reader :scope
       # @return [Boolean]
       attr_reader :optional
+      # @return [FormCondition,nil]
+      attr_reader :visible_if
 
       # Constructor
       #
@@ -109,6 +112,7 @@ module Y2ConfigurationManagement
         @scope = spec.fetch("$scope", "system").to_sym
         @optional = spec["$optional"] if spec["$optional"]
         @parent = parent
+        @visible_if = FormCondition.parse(spec.fetch("$visibleIf", ""), context: self)
       end
 
       # Return the absolute locator of this form element in the actual form

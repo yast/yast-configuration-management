@@ -31,6 +31,8 @@ module Y2ConfigurationManagement
       # @return [String,nil] Default value
       attr_reader :default
 
+      include SaltVisibilitySwitcher
+
       # Constructor
       #
       # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification

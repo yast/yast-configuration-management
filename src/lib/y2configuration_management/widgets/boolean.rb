@@ -24,11 +24,29 @@ module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a boolean (checkbox) field. TODO: is tristate possible?
-    class Boolean < ::CWM::CheckBox
+    class Boolean < VisibilitySwitcher
       include BaseMixin
 
       # @return [Boolean] Default value
       attr_reader :default
+
+      include SaltVisibilitySwitcher
+
+      # A helper to go inside a ReplacePoint
+      class CheckBox < ::CWM::CheckBox
+        # @return [String] Widget label
+        attr_reader :label
+
+        def initialize(id:, label:)
+          self.widget_id = id
+          @label = label
+        end
+
+        # TODO: only if I am mentioned in a visible_if
+        def opt
+          [:notify]
+        end
+      end
 
       # Constructor
       #
@@ -36,12 +54,15 @@ module Y2ConfigurationManagement
       def initialize(spec)
         initialize_base(spec)
         @default = spec.default == true # nil -> false
-        self.widget_id = "boolean:#{spec.id}"
+
+        inner = CheckBox.new(id: "boolean:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
       end
 
       # @see CWM::AbstractWidget
       def init
-        self.value = default
+        super(default)
       end
     end
   end

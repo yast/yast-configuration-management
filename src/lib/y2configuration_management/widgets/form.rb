@@ -65,10 +65,13 @@ module Y2ConfigurationManagement
       #
       # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
       # @param scalar [Boolean] Determines whether the form stores are scalar value
-      def initialize(children, scalar: false)
+      def initialize(children, controller, scalar: false)
         @value = scalar ? nil : {}
         @scalar = scalar
         add_children(*children)
+        @controller = controller
+        self.handle_all_events = true
+        super()
       end
 
       # This method propagates the values to the underlying widgets.
@@ -111,6 +114,17 @@ module Y2ConfigurationManagement
         self.value = values
         @result = nil
         set_children_contents
+      end
+
+      def handle
+        @controller.update_visibility
+        nil
+      end
+
+      def update_visibility(data)
+        children.each do |widget|
+          widget.update_visibility(data)
+        end
       end
 
       # Add children widgets

@@ -24,10 +24,29 @@ module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
     # This class represents a simple text field
-    class Text < ::CWM::InputField
+    class Text < VisibilitySwitcher
+      # @return [String] Default value
+      attr_reader :default
+
       include BaseMixin
 
-      attr_reader :default
+      include SaltVisibilitySwitcher
+
+      # A helper to go inside a ReplacePoint
+      class InputField < ::CWM::InputField
+        # @return [String] Widget label
+        attr_reader :label
+
+        def initialize(id:, label:)
+          self.widget_id = id
+          @label = label
+        end
+
+        # TODO: only if I am mentioned in a visible_if
+        def opt
+          [:notify]
+        end
+      end
 
       # Constructor
       #
@@ -35,12 +54,21 @@ module Y2ConfigurationManagement
       def initialize(spec)
         initialize_base(spec)
         @default = spec.default.to_s
-        self.widget_id = "text:#{spec.id}"
+
+        inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
       end
 
       # @see CWM::AbstractWidget
       def init
-        self.value = default if value.nil? || value.empty?
+        saved_value = value
+        replace(inner)
+        self.value = if saved_value.nil? || saved_value.empty?
+          default
+        else
+          saved_value
+        end
       end
 
       # @see CWM::ValueBasedWidget

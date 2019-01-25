@@ -35,6 +35,7 @@ module Y2ConfigurationManagement
       def initialize(spec, children)
         textdomain "configuration_management"
         initialize_base(spec)
+        @has_frame = spec.type == :group
         self.widget_id = "group:#{spec.id}"
         add_children(*children)
       end
@@ -43,7 +44,12 @@ module Y2ConfigurationManagement
       #
       # @return [Yast::Term]
       def contents
-        VBox(*children)
+        c = VBox(*children)
+        if @has_frame
+          Frame(label, c)
+        else
+          c
+        end
       end
 
       # Sets the value for the form
@@ -71,6 +77,12 @@ module Y2ConfigurationManagement
       # @see #value=
       def value
         children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+      end
+
+      def update_visibility(data)
+        children.each do |widget|
+          widget.update_visibility(data) if widget.respond_to? :update_visibility
+        end
       end
 
       # Add children widgets

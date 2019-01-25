@@ -11,7 +11,7 @@ demo:
   super-secret:
     $scope: readonly
     $default: This is a super secret message!
-    $visibleIf: demo$password == supersecretpassword
+    $visibleIf: demo#password == supersecretpassword
   number:
     $type: number
     $default: 12345
@@ -24,12 +24,12 @@ demo:
     $values: ["select", "checkbox"]
   checkbox:
     $type: boolean
-    $visibleIf: demo$show != select
+    $visibleIf: demo#show != select
     $help: help for checkbox
   select:
     $type: select
     $values: ["value a", "value b"]
-    $visibleIf: demo$show != checkbox
+    $visibleIf: demo#show != checkbox
     $help: help for select
 
   test-check:
@@ -37,7 +37,7 @@ demo:
 
   test-group:
     $type: group
-    $visibleIf: demo$test-check == true
+    $visibleIf: demo#test-check == true
 
     text1:
       $default: text1
