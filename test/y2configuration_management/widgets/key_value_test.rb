@@ -69,8 +69,8 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
 
   describe "#contents" do
     it "contains a InputFIeld for the $key and $value" do
-      key_input = subject.contents.nested_find { |i| i.label == "$key" }
-      value_input = subject.contents.nested_find { |i| i.label == "$value" }
+      key_input = subject.contents.nested_find { |i| i.label == subject.label }
+      value_input = subject.contents.nested_find { |i| i.label == _("Value") }
 
       expect(key_input).to_not eql(nil)
       expect(value_input).to_not eql(nil)
