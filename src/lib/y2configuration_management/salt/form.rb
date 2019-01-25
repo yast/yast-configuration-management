@@ -105,7 +105,7 @@ module Y2ConfigurationManagement
       def initialize(id, spec, parent:)
         @id = id
         @name = spec.fetch("$name", humanize(id))
-        @type = type_for(id, spec)
+        @type = type_for(spec)
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
         @optional = spec["$optional"] if spec["$optional"]
@@ -135,7 +135,7 @@ module Y2ConfigurationManagement
       #
       # @param spec [Hash] Form element specification
       # @return [Symbol] Form element type
-      def type_for(_id, spec)
+      def type_for(spec)
         if spec["$type"] == "text" && spec.key?("$key") && form_elements_in(spec).size <= 1
           :key_value
         else
