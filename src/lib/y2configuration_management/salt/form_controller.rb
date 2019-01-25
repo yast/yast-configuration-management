@@ -112,7 +112,7 @@ module Y2ConfigurationManagement
       def update_visibility
         state.form_widget.store
         form_result = state.form_widget.result
-        local_data = FormData.new(form)
+        local_data = state.form_data.copy
         local_data.update(state.locator, form_result)
         state.form_widget.update_visibility(local_data)
       end
