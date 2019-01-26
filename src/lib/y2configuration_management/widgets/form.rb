@@ -117,7 +117,7 @@ module Y2ConfigurationManagement
       end
 
       def handle
-        @controller.update_visibility
+        # @controller.update_visibility
         nil
       end
 
