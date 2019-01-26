@@ -54,7 +54,7 @@ module Y2ConfigurationManagement
         # @param string [String] String representing an element locator
         # @return [FormElementLocator]
         def from_string(string)
-          parts = string[1..-1].split(".").each_with_object([]) do |part, all|
+          parts = string[1..-1].scan(/(?:\[.*?\]|[^\.])+/).each_with_object([]) do |part, all|
             all.concat(from_part(part))
           end
           new(parts)

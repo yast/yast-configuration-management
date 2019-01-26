@@ -33,6 +33,15 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
         [:root, :person, :computers, 2, :interfaces, "eth0"]
       )
     end
+
+    context "when a index containing points is given" do
+      it "keeps those points" do
+        locator = described_class.from_string(".root.domains[example.net]")
+        expect(locator.parts).to eq(
+          [:root, :domains, "example.net"]
+        )
+      end
+    end
   end
 
   describe "#to_s" do
