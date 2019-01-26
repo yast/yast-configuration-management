@@ -150,7 +150,7 @@ module Y2ConfigurationManagement
       # @param widget [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
       # @return [Hash,nil] Dialog's result
       def show_popup(widget)
-        Widgets::FormPopup.new(widget.title, widget).run
+        return unless Widgets::FormPopup.new(widget.title, widget).run == :ok
         widget.result
       end
 
