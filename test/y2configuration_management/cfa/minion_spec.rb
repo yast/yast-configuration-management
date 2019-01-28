@@ -1,17 +1,17 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/cfa/minion"
+require "y2configuration_management/cfa/minion"
 require "tmpdir"
 
-describe Yast::ConfigurationManagement::CFA::Minion do
+describe Y2ConfigurationManagement::CFA::Minion do
   EXAMPLE_PATH = FIXTURES_PATH.join("salt", "minion").to_s.freeze
 
-  subject(:config) { Yast::ConfigurationManagement::CFA::Minion.new }
+  subject(:config) { Y2ConfigurationManagement::CFA::Minion.new }
   let(:path) { EXAMPLE_PATH }
 
   before do
-    stub_const("Yast::ConfigurationManagement::CFA::Minion::PATH", path)
+    stub_const("Y2ConfigurationManagement::CFA::Minion::PATH", path)
     config.load if File.exist?(path)
   end
 

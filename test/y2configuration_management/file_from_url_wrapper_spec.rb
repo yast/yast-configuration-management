@@ -1,13 +1,13 @@
 #!/usr/bin/env rspec
 
 require_relative "../spec_helper"
-require "configuration_management/file_from_url_wrapper"
+require "y2configuration_management/file_from_url_wrapper"
 require "uri"
 require "pathname"
 
-describe Yast::ConfigurationManagement::FileFromUrlWrapper do
+describe Y2ConfigurationManagement::FileFromUrlWrapper do
   describe "#get_file" do
-    described_class { Yast::ConfigurationManagement::FileFromUrlWrapper }
+    described_class { Y2ConfigurationManagement::FileFromUrlWrapper }
     subject(:wrapper) { described_class }
 
     let(:uri_port) { URI("http://yast.example.net:8888/some-file.txt") }
@@ -51,9 +51,9 @@ describe Yast::ConfigurationManagement::FileFromUrlWrapper do
     end
 
     it "returns value from get_file_from_url" do
-      allow(Yast::ConfigurationManagement::FileFromUrlWrapper).to receive(:get_file_from_url)
+      allow(Y2ConfigurationManagement::FileFromUrlWrapper).to receive(:get_file_from_url)
         .and_return("some-value")
-      expect(Yast::ConfigurationManagement::FileFromUrlWrapper.get_file(uri, target))
+      expect(Y2ConfigurationManagement::FileFromUrlWrapper.get_file(uri, target))
         .to eq("some-value")
     end
   end

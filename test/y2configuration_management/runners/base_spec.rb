@@ -1,10 +1,10 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/runners/base"
+require "y2configuration_management/runners/base"
 
-describe Yast::ConfigurationManagement::Runners::Base do
-  subject(:runner) { Yast::ConfigurationManagement::Runners::Base.new(config) }
+describe Y2ConfigurationManagement::Runners::Base do
+  subject(:runner) { Y2ConfigurationManagement::Runners::Base.new(config) }
   let(:mode) { :masterless }
 
   let(:config) { double("config", master: "salt.suse.de", mode: mode, type: "salt") }
@@ -12,7 +12,7 @@ describe Yast::ConfigurationManagement::Runners::Base do
   describe ".for" do
     it "returns a runner for the given configuration" do
       runner = described_class.for(config)
-      expect(runner).to be_kind_of(Yast::ConfigurationManagement::Runners::Salt)
+      expect(runner).to be_kind_of(Y2ConfigurationManagement::Runners::Salt)
       expect(runner.config).to eq(config)
     end
 
@@ -22,8 +22,8 @@ describe Yast::ConfigurationManagement::Runners::Base do
       end
 
       it "raises an error" do
-        expect { Yast::ConfigurationManagement::Runners::Base.for(config) }
-          .to raise_error(Yast::ConfigurationManagement::Runners::UnknownRunner)
+        expect { Y2ConfigurationManagement::Runners::Base.for(config) }
+          .to raise_error(Y2ConfigurationManagement::Runners::UnknownRunner)
       end
     end
   end
@@ -85,7 +85,7 @@ describe Yast::ConfigurationManagement::Runners::Base do
 
       it "raises an exception" do
         expect { runner.run }
-          .to raise_error(Yast::ConfigurationManagement::Runners::Base::WithoutZyppLockNotAllowed)
+          .to raise_error(Y2ConfigurationManagement::Runners::Base::WithoutZyppLockNotAllowed)
       end
     end
 

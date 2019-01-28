@@ -33,21 +33,21 @@ describe Y2ConfigurationManagement::Clients::Main do
     end
     let(:filename) { "config.xml" }
     let(:file_exists?) { true }
-    let(:provision) { instance_double(Yast::ConfigurationManagement::Clients::Provision, run: nil) }
+    let(:provision) { instance_double(Y2ConfigurationManagement::Clients::Provision, run: nil) }
     let(:packages) { { "install" => ["salt"] } }
     let(:configurator) do
       instance_double(
-        Yast::ConfigurationManagement::Configurators::Salt, prepare: prepared, packages: packages
+        Y2ConfigurationManagement::Configurators::Salt, prepare: prepared, packages: packages
       )
     end
-    let(:configuration) { Yast::ConfigurationManagement::Configurations::Base }
+    let(:configuration) { Y2ConfigurationManagement::Configurations::Base }
 
     before do
       allow(Yast::WFM).to receive(:Args).with(0).and_return(filename)
       allow(Yast::XML).to receive(:XMLToYCPFile).with(filename).and_return(config)
-      allow(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
+      allow(Y2ConfigurationManagement::Configurators::Base).to receive(:for)
         .and_return(configurator)
-      allow(Yast::ConfigurationManagement::Clients::Provision).to receive(:new)
+      allow(Y2ConfigurationManagement::Clients::Provision).to receive(:new)
         .and_return(provision)
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(filename).and_return(file_exists?)

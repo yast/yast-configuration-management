@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/configurations/puppet"
+require "y2configuration_management/configurations/puppet"
 require "tmpdir"
 
-describe Yast::ConfigurationManagement::Configurations::Puppet do
-  subject(:config) { Yast::ConfigurationManagement::Configurations::Puppet.new(profile) }
+describe Y2ConfigurationManagement::Configurations::Puppet do
+  subject(:config) { Y2ConfigurationManagement::Configurations::Puppet.new(profile) }
 
   let(:master) { "puppet.suse.de" }
   let(:modules_url) { "http://ftp.suse.de/modules.tgz" }

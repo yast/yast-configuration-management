@@ -1,9 +1,9 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/clients/configuration_management_finish"
+require "y2configuration_management/clients/configuration_management_finish"
 
-describe Yast::ConfigurationManagement::ConfigurationManagementFinish do
+describe Y2ConfigurationManagement::ConfigurationManagementFinish do
   subject(:client) { described_class.new }
 
   describe "#write" do
@@ -11,11 +11,11 @@ describe Yast::ConfigurationManagement::ConfigurationManagementFinish do
     let(:provision_client) { double("provision_client", run: true) }
 
     before do
-      allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:current)
+      allow(Y2ConfigurationManagement::Configurations::Base).to receive(:current)
         .and_return(config)
-      allow(Yast::ConfigurationManagement::Configurators::Base).to receive(:current)
+      allow(Y2ConfigurationManagement::Configurators::Base).to receive(:current)
         .and_return(configurator)
-      allow(Yast::ConfigurationManagement::Clients::Provision).to receive(:new)
+      allow(Y2ConfigurationManagement::Clients::Provision).to receive(:new)
         .and_return(provision_client)
     end
 

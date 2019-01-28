@@ -1,10 +1,10 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/clients/provision"
-require "configuration_management/configurations/base"
+require "y2configuration_management/clients/provision"
+require "y2configuration_management/configurations/base"
 
-describe Yast::ConfigurationManagement::Clients::Provision do
+describe Y2ConfigurationManagement::Clients::Provision do
   subject(:client) { described_class.new }
 
   let(:dialog) { double("dialog") }
@@ -13,11 +13,11 @@ describe Yast::ConfigurationManagement::Clients::Provision do
 
   describe "#run" do
     before do
-      allow(Yast::ConfigurationManagement::Dialogs::Running).to receive(:new)
+      allow(Y2ConfigurationManagement::Dialogs::Running).to receive(:new)
         .and_return(dialog)
-      allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:current)
+      allow(Y2ConfigurationManagement::Configurations::Base).to receive(:current)
         .and_return(config)
-      allow(Yast::ConfigurationManagement::Runners::Base).to receive(:for)
+      allow(Y2ConfigurationManagement::Runners::Base).to receive(:for)
         .and_return(runner)
     end
 

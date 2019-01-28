@@ -1,35 +1,35 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/clients/auto_client"
-require "configuration_management/configurators/salt"
+require "y2configuration_management/clients/auto_client"
+require "y2configuration_management/configurators/salt"
 
-describe Yast::ConfigurationManagement::AutoClient do
+describe Y2ConfigurationManagement::AutoClient do
   subject(:client) { described_class.new }
 
   let(:configurator) { double("configurator", packages: packages) }
   let(:packages) { { "install" => ["pkg1"] } }
   let(:profile) { { "type" => "salt", "master" => "myserver" } }
-  let(:config) { Yast::ConfigurationManagement::Configurations::Base.for(profile) }
+  let(:config) { Y2ConfigurationManagement::Configurations::Base.for(profile) }
 
   before do
-    allow(Yast::ConfigurationManagement::Configurations::Base).to receive(:for).with(profile)
+    allow(Y2ConfigurationManagement::Configurations::Base).to receive(:for).with(profile)
       .and_return(config)
   end
 
   describe "#import" do
     it "initializes the current configurator" do
-      expect(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
+      expect(Y2ConfigurationManagement::Configurators::Base).to receive(:for)
         .with(config).and_call_original
       client.import(profile)
-      expect(Yast::ConfigurationManagement::Configurators::Base.current)
-        .to be_kind_of(Yast::ConfigurationManagement::Configurators::Salt)
+      expect(Y2ConfigurationManagement::Configurators::Base.current)
+        .to be_kind_of(Y2ConfigurationManagement::Configurators::Salt)
     end
   end
 
   describe "#packages" do
     before do
-      expect(Yast::ConfigurationManagement::Configurators::Base).to receive(:for)
+      expect(Y2ConfigurationManagement::Configurators::Base).to receive(:for)
         .with(config).and_return(configurator)
       client.import(profile)
     end

@@ -1,11 +1,11 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/configurations/salt"
-require "configuration_management/configurators/salt"
+require "y2configuration_management/configurations/salt"
+require "y2configuration_management/configurators/salt"
 
-describe Yast::ConfigurationManagement::Configurators::Salt do
-  subject(:configurator) { Yast::ConfigurationManagement::Configurators::Salt.new(config) }
+describe Y2ConfigurationManagement::Configurators::Salt do
+  subject(:configurator) { Y2ConfigurationManagement::Configurators::Salt.new(config) }
 
   let(:master) { "myserver" }
   let(:states_url) { "https://yast.example.net/mystates.tgz" }
@@ -14,7 +14,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
   let(:keys_url) { "https://yast.example.net/keys" }
 
   let(:config) do
-    Yast::ConfigurationManagement::Configurations::Salt.new(
+    Y2ConfigurationManagement::Configurations::Salt.new(
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
@@ -51,9 +51,9 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
       let(:key_finder) { double("key_finder", fetch_to: true) }
 
       before do
-        allow(Yast::ConfigurationManagement::CFA::Minion).to receive(:new).and_return(minion_config)
+        allow(Y2ConfigurationManagement::CFA::Minion).to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:master=)
-        allow(Yast::ConfigurationManagement::KeyFinder).to receive(:new).and_return(key_finder)
+        allow(Y2ConfigurationManagement::KeyFinder).to receive(:new).and_return(key_finder)
         allow(FileUtils).to receive(:mkdir_p)
       end
 
@@ -79,7 +79,7 @@ describe Yast::ConfigurationManagement::Configurators::Salt do
       end
 
       before do
-        allow(Yast::ConfigurationManagement::CFA::Minion)
+        allow(Y2ConfigurationManagement::CFA::Minion)
           .to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:set_file_roots)
         allow(configurator).to receive(:fetch_config)

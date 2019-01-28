@@ -1,18 +1,16 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/runners/puppet"
-require "configuration_management/configurations/puppet"
+require "y2configuration_management/runners/salt"
+require "y2configuration_management/configurations/salt"
 
-describe Yast::ConfigurationManagement::Runners::Puppet do
-  subject(:runner) { Yast::ConfigurationManagement::Runners::Puppet.new(config) }
-
-  let(:mode) { :masterless }
-  let(:master) { "puppet.suse.de" }
+describe Y2ConfigurationManagement::Runners::Salt do
+  subject(:runner) { Y2ConfigurationManagement::Runners::Salt.new(config) }
+  let(:master) { "salt.suse.de" }
   let(:tmpdir) { "/mnt/tmp/yast_cm" }
 
   let(:config) do
-    Yast::ConfigurationManagement::Configurations::Puppet.new(master: master)
+    Y2ConfigurationManagement::Configurations::Salt.new(master: master)
   end
 
   before do
@@ -26,18 +24,18 @@ describe Yast::ConfigurationManagement::Runners::Puppet do
     end
 
     context "when running in client mode" do
-      it "runs puppet agent" do
-        expect(Cheetah).to receive(:run)
-          .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
-            "--waitforcert", config.auth_time_out.to_s, stdout: $stdout,
-            stderr: $stderr, chroot: "/mnt")
+      it "runs salt-call" do
+        expect(Cheetah).to receive(:run).with(
+          "salt-call", "--log-level", "debug", "state.highstate",
+          stdout: $stdout, stderr: $stderr, chroot: "/mnt"
+        )
         expect(runner.run).to eq(true)
       end
 
-      context "when puppet agent fails" do
-        it "retries up to 'auth_attempts' times" do
+      context "when salt-call fails" do
+        it "returns false" do
           expect(Cheetah).to receive(:run)
-            .with("puppet", *any_args)
+            .with("salt-call", *any_args)
             .and_raise(Cheetah::ExecutionFailed.new([], 0, nil, nil))
             .exactly(config.auth_attempts).times
           expect(runner.run).to eq(false)
@@ -50,8 +48,9 @@ describe Yast::ConfigurationManagement::Runners::Puppet do
 
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "puppet", "apply", "--modulepath", config.work_dir(:target).join("modules").to_s,
-          config.work_dir(:target).join("manifests", "site.pp").to_s, "--debug",
+          "salt-call", "--log-level", "debug",
+          "--local", "--pillar-root=#{config.pillar_root(:target)}",
+          "state.highstate",
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)

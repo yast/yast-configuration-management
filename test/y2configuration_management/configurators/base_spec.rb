@@ -1,21 +1,21 @@
 #!/usr/bin/env rspec
 
 require_relative "../../spec_helper"
-require "configuration_management/configurators/base"
-require "configuration_management/configurations/salt"
+require "y2configuration_management/configurators/base"
+require "y2configuration_management/configurations/salt"
 
-describe Yast::ConfigurationManagement::Configurators::Base do
-  subject(:configurator) { Yast::ConfigurationManagement::Configurators::Base.new(config) }
+describe Y2ConfigurationManagement::Configurators::Base do
+  subject(:configurator) { Y2ConfigurationManagement::Configurators::Base.new(config) }
 
   let(:master) { "myserver" }
   let(:mode) { :client }
   let(:keys_url) { nil }
   let(:states_url) { "https://yast.example.net/myconfig.tgz" }
   let(:work_dir) { FIXTURES_PATH.join("tmp") }
-  let(:file_from_url_wrapper) { Yast::ConfigurationManagement::FileFromUrlWrapper }
+  let(:file_from_url_wrapper) { Y2ConfigurationManagement::FileFromUrlWrapper }
 
   let(:config) do
-    Yast::ConfigurationManagement::Configurations::Salt.new(
+    Y2ConfigurationManagement::Configurations::Salt.new(
       auth_attempts: 3,
       auth_time_out: 10,
       master:        master,
@@ -25,7 +25,7 @@ describe Yast::ConfigurationManagement::Configurators::Base do
   end
 
   # Dummy configurator
-  class DummyClass < Yast::ConfigurationManagement::Configurators::Base
+  class DummyClass < Y2ConfigurationManagement::Configurators::Base
     mode(:client) { 1 }
   end
 
@@ -82,7 +82,7 @@ describe Yast::ConfigurationManagement::Configurators::Base do
     let(:private_key_path) { Pathname("/tmp/private") }
 
     it "retrieves the authentication keys" do
-      expect(Yast::ConfigurationManagement::KeyFinder).to receive(:new)
+      expect(Y2ConfigurationManagement::KeyFinder).to receive(:new)
         .with(keys_url: url).and_return(key_finder)
       expect(key_finder).to receive(:fetch_to)
         .with(private_key_path, public_key_path)
