@@ -36,7 +36,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
   let(:locator) { locator_from_string(".root.person.computers") }
   let(:collection_locator) { locator_from_string(".person.computers") }
-  let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: nil) }
+  let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: popup_run) }
+  let(:popup_run) { :ok }
   let(:widget) do
     instance_double(Y2ConfigurationManagement::Widgets::Form, result: result).as_null_object
   end
@@ -119,6 +120,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
     context "when the user cancels the dialog" do
       let(:result) { nil }
+      let(:popup_run) { :cancel }
 
       it "does not modify form data" do
         expect(data).to_not receive(:add_item)
@@ -177,7 +179,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
     end
 
     context "when the user cancels the dialog" do
-      let(:result) { nil }
+      let(:result) { { "brand" => "Lenovo", "disks" => [] } }
+      let(:popup_run) { :cancel }
 
       it "does not modify form data" do
         expect(data).to_not receive(:update).with(locator, anything)

@@ -41,6 +41,12 @@ module Y2ConfigurationManagement
       def contents
         VBox(@inner_content)
       end
+
+    private
+
+      def buttons
+        [ok_button, cancel_button]
+      end
     end
   end
 end
