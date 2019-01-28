@@ -139,18 +139,7 @@ module Y2ConfigurationManagement
             ),
             VSpacing(0.2),
             HCenter(Label(Id(:remaining_time), _("Please, wait"))),
-            ButtonBox(
-              PushButton(
-                Id(:ok),
-                Opt(:default, :okButton, :disabled),
-                Yast::Label.OKButton
-              ),
-              PushButton(
-                Id(:stop),
-                Opt(:cancelButton, :disabled),
-                Yast::Label.StopButton
-              )
-            )
+            buttons_box
           ),
           HSpacing(1)
         )
@@ -168,6 +157,24 @@ module Y2ConfigurationManagement
       # @return [Symbol] User's input.
       def user_input
         timer_stopped? ? Yast::UI.UserInput : Yast::UI.TimeoutUserInput(1000)
+      end
+
+      # Buttons box
+      #
+      # @return [Yast::Term] Buttons box
+      def buttons_box
+        ButtonBox(
+          PushButton(
+            Id(:ok),
+            Opt(:default, :okButton, :disabled),
+            Yast::Label.OKButton
+          ),
+          PushButton(
+            Id(:stop),
+            Opt(:cancelButton, :disabled),
+            Yast::Label.StopButton
+          )
+        )
       end
 
       # Auxiliar class used to update the dialog. This class looks like an IO
