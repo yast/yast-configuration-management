@@ -1,60 +1,58 @@
 require "yast"
 require "installation/finish_client"
-require "configuration_management/configurators/base"
-require "configuration_management/configurations/base"
-require "configuration_management/clients/provision"
+require "y2configuration_management/configurators/base"
+require "y2configuration_management/configurations/base"
+require "y2configuration_management/clients/provision"
 
 Yast.import "Service"
 
-module Yast
-  module ConfigurationManagement
-    # Client to write the provisioner's configuration
+module Y2ConfigurationManagement
+  # Client to write the provisioner's configuration
+  #
+  # @see Y2ConfigurationManagement::Configurators
+  class ConfigurationManagementFinish < ::Installation::FinishClient
+    include Yast::I18n
+
+    def initialize
+      textdomain "configuration_management"
+    end
+
+    # Writes configuration
     #
-    # @see Yast::ConfigurationManagement::Configurators
-    class ConfigurationManagementFinish < ::Installation::FinishClient
-      include Yast::I18n
+    #
+    # @return [TrueClass,FalseClass] True if configurations have been written;
+    #                                otherwise it returns false.
+    def write
+      return false if config.nil?
+      log.info("Provisioning Configuration Management")
+      configurator.prepare
+      # saving settings to target system
+      Y2ConfigurationManagement::Clients::Provision.new.run
 
-      def initialize
-        textdomain "configuration_management"
+      # enabling services
+      if config.enable_services
+        configurator.services.each { |s| Service.Enable(s) }
       end
 
-      # Writes configuration
-      #
-      #
-      # @return [TrueClass,FalseClass] True if configurations have been written;
-      #                                otherwise it returns false.
-      def write
-        return false if config.nil?
-        log.info("Provisioning Configuration Management")
-        configurator.prepare
-        # saving settings to target system
-        Yast::ConfigurationManagement::Clients::Provision.new.run
+      true
+    end
 
-        # enabling services
-        if config.enable_services
-          configurator.services.each { |s| Service.Enable(s) }
-        end
+    def modes
+      [:autoinst, :autoupg]
+    end
 
-        true
-      end
+    def title
+      _("Provisioning Configuration Management ...")
+    end
 
-      def modes
-        [:autoinst, :autoupg]
-      end
+  private
 
-      def title
-        _("Provisioning Configuration Management ...")
-      end
+    def configurator
+      @configurator ||= Y2ConfigurationManagement::Configurators::Base.current
+    end
 
-    private
-
-      def configurator
-        @configurator ||= Yast::ConfigurationManagement::Configurators::Base.current
-      end
-
-      def config
-        @config ||= Yast::ConfigurationManagement::Configurations::Base.current
-      end
+    def config
+      @config ||= Y2ConfigurationManagement::Configurations::Base.current
     end
   end
 end

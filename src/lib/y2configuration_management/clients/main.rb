@@ -18,9 +18,9 @@
 # find current contact information at www.suse.com.
 
 require "yast"
-require "configuration_management/clients/provision"
-require "configuration_management/configurators/salt"
-require "configuration_management/configurations/salt"
+require "y2configuration_management/clients/provision"
+require "y2configuration_management/configurators/salt"
+require "y2configuration_management/configurations/salt"
 require "y2configuration_management/salt/formula"
 
 Yast.import "WFM"
@@ -60,13 +60,13 @@ module Y2ConfigurationManagement
       def run
         settings = settings_from_xml || DEFAULT_SETTINGS
         log.info("Provisioning Configuration Management")
-        config = Yast::ConfigurationManagement::Configurations::Base.import(settings)
-        configurator = Yast::ConfigurationManagement::Configurators::Base.for(config)
+        config = Y2ConfigurationManagement::Configurations::Base.import(settings)
+        configurator = Y2ConfigurationManagement::Configurators::Base.for(config)
         return :abort unless configurator.prepare
         if !Yast::PackageSystem.CheckAndInstallPackages(configurator.packages.fetch("install", []))
           return :abort
         end
-        Yast::ConfigurationManagement::Clients::Provision.new.run
+        Y2ConfigurationManagement::Clients::Provision.new.run
       end
 
     private

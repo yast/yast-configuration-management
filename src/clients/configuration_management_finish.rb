@@ -1,2 +1,2 @@
-require "configuration_management/clients/configuration_management_finish"
-Yast::ConfigurationManagement::ConfigurationManagementFinish.run
+require "y2configuration_management/clients/configuration_management_finish"
+Y2ConfigurationManagement::ConfigurationManagementFinish.run

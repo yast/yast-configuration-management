@@ -1,3 +1,3 @@
-require "configuration_management/clients/provision"
+require "y2configuration_management/clients/provision"
 
-Yast::ConfigurationManagement::Clients::Provision.new.run
+Y2ConfigurationManagement::Clients::Provision.new.run
