@@ -84,6 +84,8 @@ describe Y2ConfigurationManagement::Configurators::Salt do
         allow(minion_config).to receive(:set_file_roots)
         allow(configurator).to receive(:fetch_config)
         allow(Yast::WFM).to receive(:CallFunction)
+        allow(Y2ConfigurationManagement::Salt::FormulaSequence).to receive(:new)
+          .and_return(formula_sequence)
       end
 
       it "retrieves the Salt states" do
