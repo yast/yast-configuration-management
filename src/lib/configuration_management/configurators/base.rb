@@ -12,7 +12,10 @@ Yast.import "Installation"
 module Yast
   module ConfigurationManagement
     module Configurators
-      # This class handles the general bit of configuring/running CM systems.
+      # This class handles the general bits of configuring/running CM systems.
+      #
+      # Configurators are responsible for setting up a given configuration management system.
+      # They usually take care of downloading assets and/or adjusting the configuration files.
       class Base
         include Yast::Logger
 
@@ -38,9 +41,7 @@ module Yast
           def command(name, *args)
             Yast::ConfigurationManagement::Commands::Base.find(name).run(*args)
           end
-        end
 
-        class << self
           # Current configurator
           #
           # @return [Yast::ConfigurationManagement::Configurators::Base] Current configurator
@@ -48,15 +49,12 @@ module Yast
 
           # Set the configurator to use
           #
-          # @param configurator [Yast::ConfigurationManagement::Configurators::Base]
-          #   Configurator to be used
           # @return [Yast::ConfigurationManagement::Configurators::Base]
           #   Current configurator
           attr_writer :current
 
           # Return the configurator for a given CM system and a configuration
           #
-          # @param type   [String] CM type ("salt", "puppet", etc.)
           # @param config [Hash]   Configurator configuration
           # @return [Yast::ConfigurationManagement::Configurators::Base]
           #   Configurator to handle 'type' configuration

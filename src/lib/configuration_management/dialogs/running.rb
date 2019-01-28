@@ -18,7 +18,7 @@ module Yast
 
         # Update progress
         #
-        # @param [Array<String>] Text to be shown
+        # @param new_lines [Array<String>] Text to be shown
         def add_lines(new_lines)
           value = Yast::UI.QueryWidget(Id(:progress), :Value)
           lines = new_lines.dup

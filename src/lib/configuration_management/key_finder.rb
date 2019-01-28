@@ -42,7 +42,8 @@ module Yast
       #   finder = KeyFinder.new(keys_url: URI("usb:/"))
       #   finder.fetch_to("/tmp/minion")
       #
-      # @param target [Pathname] Destination (including the file basename).
+      # @param key [String]  key file name
+      # @param cert [String] certificate file name
       # @return [Boolean] true if keys were copied; false otherwise.
       def fetch_to(key, cert)
         ret = names.find { |n| fetch_files(n, key, cert) }

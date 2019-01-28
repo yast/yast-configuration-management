@@ -1,0 +1,182 @@
+# encoding: utf-8
+
+# Copyright (c) [2019] SUSE LLC
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of version 2 of the GNU General Public License as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, contact SUSE LLC.
+#
+# To contact SUSE LLC about this file by physical or electronic mail, you may
+# find current contact information at www.suse.com.
+
+require "y2configuration_management/salt/form"
+require "y2configuration_management/salt/form_data"
+
+module Y2ConfigurationManagement
+  module Salt
+    # This class is responsible for reading the form data from its definition and a data pillar.
+    #
+    # The format used in the pillar is slightly different from the internal representation of this
+    # module, so this class takes care of the conversion. However, the initial intentation is to not
+    # use it directly but through the {FormDate.from_pillar} class method.
+    #
+    # ## Handling collections
+    #
+    # There might be different kind of collections:
+    #
+    # * Array with simple values (strings, integers, etc).
+    # * Array of hashes. They allow a more complex collection.
+    # * Hash based collections which index is provided by the user.
+    #
+    # To simplify things in the UI layer, all collections are handled as arrays so, in the third
+    # case, some conversion is needed. Given an specification with three fields `$key`, `url`,
+    # and `license`, the collection would be stored in the Pillar like this:
+    #
+    #   { "yast2" =>
+    #     { "url" => "https://yast.opensuse.org", "license" => "GPL" }
+    #   }
+    #
+    # Internally, it will be handled as an array:
+    #
+    #   [{ "$key" => "yast2", "url" => "https://yast.opensuse.org", "license" => "GPL" }]
+    #
+    # Something similar applies to hash based simple collections which are originally like this (it
+    # is a hash where the keys are specified by the user):
+    #
+    #   { "vers" => "4", "timeout" => "0" }
+    #
+    # It will be converted to:
+    #
+    #   [{ "$key" => "vers", "$value" => "4" }, { "$key" => "timeout", "$value" => "0" }]
+    class FormDataReader
+      include Yast::Logger
+      # @return [Form] Form definition
+      attr_reader :form
+      # @return [Pillar]
+      attr_reader :pillar
+
+      # Constructor
+      #
+      # @param form   [Form] Form definition
+      # @param pillar [Pillar] Pillar to read the data from
+      def initialize(form, pillar)
+        @pillar = pillar
+        @form = form
+      end
+
+      # Builds a FormData object containing the form data
+      #
+      # @return [FormData] Form data object
+      def form_data
+        data_from_pillar = { "root" => hash_from_pillar(pillar.data, form.root.locator) }
+        defaults = defaults_for_element(form.root)
+        FormData.new(form, simple_merge(defaults, data_from_pillar))
+      end
+
+    private
+
+      # Extracts data from the pillar
+      #
+      # @param data    [Hash] Pillar data
+      # @param locator [FormElementLocator] Locator
+      # @return [Hash<String, Object>]
+      def data_from_pillar(data, locator)
+        element = form.find_element_by(locator: locator.unbounded)
+        case element
+        when Collection
+          collection_from_pillar(data, locator)
+        when Container
+          hash_from_pillar(data, locator)
+        else
+          data
+        end
+      end
+
+      # Reads a hash from the pillar for a given locator
+      #
+      # @param data    [Hash] Pillar data
+      # @param locator [FormElementLocator] Element locator
+      # @return [Hash<String, Object>]
+      def hash_from_pillar(data, locator)
+        data.reduce({}) do |all, (k, v)|
+          all.merge(k => data_from_pillar(v, locator.join(k.to_sym)))
+        end
+      end
+
+      # Converts a collection from the pillar
+      #
+      # @param data    [Hash] Pillar data
+      # @param locator [FormElementLocator] Element locator
+      # @return [Array<Hash>]
+      def collection_from_pillar(data, locator)
+        element = form.find_element_by(locator: locator.unbounded)
+        if element.keyed?
+          data.map { |k, v| { "$key" => k }.merge(hash_from_pillar(v, locator.join(k))) }
+        elsif element.prototype.is_a?(FormInput)
+          if element.prototype.type == :key_value
+            data.map { |k, v| { "$key" => k, "$value" => v } }
+          else
+            data
+          end
+        else
+          data.map { |d| hash_from_pillar(d, locator) }
+        end
+      end
+
+      # Extracts default values for a given element
+      #
+      # @param element [FormElement]
+      # @return [Object]
+      def defaults_for_element(element)
+        case element
+        when Container
+          defaults = element.elements.reduce({}) { |a, e| a.merge(defaults_for_element(e)) }
+          { element.id => defaults }
+        when Collection
+          { element.id => defaults_for_collection(element) }
+        else
+          { element.id => element.default }
+        end
+      end
+
+      # Extracts default values for a given collection
+      #
+      # @param collection [Collection]
+      # @return [Array<Hash>]
+      def defaults_for_collection(collection)
+        if collection.keyed?
+          collection.default.map { |k, v| { "$key" => k }.merge(v) }
+        elsif collection.prototype.is_a?(FormInput) && collection.prototype.type == :key_value
+          collection.default.map { |k, v| { "$key" => k, "$value" => v } }
+        else
+          collection.default
+        end
+      end
+
+      # Simple deep merge
+      #
+      # @param defaults [Hash] Default values
+      # @param data [Hash] Pillar data
+      def simple_merge(defaults, data)
+        defaults.reduce({}) do |all, (k, v)|
+          next all.merge(k => v) if data[k].nil?
+          if v.is_a?(Hash)
+            all.merge(k => simple_merge(defaults[k], data[k]))
+          else
+            all.merge(k => data[k])
+          end
+        end
+      end
+    end
+  end
+end

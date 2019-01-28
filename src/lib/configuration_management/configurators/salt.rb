@@ -2,6 +2,7 @@ require "yast"
 require "cheetah"
 require "configuration_management/cfa/minion"
 require "configuration_management/configurators/base"
+require "y2configuration_management/salt/formula_sequence"
 require "pathname"
 
 module Yast
@@ -10,6 +11,17 @@ module Yast
       # Salt configurator
       #
       # This class is responsible for configuring Salt before running it.
+      #
+      # ### Masterless Mode
+      #
+      # * Retrieves remote states and pillars if needed
+      # * Searches for formulas and configures them if needed (writing data into pillars).
+      # * Updates the minion configuration (see {#update_configuration})
+      #
+      # ### Client/Server Mode
+      #
+      # * Fetches keys for authentication from a given URL
+      # * Updates the minion configuration (see {#update_configuration})
       class Salt < Base
         PRIVATE_KEY_PATH = "/etc/salt/pki/minion/minion.pem".freeze
         PUBLIC_KEY_PATH = "/etc/salt/pki/minion/minion.pub".freeze
@@ -18,8 +30,7 @@ module Yast
           fetch_config(config.states_url, config.work_dir) if config.states_url
           fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
           update_configuration
-          Yast::WFM.CallFunction("configuration_management_formula",
-            [config.states_root.to_s, config.formulas_root.to_s, config.pillar_root.to_s])
+          Y2ConfigurationManagement::Salt::FormulaSequence.new(config).run == :finish
         end
 
         mode(:client) do
@@ -62,7 +73,9 @@ module Yast
           if config.master.is_a?(::String)
             config_file.master = config.master
           else
-            config_file.set_file_roots([config.states_root(:target), config.formulas_root(:target)])
+            config_file.set_file_roots(
+              config.states_roots(:target) + config.formulas_roots(:target)
+            )
           end
           config_file.save
         end

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<productDefines xmlns="http://www.suse.com/1.0/yast2ns" 
+  xmlns:config="http://www.suse.com/1.0/configns">
+
+    <textdomain>configuration_management</textdomain>
+
+    <configuration_management>
+        <type>salt</type>
+        <!-- Default Salt Formulas root directories -->
+        <formulas_roots config:type="list">
+          <formula_root>/usr/share/susemanager/formulas/metadata</formula_root>
+          <formula_root>/srv/formula_metadata</formula_root>
+        </formulas_roots>
+        <!-- Default Salt Formulas state directories -->
+        <states_roots config:type="list">
+          <state_root>/usr/share/susemanager/formulas/states</state_root>
+        </states_roots>
+        <!-- Default Salt Formulas pillar data directory  -->
+        <pillar_root>/srv/susemanager/formula_data</pillar_root>
+    </configuration_management>
+
+</productDefines>

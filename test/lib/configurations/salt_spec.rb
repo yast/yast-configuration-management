@@ -12,8 +12,9 @@ describe Yast::ConfigurationManagement::Configurations::Salt do
 
   let(:profile) do
     {
-      master:     master,
-      states_url: URI(states_url)
+      master:         master,
+      states_url:     URI(states_url),
+      enabled_states: ["motd"]
     }
   end
 
@@ -32,6 +33,20 @@ describe Yast::ConfigurationManagement::Configurations::Salt do
   describe "#pillar_root" do
     it "returns work_dir + 'pillar'" do
       expect(config.pillar_root).to eq(config.work_dir.join("pillar"))
+    end
+  end
+
+  describe "#enabled_states" do
+    it "returns the list of enabled states" do
+      expect(config.enabled_states).to eq(["motd"])
+    end
+
+    context "when on states have been enabled" do
+      let(:profile) { {} }
+
+      it "returns an empty array" do
+        expect(config.enabled_states).to eq([])
+      end
     end
   end
 end

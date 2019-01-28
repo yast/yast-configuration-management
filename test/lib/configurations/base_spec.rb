@@ -21,10 +21,6 @@ describe Yast::ConfigurationManagement::Configurations::Base do
     }
   end
 
-  before do
-    stub_const("Yast::ConfigurationManagement::Configurations::Base::DEFAULT_PATH", default_path)
-  end
-
   describe "#mode" do
     context "when a master server is not specified" do
       let(:master) { nil }

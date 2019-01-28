@@ -21,7 +21,6 @@ module Yast
       # Additional configurator-specific options can be specified. They will be passed
       # to the configurator's constructor.
       #
-      # @return profile [Hash] configuration from AutoYaST profile
       # @option profile [String] "type"            Configurator to use ("salt", "puppet", etc.)
       # @option profile [String] "master"          Master server name
       # @option profile [String] "auth_attempts"   Number of authentication attempts
@@ -30,6 +29,7 @@ module Yast
       # @option profile [String] "states_url"      Location of Salt states
       # @option profile [String] "modules_url"     Location of Puppet modules
       # @option profile [String] "keys_url"        Authentication keys URL
+      # @return [Hash] configuration from AutoYaST profile
       def import(profile = {})
         Configurations::Base.import(profile)
         self.configurator = Configurators::Base.for(Configurations::Base.current)
