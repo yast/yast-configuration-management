@@ -37,8 +37,8 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param form [Form] Form definition
-      # @param data [Hash] Initial data in hash form
+      # @param form    [Form] Form definition
+      # @param initial [Hash] Initial data in hash form
       def initialize(form, initial = {})
         @form = form
         @data = initial
@@ -188,7 +188,7 @@ module Y2ConfigurationManagement
 
       # Convenience method which converts a value to be used as key for a array or a hash
       #
-      # @param [String,Symbol,Integer]
+      # @param key [String,Symbol,Integer]
       # @return [String,Integer]
       def key_for(key)
         key.is_a?(Symbol) ? key.to_s : key
