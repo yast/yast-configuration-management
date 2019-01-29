@@ -19,4 +19,4 @@ configuration_management = element configuration_management {
 
 formulas_root = element (path | listentry) { text }
 states_root = element (path | listentry) { text }
-enabled_state = element (enabled_state | listentry) { text }
+enabled_state = element (state | listentry) { text }
