@@ -1,0 +1,22 @@
+default namespace = "http://www.suse.com/1.0/yast2ns"
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+namespace config = "http://www.suse.com/1.0/configns"
+
+configuration_management = element configuration_management {
+  element type { text }? &
+  element master { text }? &
+  element auth_attempts { INTEGER }? &
+  element auth_time_out { INTEGER }? &
+  element enable_services { BOOLEAN }? &
+  element formulas_roots { LIST, formulas_root* }? &
+  element states_roots { LIST, states_root* }? &
+  element pillar_root { text }? &
+  element pillar_url { text }? &
+  element keys_url { text }? &
+  element states_url { text }? &
+  element enabled_states { LIST, enabled_state* }?
+}
+
+formulas_root = element (path | listentry) { text }
+states_root = element (path | listentry) { text }
+enabled_state = element (enabled_state | listentry) { text }

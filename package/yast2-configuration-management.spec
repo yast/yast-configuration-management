@@ -62,6 +62,7 @@ rake install DESTDIR="%{buildroot}"
 %{yast_libdir}/configuration_management
 %{yast_libdir}/y2configuration_management
 %{yast_desktopdir}/*.desktop
+%{yast_schemadir}/autoyast/rnc/*.rnc
 %{yast_icondir}
 
 %dir %{yast_docdir}
