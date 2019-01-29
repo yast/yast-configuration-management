@@ -14,9 +14,11 @@ configuration_management = element configuration_management {
   element pillar_url { text }? &
   element keys_url { text }? &
   element states_url { text }? &
+  element modules_url { LIST, modules_url* }
   element enabled_states { LIST, enabled_state* }?
 }
 
 formulas_root = element (path | listentry) { text }
 states_root = element (path | listentry) { text }
+modules_url = element (url | listentry) { text }
 enabled_state = element (state | listentry) { text }
