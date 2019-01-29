@@ -146,4 +146,5 @@ pillar_root     | string       | all        | Path to write the Salt Pillar cont
 pillar_url      | string       | masterless | URL to get Pillar content from
 keys_url        | string       | masterless | URL to get authentication keys from
 states_url      | string       | masterless | URL to get the Salt states from
+modules_url     | list(string) | masterless | URL to get Puppet modules from
 enabled_states  | list(string) | masterless | List of states/formulas to apply
