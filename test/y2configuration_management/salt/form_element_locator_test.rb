@@ -28,24 +28,24 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
   describe "#from_string" do
     it "extracts the parts" do
-      locator = described_class.from_string(".root.person.computers[2].interfaces[eth0]")
+      locator = described_class.from_string("root#person#computers[2]#interfaces[eth0]")
       expect(locator.parts).to eq(
         [:root, :person, :computers, 2, :interfaces, "eth0"]
       )
     end
 
-    context "when a index containing points is given" do
-      it "keeps those points" do
-        locator = described_class.from_string(".root.domains[example.net]")
+    context "when a index containing hashes is given" do
+      it "keeps those hashes" do
+        locator = described_class.from_string("root#domains[example#net]")
         expect(locator.parts).to eq(
-          [:root, :domains, "example.net"]
+          [:root, :domains, "example#net"]
         )
       end
     end
 
     context "when a index containing indexes together" do
       it "extracts all the indexes" do
-        locator = described_class.from_string(".root.domains[example.net][0]")
+        locator = described_class.from_string("#root#domains[example.net][0]")
         expect(locator.parts).to eq(
           [:root, :domains, "example.net", 0]
         )
@@ -55,7 +55,7 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
   describe "#to_s" do
     it "returns the string representation of the element locator" do
-      expect(locator.to_s).to eq(".root.hosts[1].interfaces[3]")
+      expect(locator.to_s).to eq("root#hosts[1]#interfaces[3]")
     end
   end
 
@@ -73,7 +73,7 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
   describe "#rest" do
     it "returns the locator without the prefix" do
-      expect(locator.rest).to eq(locator_from_string(".hosts[1].interfaces[3]"))
+      expect(locator.rest).to eq(locator_from_string("hosts[1]#interfaces[3]"))
     end
   end
 
@@ -84,16 +84,16 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
     end
 
     it "returns a new locator adding the given locator" do
-      address_locator = locator.join(locator_from_string(".address.type"))
+      address_locator = locator.join(locator_from_string("address#type"))
       expect(address_locator.parts).to eq([:root, :hosts, 1, :interfaces, 3, :address, :type])
     end
   end
 
   describe "#unbounded" do
-    let(:locator) { locator_from_string(".root.hosts[1].interfaces[eth0]") }
+    let(:locator) { locator_from_string("root#hosts[1]#interfaces[eth0]") }
 
     it "removes specific elements" do
-      expect(locator.unbounded.to_s).to eq(".root.hosts.interfaces")
+      expect(locator.unbounded.to_s).to eq("root#hosts#interfaces")
     end
   end
 end

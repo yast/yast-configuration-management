@@ -54,13 +54,15 @@ module Y2ConfigurationManagement
         # @param string [String] String representing an element locator
         # @return [FormElementLocator]
         def from_string(string)
-          parts = string[1..-1].scan(/(?:\[.*?\]|[^\.\[])+/).each_with_object([]) do |part, all|
+          parts = string.scan(/(?:\[.*?\]|[^#{SEPARATOR}\[])+/).each_with_object([]) do |part, all|
             all.concat(from_part(part))
           end
           new(parts)
         end
 
       private
+
+        SEPARATOR = "#".freeze
 
         # @return [Regexp] Regular expression representing a locator part
         INDEXED_PART = /\A([^\[]+)\[(.+)\]\z/
@@ -115,10 +117,11 @@ module Y2ConfigurationManagement
       #
       # @return [String] String representation
       def to_s
-        parts.reduce("") do |memo, part|
-          part_as_string = part.is_a?(Integer) ? "[#{part}]" : ".#{part}"
+        as_string = parts.reduce("") do |memo, part|
+          part_as_string = part.is_a?(Integer) ? "[#{part}]" : "##{part}"
           memo << part_as_string
         end
+        as_string[1..-1]
       end
 
       # Extends a locator
