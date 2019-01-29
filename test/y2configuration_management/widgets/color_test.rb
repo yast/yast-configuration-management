@@ -28,7 +28,7 @@ describe Y2ConfigurationManagement::Widgets::Color do
   let(:form_spec) { { "bg_color" => { "$type" => "color", "$default" => default } } }
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
   let(:spec) { form.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.bg_color") }
+  let(:locator) { locator_from_string("root#bg_color") }
   let(:default) { "#02D35F" }
 
   include_examples "CWM::AbstractWidget"

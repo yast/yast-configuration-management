@@ -26,21 +26,21 @@ module Y2ConfigurationManagement
     # Represent the locator to a form element
     #
     # The locator can be seen as a path to the form element. In a human readable form, the locator
-    # looks like: ".root.person.computers[1]" or ".root.hosts[router]".
+    # looks like: "root#person#computers[1]" or "root#hosts[router]".
     #
     # @example Building a locator from a string for an array based collection
-    #   locator = FormElementLocator.from_string(".root.person.computers[1]")
-    #   locator.to_s  #=> ".root.person.computers[1]"
+    #   locator = FormElementLocator.from_string("root#person#computers[1]")
+    #   locator.to_s  #=> "root#person#computers[1]"
     #   locator.parts #=> [:root, :person, :computers, 1]
     #
     # @example Building a locator from a string for a hash based collection
-    #   locator = FormElementLocator.from_string(".root.hosts[router]")
-    #   locator.to_s  #=> ".root.hosts[router]"
+    #   locator = FormElementLocator.from_string("root#hosts[router]")
+    #   locator.to_s  #=> "root#hosts[router]"
     #   locator.parts #=> [:root, :hosts, "router"]
     #
     # @example Building a locator from its parts
     #   locator = FormElementLocator.new(:root, :hosts, "router")
-    #   locator.to_s #=> ".root.hosts[router]"
+    #   locator.to_s #=> "root#hosts[router]"
     class FormElementLocator
       extend Forwardable
 

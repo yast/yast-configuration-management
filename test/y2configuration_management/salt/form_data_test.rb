@@ -33,19 +33,19 @@ describe Y2ConfigurationManagement::Salt::FormData do
   describe "#get" do
     context "when the value has not been set" do
       it "returns the default value" do
-        expect(form_data.get(locator_from_string(".root.person.name"))).to eq("John Doe")
+        expect(form_data.get(locator_from_string("root#person#name"))).to eq("John Doe")
       end
 
       context "and it is a collection" do
         it "returns an array with the default values" do
-          expect(form_data.get(locator_from_string(".root.person.computers")))
+          expect(form_data.get(locator_from_string("root#person#computers")))
             .to eq([{ "brand" => "ACME", "disks" => [] }])
         end
       end
     end
 
     context "when the value has been set" do
-      let(:locator) { locator_from_string(".root.person.name") }
+      let(:locator) { locator_from_string("root#person#name") }
 
       before do
         form_data.update(locator, "Mr. Doe")
@@ -57,7 +57,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
 
     context "when a collection locator and an index are given" do
-      let(:locator) { locator_from_string(".root.person.computers[0]") }
+      let(:locator) { locator_from_string("root#person#computers[0]") }
 
       it "returns the item in the given position" do
         expect(form_data.get(locator)).to eq("brand" => "ACME", "disks" => [])
@@ -65,7 +65,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
 
     context "when a collection locator and a key are given" do
-      let(:locator) { locator_from_string(".root.person.projects[yast2]") }
+      let(:locator) { locator_from_string("root#person#projects[yast2]") }
 
       it "returns the item in the given position" do
         expect(form_data.get(locator))
@@ -74,7 +74,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
 
     context "when an index based collection locator is given" do
-      let(:locator) { locator_from_string(".root.person.projects") }
+      let(:locator) { locator_from_string("root#person#projects") }
 
       it "returns an array containing all the elements" do
         expect(form_data.get(locator)).to eq(
@@ -84,7 +84,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
 
     context "when a hash based collection locator is given" do
-      let(:locator) { locator_from_string(".root.person.computers") }
+      let(:locator) { locator_from_string("root#person#computers") }
 
       it "returns an array containing all the elements" do
         expect(form_data.get(locator)).to eq(
@@ -95,7 +95,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
   end
 
   describe "#add_item" do
-    let(:locator) { locator_from_string(".root.person.computers") }
+    let(:locator) { locator_from_string("root#person#computers") }
 
     it "adds the element to the collection" do
       form_data.add_item(locator, "brand" => "Dell", "disks" => 2)
@@ -103,7 +103,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
 
     context "when a hash based collection is referred" do
-      let(:locator) { locator_from_string(".root.person.projects") }
+      let(:locator) { locator_from_string("root#person#projects") }
 
       it "adds the element to the collection" do
         form_data.add_item(locator, "$key" => "openSUSE", "url" => "https://opensuse.org")
@@ -118,7 +118,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
   end
 
   describe "#update_item" do
-    let(:locator) { locator_from_string(".root.person.computers[0]") }
+    let(:locator) { locator_from_string("root#person#computers[0]") }
 
     it "updates the item in the collection" do
       form_data.update_item(locator, "brand" => "Lenovo", "disks" => 3)
@@ -130,8 +130,8 @@ describe Y2ConfigurationManagement::Salt::FormData do
 
   describe "#remove_item" do
     it "removes the element from the collection" do
-      form_data.remove_item(locator_from_string(".root.person.computers[0]"))
-      expect(form_data.get(locator_from_string(".root.person.computers"))).to be_empty
+      form_data.remove_item(locator_from_string("root#person#computers[0]"))
+      expect(form_data.get(locator_from_string("root#person#computers"))).to be_empty
     end
   end
 
@@ -159,7 +159,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
       # but *is* not the same at the top
       expect(copy).to_not be(form_data)
       # ... nor at a lower level
-      locator = locator_from_string(".root.person.name")
+      locator = locator_from_string("root#person#name")
       malkovich = "John Malkovich"
       form_data.update_item(locator, malkovich)
       expect(copy.get(locator)).to_not eq(malkovich)

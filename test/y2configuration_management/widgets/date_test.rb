@@ -30,7 +30,7 @@ describe Y2ConfigurationManagement::Widgets::Date do
   end
 
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.person.birth_date") }
+  let(:locator) { locator_from_string("root#person#birth_date") }
 
   include_examples "CWM::DateField"
 end

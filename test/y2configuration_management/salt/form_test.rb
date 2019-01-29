@@ -28,7 +28,7 @@ describe Y2ConfigurationManagement::Salt::Form do
     end
   end
 
-  describe "#root" do
+  describe "root" do
     it "returns the form root Y2ConfigurationManagement::Salt::Container" do
       expect(form.root).to be_a(Y2ConfigurationManagement::Salt::Container)
       expect(form.root.name).to eql("Root")
@@ -37,17 +37,17 @@ describe Y2ConfigurationManagement::Salt::Form do
 
   describe "#find_element_by" do
     it "returns the FormElment which match a given argument" do
-      expect(form.find_element_by(locator: locator_from_string(".root.person.name")))
+      expect(form.find_element_by(locator: locator_from_string("root#person#name")))
         .to be_a(Y2ConfigurationManagement::Salt::FormInput)
 
       number = form.find_element_by(name: "E-mail")
       expect(number).to be_a(Y2ConfigurationManagement::Salt::FormInput)
-      expect(number.locator.to_s).to eql(".root.person.email")
+      expect(number.locator.to_s).to eql("root#person#email")
       expect(form.find_element_by(id: "root"))
         .to be_a(Y2ConfigurationManagement::Salt::Container)
 
       nested = form.find_element_by(
-        locator: locator_from_string(".root.person.computers.disks.size")
+        locator: locator_from_string("root#person#computers#disks#size")
       )
       expect(nested).to be_a(Y2ConfigurationManagement::Salt::FormInput)
     end
@@ -104,9 +104,9 @@ describe Y2ConfigurationManagement::Salt::FormElement do
 
     it "returns the absolute form element locator in the Form" do
       computers_collection = locator_form.find_element_by(id: "computers")
-      expect(computers_collection.locator.to_s).to eql(".root.person.computers")
+      expect(computers_collection.locator.to_s).to eql("root#person#computers")
       brand = computers_collection.prototype.find_element_by(id: "brand")
-      expect(brand.locator.to_s).to eql(".root.person.computers.brand")
+      expect(brand.locator.to_s).to eql("root#person#computers#brand")
     end
   end
 end
@@ -139,7 +139,7 @@ describe Y2ConfigurationManagement::Salt::Container do
     end
 
     context "when the element is named '$key'" do
-      let(:locator) { locator_from_string(".root.person.projects.$key") }
+      let(:locator) { locator_from_string("root#person#projects#\$key") }
 
       it "returns true" do
         expect(form_element.collection_key?).to eq(true)
@@ -147,7 +147,7 @@ describe Y2ConfigurationManagement::Salt::Container do
     end
 
     context "when the element is named different from '$key'" do
-      let(:locator) { locator_from_string(".root.person.projects.url") }
+      let(:locator) { locator_from_string("root#person#projects#url") }
 
       it "returns false" do
         expect(form_element.collection_key?).to eq(false)
@@ -167,7 +167,7 @@ describe Y2ConfigurationManagement::Salt::Collection do
     end
 
     context "when it is a collection indexed by a key" do
-      let(:locator) { locator_from_string(".root.person.projects") }
+      let(:locator) { locator_from_string("root#person#projects") }
 
       it "returns true" do
         expect(collection).to be_keyed
@@ -175,7 +175,7 @@ describe Y2ConfigurationManagement::Salt::Collection do
     end
 
     context "when it is a collection indexed by an index" do
-      let(:locator) { locator_from_string(".root.person.computers") }
+      let(:locator) { locator_from_string("root#person#computers") }
 
       it "returns false" do
         expect(collection).to_not be_keyed

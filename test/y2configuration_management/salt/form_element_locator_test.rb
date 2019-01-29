@@ -45,7 +45,7 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
     context "when a index containing indexes together" do
       it "extracts all the indexes" do
-        locator = described_class.from_string("#root#domains[example.net][0]")
+        locator = described_class.from_string("root#domains[example.net][0]")
         expect(locator.parts).to eq(
           [:root, :domains, "example.net", 0]
         )

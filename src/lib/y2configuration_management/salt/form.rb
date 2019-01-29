@@ -66,7 +66,7 @@ module Y2ConfigurationManagement
       #
       #   f = Y2ConfigurationManagemenet.from_file("form.yml")
       #   f.find_element_by(name: "subnets") #=> <Collection @name="subnets">
-      #   locator = FormElementLocator.from_string(".root.dhcpd")
+      #   locator = FormElementLocator.from_string("root#dhcpd")
       #   f.find_element_by(locator: locator) #=> <Container @name="dhcpd">
       #   f.find_element_by(id: "hosts") #=> <Container @id="hosts">
       #

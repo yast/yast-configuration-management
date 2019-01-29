@@ -37,7 +37,7 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
     }
   end
   let(:spec) { form.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.servers") }
+  let(:locator) { locator_from_string("root#servers") }
   let(:key_widget) { dictionary.send(:key_widget) }
   let(:value_widget) { dictionary.send(:value_widget) }
   subject(:dictionary) { described_class.new(spec) }

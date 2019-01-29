@@ -39,7 +39,7 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
 
   describe "#form_data" do
     context "when a value is defined in the pillar" do
-      let(:locator) { locator_from_string(".root.person.name") }
+      let(:locator) { locator_from_string("root#person#name") }
 
       it "uses the value from the pillar" do
         form_data = reader.form_data
@@ -48,7 +48,7 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
     end
 
     context "when a value is not defined in the pillar" do
-      let(:locator) { locator_from_string(".root.person.email") }
+      let(:locator) { locator_from_string("root#person#email") }
 
       it "uses the default value from the form definition" do
         form_data = reader.form_data
@@ -57,7 +57,7 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
     end
 
     context "when a hash based collection is given" do
-      let(:locator) { locator_from_string(".root.person.projects") }
+      let(:locator) { locator_from_string("root#person#projects") }
 
       it "converts it to an array of hashes adding a '$key' key" do
         form_data = reader.form_data
@@ -68,7 +68,7 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
     end
 
     context "when a simple hash based collection is given" do
-      let(:locator) { locator_from_string(".root.person.projects[0].properties") }
+      let(:locator) { locator_from_string("root#person#projects[0]#properties") }
 
       it "converts it to an array of hashes adding '$key' and '$value' keys" do
         form_data = reader.form_data
@@ -81,7 +81,7 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
     end
 
     context "when a simple values based collection is given" do
-      let(:locator) { locator_from_string(".root.person.projects[0].platforms") }
+      let(:locator) { locator_from_string("root#person#projects[0]#platforms") }
 
       it "keeps it as an array" do
         form_data = reader.form_data

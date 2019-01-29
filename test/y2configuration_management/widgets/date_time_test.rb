@@ -28,7 +28,7 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
   let(:form_spec) { { "deadline" => { "$type" => "datetime" } } }
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
   let(:spec) { form.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.deadline") }
+  let(:locator) { locator_from_string("root#deadline") }
   let(:yast_release) { "#{yast_release_date} #{yast_release_time}" }
   let(:yast_release_date) { "1996-05-01" }
   let(:yast_release_time) { "16:30:00" }

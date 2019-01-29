@@ -33,7 +33,7 @@ describe Y2ConfigurationManagement::Widgets::Email do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.person.email") }
+  let(:locator) { locator_from_string("root#person#email") }
   let(:default) { "somebody@example.net" }
 
   describe ".new" do
