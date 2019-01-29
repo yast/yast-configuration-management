@@ -54,7 +54,7 @@ module Y2ConfigurationManagement
         # @param string [String] String representing an element locator
         # @return [FormElementLocator]
         def from_string(string)
-          parts = string[1..-1].split(".").each_with_object([]) do |part, all|
+          parts = string[1..-1].scan(/(?:\[.*?\]|[^\.\[])+/).each_with_object([]) do |part, all|
             all.concat(from_part(part))
           end
           new(parts)
@@ -63,7 +63,7 @@ module Y2ConfigurationManagement
       private
 
         # @return [Regexp] Regular expression representing a locator part
-        INDEXED_PART = /\A(\w+)\[(.+)\]\z/
+        INDEXED_PART = /\A([^\[]+)\[(.+)\]\z/
 
         # Parses a locator part
         #
@@ -72,8 +72,11 @@ module Y2ConfigurationManagement
         def from_part(string)
           match = INDEXED_PART.match(string)
           return [string.to_sym] unless match
-          path, id = match[1..-1]
-          numeric_id?(id) ? [path.to_sym, id.to_i] : [path.to_sym, id]
+          path = match[1]
+          ids = match[2].split("][").map do |id|
+            numeric_id?(id) ? id.to_i : id
+          end
+          [path.to_sym] + ids
         end
 
         # Determines whether the id is numeric or not
