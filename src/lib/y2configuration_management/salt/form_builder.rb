@@ -44,18 +44,22 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param controller [FormController] Controller to inject in widgets
-      def initialize(controller)
+      def initialize(controller, form)
         @controller = controller
+        @form = form
       end
 
       # Returns the list of widgets to be included in the form
       #
       # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
       # @return [Y2ConfigurationManagement::Widgets::Form] Form
-      def build(form_element)
+      def build(locator)
+        form_element = form.find_element_by(locator: locator.unbounded)
+        form_element = form_element.prototype if form_element.is_a?(Collection)
         scalar = !form_element.respond_to?(:elements)
+        root_locator = form_element.is_a?(Container) ? locator : locator.parent
         elements = scalar ? [form_element] : form_element.elements
-        widgets = Array(elements).map { |e| build_element(e) }
+        widgets = Array(elements).map { |e| build_element(e, root_locator) }
         Y2ConfigurationManagement::Widgets::Form.new(
           widgets, controller, scalar: scalar
         )
@@ -65,6 +69,8 @@ module Y2ConfigurationManagement
 
       # @return [FormController] Controller to inject in widgets
       attr_reader :controller
+      # @return [FormElement] Form description
+      attr_reader :form
 
       # Build a form element
       #
@@ -76,14 +82,15 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Group,
       #          Y2ConfigurationManagement::Widgets::Text,
       #          Y2ConfigurationManagement::Widgets::Collection]
-      def build_element(element)
+      def build_element(element, locator)
+        element_locator = locator.join(element.id.to_sym)
         case element.type
         when :group, :namespace, :"hidden-group"
-          build_group(element)
+          build_group(element, element_locator)
         when :"edit-group"
-          build_collection(element)
+          build_collection(element, element_locator)
         when *INPUT_WIDGET_CLASS.keys
-          build_input(element)
+          build_input(element, element_locator)
         else
           raise "Unknown $type: #{element.type}"
         end
@@ -93,11 +100,11 @@ module Y2ConfigurationManagement
       #
       # @param group [Y2ConfigurationManagement::Salt::Group] Group specification
       # @return [Y2ConfigurationManagement::Widgets::Group]
-      def build_group(group)
+      def build_group(group, locator)
         children = group.elements.map do |element_spec|
-          build_element(element_spec)
+          build_element(element_spec, locator)
         end
-        Y2ConfigurationManagement::Widgets::Group.new(group, children)
+        Y2ConfigurationManagement::Widgets::Group.new(group, children, locator)
       end
 
       # Builds a simple input element
@@ -106,17 +113,17 @@ module Y2ConfigurationManagement
       #
       # @param input_spec [Hash] Group specification
       # @return [Y2ConfigurationManagement::Widgets::Text]
-      def build_input(input_spec)
+      def build_input(input_spec, locator)
         klass = INPUT_WIDGET_CLASS[input_spec.type]
-        klass.new(input_spec)
+        klass.new(input_spec, locator)
       end
 
       # Builds a collection
       #
       # @param collection_spec [Hash] Collection specification
       # @return [Y2ConfigurationManagement::Widgets::Collection]
-      def build_collection(collection_spec)
-        Y2ConfigurationManagement::Widgets::Collection.new(collection_spec, controller)
+      def build_collection(collection_spec, locator)
+        Y2ConfigurationManagement::Widgets::Collection.new(collection_spec, controller, locator)
       end
     end
   end

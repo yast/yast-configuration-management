@@ -32,7 +32,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
   let(:pillar_path) { FIXTURES_PATH.join("pillar/test-formula.sls") }
   let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
-  let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
+  let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller, form) }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
   let(:locator) { locator_from_string("root#person#computers") }
   let(:collection_locator) { locator_from_string("person#computers") }
@@ -48,9 +48,9 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Salt::FormControllerState).to receive(:new)
       .and_return(state)
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
-      .with(controller).and_return(builder)
+      .with(controller, form).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
-    state.open_form(form.root.locator, builder.build(form.root))
+    state.open_form(form.root.locator, builder.build(form.root.locator))
   end
 
   shared_examples "form_controller" do
@@ -64,13 +64,13 @@ describe Y2ConfigurationManagement::Salt::FormController do
       end
 
       it "opens the dialog with the whole form" do
-        expect(builder).to receive(:build).with(form.root).and_call_original
+        expect(builder).to receive(:build).with(form.root.locator).and_call_original
         expect(Yast::CWM).to receive(:show)
         controller.show_main_dialog
       end
 
       it "runs the dialog with the whole form" do
-        expect(builder).to receive(:build).with(form.root).and_call_original
+        expect(builder).to receive(:build).with(form.root.locator).and_call_original
         controller.show_main_dialog
       end
 
@@ -95,17 +95,17 @@ describe Y2ConfigurationManagement::Salt::FormController do
   include_examples "form_controller"
 
   describe "#add" do
-    let(:prototype) { form.find_element_by(locator: locator).prototype }
+    let(:item_locator) { locator.join(0) }
 
     before do
       allow(Y2ConfigurationManagement::Widgets::FormPopup)
         .to receive(:new).and_return(popup)
       allow(builder).to receive(:build).and_call_original
-      allow(builder).to receive(:build).with(prototype).and_return(widget)
+      allow(builder).to receive(:build).with(item_locator).and_return(widget)
     end
 
     it "opens the dialog using the collections's prototype" do
-      expect(builder).to receive(:build).with(prototype).and_return(widget)
+      expect(builder).to receive(:build).with(locator.join(0)).and_return(widget)
       controller.add(collection_locator)
     end
 
@@ -157,16 +157,16 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   describe "#edit" do
     let(:result) { nil }
-    let(:prototype) { form.find_element_by(locator: locator).prototype }
+    let(:item_locator) { locator.join(0) }
 
     before do
       allow(builder).to receive(:build).and_call_original
-      allow(builder).to receive(:build).with(prototype).and_return(widget)
+      allow(builder).to receive(:build).with(item_locator).and_return(widget)
       allow(data).to receive(:update).and_call_original
     end
 
     it "opens the dialog using the collections's prototype" do
-      expect(builder).to receive(:build).with(prototype).and_return(widget)
+      expect(builder).to receive(:build).with(item_locator).and_return(widget)
       controller.edit(collection_locator.join(0))
     end
 
@@ -175,7 +175,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "updates the form data" do
         controller.edit(collection_locator.join(0))
-        expect(controller.get(locator.join(0))).to include(result)
+        expect(controller.get(item_locator)).to include(result)
       end
     end
 
