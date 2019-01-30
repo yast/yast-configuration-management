@@ -24,8 +24,9 @@ require "y2configuration_management/widgets/base_mixin"
 module Y2ConfigurationManagement
   module Widgets
     # This class represents a datetime field
-    class DateTime < ::CWM::CustomWidget
+    class DateTime < VisibilitySwitcher
       include BaseMixin
+      include SaltVisibilitySwitcher
 
       # Constructor
       #
@@ -34,8 +35,26 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        self.widget_id = "datetime:#{spec.id}"
-        @value = nil
+
+        inner = AlwaysVisibleDateTime.new(id: "datetime:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
+      end
+    end
+
+    # This class represents a datetime field
+    class AlwaysVisibleDateTime < ::CWM::CustomWidget
+      # @return [String] Widget label
+      attr_reader :label
+
+      def initialize(id:, label:)
+        self.widget_id = id
+        @label = label
+      end
+
+      # TODO: only if I am mentioned in a visible_if
+      def opt
+        [:notify]
       end
 
       def contents
@@ -51,10 +70,6 @@ module Y2ConfigurationManagement
         )
       end
 
-      def init
-        self.value = @value
-      end
-
       def value
         "#{date.value} #{time.value}"
       end
@@ -65,11 +80,6 @@ module Y2ConfigurationManagement
         time_value = t.strftime("%H:%M:%S")
         date.value = date_value
         time.value = time_value
-        @value = "#{date_value} #{time_value}"
-      end
-
-      def store
-        @value = value
       end
 
     private
