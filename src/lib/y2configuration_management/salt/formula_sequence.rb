@@ -21,7 +21,7 @@ require "ui/sequence"
 require "y2configuration_management/salt/formula_configuration"
 require "y2configuration_management/salt/formula_selection"
 require "y2configuration_management/salt/formula"
-require "configuration_management/cfa/salt_top"
+require "y2configuration_management/cfa/salt_top"
 
 Yast.import "Report"
 Yast.import "Message"
@@ -39,13 +39,13 @@ module Y2ConfigurationManagement
       # @return [Array<Formula>] available on the system
       attr_reader :formulas
 
-      # @return [Yast::ConfigurationManagement::Configurations::Salt]
+      # @return [Y2ConfigurationManagement::Configurations::Salt]
       attr_reader :config
 
       # Constructor
       #
       # @macro seeSequence
-      # @param config [Yast::ConfigurationManagement::Configurations::Salt]
+      # @param config [Y2ConfigurationManagement::Configurations::Salt]
       def initialize(config)
         textdomain "configuration_management"
         @config = config
@@ -84,7 +84,7 @@ module Y2ConfigurationManagement
 
         [config.pillar_root, config.states_root].each do |path|
           ::FileUtils.mkdir_p(path) unless File.exist?(path)
-          top = Yast::ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
           top.load
           top.add_states(formulas.select(&:enabled?).map(&:id))
           top.save

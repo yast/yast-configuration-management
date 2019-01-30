@@ -28,7 +28,7 @@ module Y2ConfigurationManagement
     #
     # The format used in the pillar is slightly different from the internal representation of this
     # module, so this class takes care of the conversion. However, the initial intentation is to not
-    # use it directly but through the {FormDate.from_pillar} class method.
+    # use it directly but through the {FormData.from_pillar} class method.
     #
     # ## Handling collections
     #

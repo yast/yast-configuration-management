@@ -146,7 +146,6 @@ module Y2ConfigurationManagement
 
       # Displays a popup
       #
-      # @param title    [String] Popup title
       # @param widget [Array<CWM::AbstractWidget>] Popup content (as an array of CWM widgets)
       # @return [Hash,nil] Dialog's result
       def show_popup(widget)

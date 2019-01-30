@@ -30,7 +30,9 @@ module Y2ConfigurationManagement
       def run
         textdomain "configuration_management"
 
-        pillar = Salt::Pillar.from_file("test/fixtures/pillar/test-formula.sls")
+        pillar_file = "test/fixtures/pillar/test-formula.sls"
+        pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
+        pillar.load
         formula = Salt::Formula.new(Pathname.new("test/fixtures"), pillar)
         controller = Salt::FormController.new(formula.form, pillar)
         controller.show_main_dialog

@@ -1,3 +1,3 @@
-require "configuration_management/clients/auto_client"
+require "y2configuration_management/clients/auto_client"
 
-Yast::ConfigurationManagement::AutoClient.new.run
+Y2ConfigurationManagement::AutoClient.new.run

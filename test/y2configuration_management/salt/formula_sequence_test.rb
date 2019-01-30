@@ -22,7 +22,7 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula_sequence"
 require "y2configuration_management/salt/formula"
-require "configuration_management/configurations/salt"
+require "y2configuration_management/configurations/salt"
 require "tmpdir"
 require "cwm/rspec"
 
@@ -35,7 +35,7 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration)
   end
   let(:config) do
-    Yast::ConfigurationManagement::Configurations::Salt.new(
+    Y2ConfigurationManagement::Configurations::Salt.new(
       formulas_roots: [formulas_root]
     )
   end
