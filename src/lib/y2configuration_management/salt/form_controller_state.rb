@@ -34,21 +34,18 @@ module Y2ConfigurationManagement
       def initialize(data)
         @form_widgets = []
         @locators = []
-        @actions = []
         @form_data_snapshots = [data]
       end
 
       # Registers that a new form has been open
       #
-      # It stores relevant information (the action, the locator and the form).
+      # It stores relevant information (the current locator and the form).
       #
-      # @param action      [Symbol] Action which triggered the form (:add or :edit)
       # @param locator     [FormElementLocator] Form element locator
       # @param form_widget [Widgets::Form] Form widget
-      def open_form(action, locator, form_widget)
+      def open_form(locator, form_widget)
         @form_widgets << form_widget
         @locators << locator
-        @actions << action
         backup_data
       end
 
@@ -59,13 +56,6 @@ module Y2ConfigurationManagement
         @form_widgets.last
       end
 
-      # Current action
-      #
-      # @return [Symbol] :add or :edit
-      def action
-        @actions.last
-      end
-
       # Locator of the current form widget
       #
       # @return [FormElementLocator]
@@ -73,20 +63,10 @@ module Y2ConfigurationManagement
         @locators.last
       end
 
-      # Replaces the current action/locator
-      #
-      # @param new_action  [Symbol]
-      # @param new_locator [FormElementLocator]
-      def replace(new_action, new_locator)
-        @actions[-1] = new_action
-        @locators[-1] = new_locator
-      end
-
       # Removes the information related to the most recently open form widget
       def close_form(rollback: false)
         @form_widgets.pop
         @locators.pop
-        @actions.pop
         if rollback
           restore_backup
         else

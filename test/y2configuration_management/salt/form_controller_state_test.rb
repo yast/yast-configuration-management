@@ -38,21 +38,19 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
 
   describe "#open_form" do
-    it "sets action, locator and element" do
-      state.open_form(:add, locator, form_widget)
-      expect(state.action).to eq(:add)
+    it "sets locator and element" do
+      state.open_form(locator, form_widget)
       expect(state.form_widget).to eq(form_widget)
       expect(state.locator).to eq(locator)
     end
 
     context "when a form is already open" do
       before do
-        state.open_form(:add, locator, form_widget)
+        state.open_form(locator, form_widget)
       end
 
       it "adds the information of the new form" do
-        state.open_form(:edit, locator_1, form_widget_1)
-        expect(state.action).to eq(:edit)
+        state.open_form(locator_1, form_widget_1)
         expect(state.locator).to eq(locator_1)
         expect(state.form_widget).to eq(form_widget_1)
       end
@@ -61,13 +59,13 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
 
   describe "#close_form" do
     before do
-      state.open_form(:add, locator, form_widget)
-      state.open_form(:edit, locator_1, form_widget_1)
+      state.open_form(locator, form_widget)
+      state.open_form(locator_1, form_widget_1)
     end
 
     it "removes the information of the most recent form" do
       state.close_form
-      expect(state.action).to eq(:add)
+      expect(state.locator).to eq(locator)
     end
 
     context "when asked for rollback" do

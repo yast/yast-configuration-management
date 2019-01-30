@@ -50,7 +50,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
-    state.open_form(:edit, form.root.locator, builder.build(form.root))
+    state.open_form(form.root.locator, builder.build(form.root))
   end
 
   shared_examples "form_controller" do
@@ -131,14 +131,15 @@ describe Y2ConfigurationManagement::Salt::FormController do
     context "adding an element to a nested collection" do
       let(:parent_form) do
         instance_double(
-          Y2ConfigurationManagement::Widgets::Form, result: { "brand" => "Lenovo", "disks" => [] }
+          Y2ConfigurationManagement::Widgets::Form, result: { "brand" => "ACME", "disks" => [] }
         ).as_null_object
       end
 
+      let(:parent_locator) { locator_from_string(".root.person.computers[0]") }
+
       before do
         allow(builder).to receive(:build).and_return(widget)
-        allow(data).to receive(:add_item).and_call_original
-        state.open_form(:add, locator_from_string(".root.person.computers"), parent_form)
+        state.open_form(parent_locator, parent_form)
       end
 
       context "when the user accepts the dialog" do
@@ -147,7 +148,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
         it "updates the form data" do
           controller.add(collection_locator)
-          collection = controller.get(locator_from_string(".root.person.computers[2].disks"))
+          collection = controller.get(parent_locator.join(collection_locator))
           expect(collection).to eq([result])
         end
       end
@@ -198,7 +199,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
       before do
         allow(builder).to receive(:build).and_return(widget)
         allow(data).to receive(:update).and_call_original
-        state.open_form(:edit, locator_from_string(".root.person.computers[1]"), parent_form)
+        state.open_form(locator_from_string(".root.person.computers[1]"), parent_form)
       end
 
       context "when the user accepts the dialog" do
