@@ -30,11 +30,12 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param children   [Array<AbstractWidget>] Widgets which are included in the group
-      def initialize(spec, children)
+      # @param spec         [Salt::FormElement] Element specification
+      # @param data_locator [Salt::FormElementLocator] Form element locator
+      # @param children     [Array<AbstractWidget>] Widgets which are included in the group
+      def initialize(spec, children, data_locator)
         textdomain "configuration_management"
-        initialize_base(spec)
+        initialize_base(spec, data_locator)
         @has_frame = spec.type == :group
         self.widget_id = "group:#{spec.id}"
         add_children(*children)

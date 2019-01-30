@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Time do
-  subject(:time) { described_class.new(spec) }
+  subject(:time) { described_class.new(spec, locator) }
   let(:form_spec) { { "start_time" => { "$type" => "time" } } }
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
 

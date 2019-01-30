@@ -40,7 +40,7 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
   let(:locator) { locator_from_string("root#servers") }
   let(:key_widget) { dictionary.send(:key_widget) }
   let(:value_widget) { dictionary.send(:value_widget) }
-  subject(:dictionary) { described_class.new(spec) }
+  subject(:dictionary) { described_class.new(spec, locator) }
   include_examples "CWM::CustomWidget"
 
   describe "#init" do

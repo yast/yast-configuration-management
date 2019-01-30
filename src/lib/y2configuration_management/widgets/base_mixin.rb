@@ -32,10 +32,12 @@ module Y2ConfigurationManagement
       # @return [Array<CWM::AbstractWidget>] Parent widget
       attr_accessor :parent
 
-      # @param spec [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      def initialize_base(spec)
+      # @param spec         [Salt::FormElement] Element specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize_base(spec, data_locator)
         @id = spec.id
-        @locator = spec.locator
+        @locator = data_locator
         @label = spec.label
       end
 

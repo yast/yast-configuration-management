@@ -63,8 +63,9 @@ module Y2ConfigurationManagement
       #   form.store
       #   form.result #=> "John Doe"
       #
-      # @param children [Array<CWM::AbstractWidget>] Widgets included in the form
-      # @param scalar [Boolean] Determines whether the form stores are scalar value
+      # @param children     [Array<CWM::AbstractWidget>] Widgets included in the form
+      # @param controller   [Salt::FormController] Form controller
+      # @param scalar       [Boolean] Determines whether the form stores are scalar value
       def initialize(children, controller, scalar: false)
         @value = scalar ? nil : {}
         @scalar = scalar

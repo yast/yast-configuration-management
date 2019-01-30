@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::DateTime do
-  subject(:datetime) { described_class.new(spec) }
+  subject(:datetime) { described_class.new(spec, locator) }
   let(:form_spec) { { "deadline" => { "$type" => "datetime" } } }
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
   let(:spec) { form.find_element_by(locator: locator) }

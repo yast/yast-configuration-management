@@ -52,9 +52,11 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
-      def initialize(spec)
-        initialize_base(spec)
+      # @param spec    [Y2ConfigurationManagement::Salt::FormInput] Input specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, data_locator)
+        initialize_base(spec, data_locator)
         @default = spec.default.to_s
 
         inner = InputField.new(id: "text:#{spec.id}", label: spec.label)

@@ -28,8 +28,10 @@ module Y2ConfigurationManagement
       VALID_COLOR_REGEXP = /\A#(\h{3}){1,2}\z/
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Input specification
-      def initialize(spec)
+      # @param spec         [Salt::FormInput] Input specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, data_locator)
         textdomain "configuration_management"
         super
         self.widget_id = "color:#{spec.id}"

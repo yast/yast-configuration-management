@@ -26,8 +26,10 @@ module Y2ConfigurationManagement
     class URL < Text
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
-      def initialize(spec)
+      # @param spec         [Salt::FormInput] Element specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, data_locator)
         textdomain "configuration_management"
         super
         self.widget_id = "url:#{spec.id}"

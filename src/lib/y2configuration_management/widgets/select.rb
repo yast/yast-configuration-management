@@ -35,9 +35,11 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      def initialize(spec)
-        initialize_base(spec)
+      # @param spec         [Salt::FormElement] Element specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, data_locator)
+        initialize_base(spec, data_locator)
         @default = spec.default
         @items = spec.values.map { |v| [v, v] }
         self.widget_id = "select:#{spec.id}"

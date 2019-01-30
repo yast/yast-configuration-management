@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Group do
-  subject(:group) { described_class.new(spec, [widget1]) }
+  subject(:group) { described_class.new(spec, [widget1], locator) }
 
   include_examples "CWM::CustomWidget"
 
@@ -39,7 +39,7 @@ describe Y2ConfigurationManagement::Widgets::Group do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      group = described_class.new(spec, [widget1])
+      group = described_class.new(spec, [widget1], locator)
       expect(group.locator).to eq(locator)
     end
   end

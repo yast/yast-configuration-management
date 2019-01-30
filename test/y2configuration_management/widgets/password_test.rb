@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Password do
-  subject(:password) { described_class.new(spec) }
+  subject(:password) { described_class.new(spec, locator) }
 
   include_examples "CWM::AbstractWidget"
 
@@ -37,7 +37,7 @@ describe Y2ConfigurationManagement::Widgets::Password do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      password = described_class.new(spec)
+      password = described_class.new(spec, locator)
       expect(password.locator).to eq(locator)
       expect(password.default).to eq("DefaultSecret")
     end

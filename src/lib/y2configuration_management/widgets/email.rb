@@ -20,14 +20,18 @@
 require "y2configuration_management/widgets/text"
 require "uri"
 
+Yast.import "Report"
+
 module Y2ConfigurationManagement
   module Widgets
     # This class represents an email text field
     class Email < Text
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
-      def initialize(spec)
+      # @param spec         [Salt::FormInput] Element specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, data_locator)
         textdomain "configuration_management"
         super
         self.widget_id = "email:#{spec.id}"
@@ -36,7 +40,6 @@ module Y2ConfigurationManagement
       def validate
         return true if value.to_s.empty?
 
-        Yast.import "Report"
         unless value.match(URI::MailTo::EMAIL_REGEXP)
           # TRANSLATORS: It reports that %s is an invalid email.
           Yast::Report.Error(_("%s: is not valid") % label)

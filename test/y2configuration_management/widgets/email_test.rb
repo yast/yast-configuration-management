@@ -25,7 +25,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Email do
-  subject(:email) { described_class.new(spec) }
+  subject(:email) { described_class.new(spec, locator) }
 
   include_examples "CWM::AbstractWidget"
 
@@ -38,7 +38,7 @@ describe Y2ConfigurationManagement::Widgets::Email do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      email = described_class.new(spec)
+      email = described_class.new(spec, locator)
       expect(email.locator).to eq(locator)
       expect(email.default).to eq(default)
     end

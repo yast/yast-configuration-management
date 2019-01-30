@@ -31,9 +31,11 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec [Y2ConfigurationManagement::Salt::FormInput] Element specification
-      def initialize(spec)
-        initialize_base(spec)
+      # @param spec         [Salt::FormInput] Element specification
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, data_locator)
+        initialize_base(spec, data_locator)
         @default = spec.default.to_s
         self.widget_id = "datetime:#{spec.id}"
         @value = nil

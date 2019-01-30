@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Color do
-  subject(:color) { described_class.new(spec) }
+  subject(:color) { described_class.new(spec, locator) }
   let(:form_spec) { { "bg_color" => { "$type" => "color", "$default" => default } } }
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
   let(:spec) { form.find_element_by(locator: locator) }
@@ -35,7 +35,7 @@ describe Y2ConfigurationManagement::Widgets::Color do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      color = described_class.new(spec)
+      color = described_class.new(spec, locator)
       expect(color.locator).to eq(locator)
       expect(color.default).to eq(default)
     end
