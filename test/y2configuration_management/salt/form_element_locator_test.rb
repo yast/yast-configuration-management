@@ -51,6 +51,14 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
         )
       end
     end
+
+    context "when a string describing a relative locator is given" do
+      it "generates a relative locator" do
+        locator = described_class.from_string("..domains[example.net]")
+        expect(locator).to be_relative
+        expect(locator.to_s).to eq("..domains[example.net]")
+      end
+    end
   end
 
   describe "#to_s" do
@@ -87,6 +95,13 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
       address_locator = locator.join(locator_from_string("address#type"))
       expect(address_locator.parts).to eq([:root, :hosts, 1, :interfaces, 3, :address, :type])
     end
+
+    context "when joining with a relative locator" do
+      it "goes up according to the relative locator" do
+        relative_locator = locator_from_string("..cpus[1]")
+        expect(locator.join(relative_locator).parts).to eq([:root, :hosts, 1, :cpus, 1])
+      end
+    end
   end
 
   describe "#unbounded" do
@@ -94,6 +109,32 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
 
     it "removes specific elements" do
       expect(locator.unbounded.to_s).to eq("root#hosts#interfaces")
+    end
+  end
+
+  describe "#==" do
+    context "when given two locators with the same parts" do
+      it "returns true" do
+
+        locator0 = locator_from_string("root#hosts")
+        locator1 = locator_from_string("root#hosts")
+        comparison = locator0 == locator1
+        expect(comparison).to eq(true)
+      end
+    end
+
+    context "when given two locators with the same parts but one of them is relative" do
+      it "returns false" do
+        comparison = locator_from_string(".root#hosts") == locator_from_string("root#hosts")
+        expect(comparison).to eq(false)
+      end
+    end
+
+    context "when given two locators with different parts" do
+      it "returns false" do
+        comparison = locator_from_string("root#hosts") == locator_from_string("root#interfaces")
+        expect(comparison).to eq(false)
+      end
     end
   end
 end
