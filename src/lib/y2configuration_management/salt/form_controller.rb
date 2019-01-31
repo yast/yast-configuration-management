@@ -67,7 +67,7 @@ module Y2ConfigurationManagement
       def show_main_dialog
         form_widget = form_builder.build(form.root)
         form_widget.value = get(form.root.locator)
-        state.open_form(:edit, form.root.locator, form_widget)
+        state.open_form(form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
         ret = Yast::CWM.show(
           HBox(form_widget),
@@ -172,56 +172,24 @@ module Y2ConfigurationManagement
       # @param relative_locator [FormElementLocator] Collection locator relative to the popup
       # @return [Hash,nil] edited data; `nil` when the user cancels the dialog
       def add_or_edit_item(action, relative_locator)
-        add_or_update_parent
-        result = run_popup(action, relative_locator)
-        update_form_data(result)
+        update_parent
+        item_locator = new_item_locator_for_action(action, relative_locator)
+        form_widget = item_form_for(item_locator)
+        state.open_form(item_locator, form_widget)
+        result = show_popup(form_widget)
+        form_data.update(state.locator, result) unless result.nil?
         state.close_form(rollback: result.nil?)
         refresh_top_form
       end
 
-      # Displays the add/edit form and returns the user's input
-      #
-      # @param action           [Symbol] :add or :edit
-      # @param relative_locator [FormElementLocator] Collection locator relative to the popup
-      # @return [Hash, nil] User's input or nil if the user pushed canceled the dialog
-      def run_popup(action, relative_locator)
-        abs_locator = state.locator.join(relative_locator)
-        form_widget = item_form_for(abs_locator)
-        form_widget.value = get(abs_locator) if action == :edit
-        state.open_form(action, abs_locator, form_widget)
-        show_popup(form_widget)
-      end
-
-      # Updates the form data depending on the action
-      #
-      # When result is `nil`, it just restores the backup.
-      #
-      # @param result [Hash,nil] Result to process
-      def update_form_data(result)
-        return nil if result.nil?
-
-        if state.action == :add
-          form_data.add_item(state.locator, result)
-        else
-          form_data.update(state.locator, result)
-        end
-      end
-
-      # Adds or updates the parent of a collection item
+      # Updates the parent of a collection item
       #
       # When trying to add an element to a collection, it is necessary that the parent
       # object exists.
-      def add_or_update_parent
+      def update_parent
         state.form_widget.store
         parent = state.form_widget.result
-
-        if state.action == :edit
-          form_data.update(state.locator, parent)
-        else
-          form_data.add_item(state.locator, parent)
-          locator = state.locator.join(get(state.locator).size - 1)
-          state.replace(:edit, locator)
-        end
+        form_data.update(state.locator, parent)
       end
 
       # Builds a form widget for a given locator
@@ -232,7 +200,30 @@ module Y2ConfigurationManagement
         element = form.find_element_by(locator: locator.unbounded)
         form_widget = form_builder.build(element.prototype)
         form_widget.title = element.name
+        form_widget.value = find_or_create_item(locator)
         form_widget
+      end
+
+      # Finds or creates the item to be edited
+      #
+      # @return [Hash]
+      def find_or_create_item(item_locator)
+        new_item = get(item_locator)
+        return new_item if new_item
+        new_item = {}
+        form_data.add_item(item_locator.parent, new_item)
+        new_item
+      end
+
+      # Determines the locator for an element which is about to be created
+      #
+      # If the element exists, it returns its locator; otherwise, it determines the
+      # locator of the element once it is created.
+      #
+      # @return [FormElementLocator]
+      def new_item_locator_for_action(action, relative_locator)
+        abs_locator = state.locator.join(relative_locator)
+        action == :add ? abs_locator.join(get(abs_locator).size) : abs_locator
       end
 
       # Returns the current form data
