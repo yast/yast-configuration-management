@@ -210,8 +210,9 @@ module Y2ConfigurationManagement
       def find_or_create_item(item_locator)
         new_item = get(item_locator)
         return new_item if new_item
-        form_data.add_item(item_locator.parent, {})
-        {}
+        new_item = {}
+        form_data.add_item(item_locator.parent, new_item)
+        new_item
       end
 
       # Determines the locator for an element which is about to be created
