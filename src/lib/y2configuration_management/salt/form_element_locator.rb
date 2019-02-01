@@ -166,8 +166,7 @@ module Y2ConfigurationManagement
           part_as_string = part.is_a?(Symbol) ? "##{part}" : "[#{part}]"
           memo << part_as_string
         end
-        prefix = relative? ? "." * upto : ""
-        prefix + as_string[1..-1]
+        "." * upto + as_string[1..-1]
       end
 
       # Extends a locator
