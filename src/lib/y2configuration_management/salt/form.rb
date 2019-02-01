@@ -290,6 +290,22 @@ module Y2ConfigurationManagement
         prototype.elements.any? { |e| e.respond_to?(:collection_key?) && e.collection_key? }
       end
 
+      # Determines whether the collection is an scalar one
+      #
+      # @return [Boolean] true if the collection is an scalar one; false otherwise
+      def scalar?
+        return false if prototype.nil?
+        prototype.is_a?(FormInput) && prototype.type != :key_value
+      end
+
+      # Determines whether the collection is a hash with scalar values
+      #
+      # @return [Boolean] true if the collection is a hash with scalar values; false otherwise
+      def keyed_scalar?
+        return false if prototype.nil?
+        prototype.is_a?(FormInput) && prototype.type == :key_value
+      end
+
     private
 
       # Return a single or group of {FormElement}s based on the prototype given
