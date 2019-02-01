@@ -118,9 +118,7 @@ module Y2ConfigurationManagement
 
       # Return the absolute locator of this form element in the actual form
       #
-      # FIXME: possible implementation of the form element locator
-      #
-      # @return [String]
+      # @return [FormElementLocator]
       def locator
         return FormElementLocator.new([id.to_sym]) if parent.nil?
         return parent.locator if parent.is_a?(Collection)
