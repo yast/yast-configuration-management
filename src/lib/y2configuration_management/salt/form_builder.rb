@@ -61,7 +61,7 @@ module Y2ConfigurationManagement
         elements = scalar ? [form_element] : form_element.elements
         widgets = Array(elements).map { |e| build_element(e, root_locator) }
         Y2ConfigurationManagement::Widgets::Form.new(
-          widgets, controller, scalar: scalar
+          widgets, controller, scalar: scalar, title: form_element.name
         )
       end
 

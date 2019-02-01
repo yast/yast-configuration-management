@@ -63,14 +63,16 @@ module Y2ConfigurationManagement
       #   form.store
       #   form.result #=> "John Doe"
       #
-      # @param children     [Array<CWM::AbstractWidget>] Widgets included in the form
-      # @param controller   [Salt::FormController] Form controller
-      # @param scalar       [Boolean] Determines whether the form stores are scalar value
-      def initialize(children, controller, scalar: false)
+      # @param children   [Array<CWM::AbstractWidget>] Widgets included in the form
+      # @param controller [Salt::FormController] Form controller
+      # @param scalar     [Boolean] Determines whether the form stores are scalar value
+      # @param title      [String] Form title
+      def initialize(children, controller, scalar: false, title: "")
         @value = scalar ? nil : {}
         @scalar = scalar
         add_children(*children)
         @controller = controller
+        @title = title
         self.handle_all_events = true
         super()
       end
