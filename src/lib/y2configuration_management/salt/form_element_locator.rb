@@ -106,7 +106,8 @@ module Y2ConfigurationManagement
       # @return [Array<Integer,String,Symbol>] Locator parts
       attr_reader :parts
 
-      # @return [Integer]
+      # Zero for absolute locators, nonzero for relative ones
+      # @return [Integer] how many levels up do we go for a relative locator
       attr_reader :upto
 
       # Constructor
