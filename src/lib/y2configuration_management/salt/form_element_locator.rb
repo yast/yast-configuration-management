@@ -45,6 +45,15 @@ module Y2ConfigurationManagement
     # @example Extending a locator
     #   locator = FormElementLocator.new(:root, :hosts, "router")
     #   locator.join(:interfaces).to_s #=> "root#hosts[router]#interfaces"
+    #
+    # @example Joining relative locators
+    #   relative = FormElementLocator.from_string(".subnets")
+    #   locator = FormElementLocator.new(:root, :hosts)
+    #   locator.join(relative).to_s #=> "root#subnets"
+    #
+    # @example Building a relative locator using the {.new} method
+    #   relative = FormElementLocator.new([:hosts], upto: 2)
+    #   relative.to_s #=> "..hosts"
     class FormElementLocator
       extend Forwardable
 
@@ -58,10 +67,18 @@ module Y2ConfigurationManagement
         # @param string [String] String representing an element locator
         # @return [FormElementLocator]
         def from_string(string)
-          string.scan(TOKENS).reduce(nil) do |locator, part|
-            new_locator = from_part(part)
-            locator ? locator.join(from_part(part)) : new_locator
+          string.scan(TOKENS).reduce(neutral) do |locator, part|
+            locator.join(from_part(part))
           end
+        end
+
+        # Returns a neutral locator
+        #
+        # Convenience method to return the neutral locator
+        #
+        # @return [FormElementLocator]
+        def neutral
+          new(nil)
         end
 
       private
@@ -112,10 +129,19 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param parts [Array<Integer,String,Symbol>] Locator parts
+      # @param parts [Array<Integer,String,Symbol>,nil] Locator parts; nil for the neutral element
       def initialize(parts, upto: 0)
         @parts = parts
         @upto = upto
+      end
+
+      # Determines whether this is a neutral locator
+      #
+      # The neutral locator does not modify any other locator when joining.
+      #
+      # @return [Boolean]
+      def neutral?
+        @parts.nil?
       end
 
       # Locator of the parent element
@@ -186,6 +212,8 @@ module Y2ConfigurationManagement
       # @return [Locator] Augmented locator
       # @see join
       def join_with_locator(other)
+        return self if other.neutral?
+        return other if self.neutral?
         limit = -1 - other.upto
         self.class.new(parts[0..limit] + other.parts, upto: upto)
       end

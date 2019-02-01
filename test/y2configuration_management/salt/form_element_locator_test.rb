@@ -26,7 +26,7 @@ require "y2configuration_management/salt/form_element_locator"
 describe Y2ConfigurationManagement::Salt::FormElementLocator do
   subject(:locator) { described_class.new([:root, :hosts, 1, :interfaces, 3]) }
 
-  describe "#from_string" do
+  describe ".from_string" do
     it "extracts the parts" do
       locator = described_class.from_string("root#person#computers[2]#interfaces[eth0]")
       expect(locator.parts).to eq(
@@ -102,6 +102,18 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
         expect(locator.join(relative_locator).parts).to eq([:root, :hosts, 1, :cpus, 1])
       end
     end
+
+    context "when the initial locator is neutral" do
+      it "returns the given locator" do
+        expect(described_class.neutral.join(locator)).to eq(locator)
+      end
+    end
+
+    context "when the given locator is neutral" do
+      it "returns the initial locator" do
+        expect(locator.join(described_class.neutral)).to eq(locator)
+      end
+    end
   end
 
   describe "#unbounded" do
@@ -134,6 +146,20 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
       it "returns false" do
         comparison = locator_from_string("root#hosts") == locator_from_string("root#interfaces")
         expect(comparison).to eq(false)
+      end
+    end
+  end
+
+  describe "#neutral?" do
+    context "when a neutral locator is given" do
+      it "returns true" do
+        expect(described_class.neutral).to be_neutral
+      end
+    end
+
+    context "when a non-neutral locator is given" do
+      it "returns false" do
+        expect(locator_from_string("root")).to_not be_neutral
       end
     end
   end
