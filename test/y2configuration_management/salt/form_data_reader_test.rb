@@ -85,7 +85,7 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
 
       it "keeps it as an array" do
         form_data = reader.form_data
-        expect(form_data.get(locator)).to eq(["Linux"])
+        expect(form_data.get(locator)).to eq([{ "$value" => "Linux" }])
       end
     end
   end

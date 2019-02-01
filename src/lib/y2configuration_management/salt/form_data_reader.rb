@@ -34,19 +34,27 @@ module Y2ConfigurationManagement
     #
     # There might be different kind of collections:
     #
-    # * Array with simple values (strings, integers, etc).
-    # * Array of hashes. They allow a more complex collection.
-    # * Hash based collections which index is provided by the user.
+    # * (1) Array with simple values (strings, integers, etc).
+    # * (2) Hash based collections which index is provided by the user.
+    # * (3) Array of hashes. They allow a more complex collection.
     #
-    # To simplify things in the UI layer, all collections are handled as arrays so, in the third
-    # case, some conversion is needed. Given an specification with three fields `$key`, `url`,
-    # and `license`, the collection would be stored in the Pillar like this:
+    # To simplify things in the UI layer, all collections are handled as arrays of hashes so, in (1)
+    # and (2) cases, some conversion is needed.
+    #
+    # For (1), the data in the Pillar is just an array of simple values (numbers, strings, or
+    # any other scalar value). Internally, it is converted to an array of hashes with just a
+    # `$value` key:
+    #
+    #   [{ "$value" => "foo" }, { "$value" => "bar" }]
+    #
+    # In the (2) case, given an specification with three fields `$key`, `url`, and `license`, the
+    # collection would be stored in the Pillar like this:
     #
     #   { "yast2" =>
     #     { "url" => "https://yast.opensuse.org", "license" => "GPL" }
     #   }
     #
-    # Internally, it will be handled as an array:
+    # But internally, it will be handled as an array:
     #
     #   [{ "$key" => "yast2", "url" => "https://yast.opensuse.org", "license" => "GPL" }]
     #
@@ -122,12 +130,10 @@ module Y2ConfigurationManagement
         element = form.find_element_by(locator: locator.unbounded)
         if element.keyed?
           data.map { |k, v| { "$key" => k }.merge(hash_from_pillar(v, locator.join(k))) }
-        elsif element.prototype.is_a?(FormInput)
-          if element.prototype.type == :key_value
-            data.map { |k, v| { "$key" => k, "$value" => v } }
-          else
-            data
-          end
+        elsif element.keyed_scalar?
+          data.map { |k, v| { "$key" => k, "$value" => v } }
+        elsif element.scalar?
+          data.map { |v| { "$value" => v } }
         else
           data.map { |d| hash_from_pillar(d, locator) }
         end

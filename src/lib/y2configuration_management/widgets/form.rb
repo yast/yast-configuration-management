@@ -99,15 +99,16 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget
       def store
-        @result = scalar ? current_values.values.first : current_values
+        @result = current_values
       end
 
       # Returns widget's content
       #
-      # @return [Hash,nil] values including the ones from the underlying widgets; nil when
-      #   the widget has been removed from the UI.
+      # @return [Hash] values including the ones from the underlying widgets; values are
+      #   `nil` when the form has been removed from the UI.
       def current_values
-        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+        return children_values unless scalar?
+        { "$value" => children_values.values.first }
       end
 
       # Refreshes the widget's content
@@ -149,6 +150,13 @@ module Y2ConfigurationManagement
 
     private
 
+      # Returns children values
+      #
+      # @return [Hash] Hash containing the children ids and their values
+      def children_values
+        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
+      end
+
       def set_widgets_content
         if scalar?
           set_child_content
@@ -158,7 +166,7 @@ module Y2ConfigurationManagement
       end
 
       def set_child_content
-        children.first.value = value
+        children.first.value = value["$value"]
       end
 
       def set_children_contents
