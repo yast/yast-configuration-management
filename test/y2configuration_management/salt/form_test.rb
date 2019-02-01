@@ -28,7 +28,7 @@ describe Y2ConfigurationManagement::Salt::Form do
     end
   end
 
-  describe "root" do
+  describe "#root" do
     it "returns the form root Y2ConfigurationManagement::Salt::Container" do
       expect(form.root).to be_a(Y2ConfigurationManagement::Salt::Container)
       expect(form.root.name).to eql("Root")
