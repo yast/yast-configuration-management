@@ -212,7 +212,7 @@ module Y2ConfigurationManagement
       # @see join
       def join_with_locator(other)
         return self if other.neutral?
-        return other if self.neutral?
+        return other if neutral?
         limit = -1 - other.upto
         self.class.new(parts[0..limit] + other.parts, upto: upto)
       end
