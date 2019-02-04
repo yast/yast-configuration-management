@@ -36,7 +36,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   end
   let(:form) { Y2ConfigurationManagement::Widgets::Form.new([], controller) }
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.person.computers") }
+  let(:locator) { locator_from_string("root#person#computers") }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
   let(:formatted_default) do
     [
@@ -61,7 +61,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       let(:event) { { "ID" => "#{collection.widget_id}_add".to_sym } }
 
       it "adds a new element to the collection" do
-        expect(controller).to receive(:add).with(locator_from_string(".computers"))
+        expect(controller).to receive(:add).with(locator_from_string("computers"))
         collection.handle(event)
       end
     end
@@ -74,7 +74,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "edits an element of the collection" do
-        expect(controller).to receive(:edit).with(locator_from_string(".computers[1]"))
+        expect(controller).to receive(:edit).with(locator_from_string("computers[1]"))
         collection.handle(event)
       end
     end
@@ -87,7 +87,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       end
 
       it "removes the selected element from the collection" do
-        expect(controller).to receive(:remove).with(locator_from_string(".computers[1]"))
+        expect(controller).to receive(:remove).with(locator_from_string("computers[1]"))
         collection.handle(event)
       end
     end

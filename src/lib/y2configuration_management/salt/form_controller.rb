@@ -176,6 +176,7 @@ module Y2ConfigurationManagement
         item_locator = new_item_locator_for_action(action, relative_locator)
         form_widget = item_form_for(item_locator)
         state.open_form(item_locator, form_widget)
+        form_widget.value = find_or_create_item(item_locator)
         result = show_popup(form_widget)
         form_data.update(state.locator, result) unless result.nil?
         state.close_form(rollback: result.nil?)
@@ -200,7 +201,6 @@ module Y2ConfigurationManagement
         element = form.find_element_by(locator: locator.unbounded)
         form_widget = form_builder.build(element.prototype)
         form_widget.title = element.name
-        form_widget.value = find_or_create_item(locator)
         form_widget
       end
 

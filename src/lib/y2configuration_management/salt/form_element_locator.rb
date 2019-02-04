@@ -26,21 +26,34 @@ module Y2ConfigurationManagement
     # Represent the locator to a form element
     #
     # The locator can be seen as a path to the form element. In a human readable form, the locator
-    # looks like: ".root.person.computers[1]" or ".root.hosts[router]".
+    # looks like: "root#person#computers[1]" or "root#hosts[router]".
     #
     # @example Building a locator from a string for an array based collection
-    #   locator = FormElementLocator.from_string(".root.person.computers[1]")
-    #   locator.to_s  #=> ".root.person.computers[1]"
+    #   locator = FormElementLocator.from_string("root#person#computers[1]")
+    #   locator.to_s  #=> "root#person#computers[1]"
     #   locator.parts #=> [:root, :person, :computers, 1]
     #
     # @example Building a locator from a string for a hash based collection
-    #   locator = FormElementLocator.from_string(".root.hosts[router]")
-    #   locator.to_s  #=> ".root.hosts[router]"
+    #   locator = FormElementLocator.from_string("root#hosts[router]")
+    #   locator.to_s  #=> "root#hosts[router]"
     #   locator.parts #=> [:root, :hosts, "router"]
     #
     # @example Building a locator from its parts
     #   locator = FormElementLocator.new(:root, :hosts, "router")
-    #   locator.to_s #=> ".root.hosts[router]"
+    #   locator.to_s #=> "root#hosts[router]"
+    #
+    # @example Extending a locator
+    #   locator = FormElementLocator.new(:root, :hosts, "router")
+    #   locator.join(:interfaces).to_s #=> "root#hosts[router]#interfaces"
+    #
+    # @example Joining relative locators
+    #   relative = FormElementLocator.from_string(".subnets")
+    #   locator = FormElementLocator.new(:root, :hosts)
+    #   locator.join(relative).to_s #=> "root#subnets"
+    #
+    # @example Building a relative locator using the {.new} method
+    #   relative = FormElementLocator.new([:hosts], upto: 2)
+    #   relative.to_s #=> "..hosts"
     class FormElementLocator
       extend Forwardable
 
@@ -54,29 +67,49 @@ module Y2ConfigurationManagement
         # @param string [String] String representing an element locator
         # @return [FormElementLocator]
         def from_string(string)
-          parts = string[1..-1].scan(/(?:\[.*?\]|[^\.\[])+/).each_with_object([]) do |part, all|
-            all.concat(from_part(part))
+          string.scan(TOKENS).reduce(neutral) do |locator, part|
+            locator.join(from_part(part))
           end
-          new(parts)
+        end
+
+        # Returns a neutral locator
+        #
+        # Convenience method to return the neutral locator
+        #
+        # @return [FormElementLocator]
+        def neutral
+          new(nil)
         end
 
       private
 
-        # @return [Regexp] Regular expression representing a locator part
-        INDEXED_PART = /\A([^\[]+)\[(.+)\]\z/
+        # @return [String] Locator segments separator
+        SEPARATOR = "#".freeze
+
+        # @return [Regexp] Regular expresion to extract locator segments
+        TOKENS = /(?:\[.*?\]|[^#{SEPARATOR}\[])+/
+
+        # @return [Regexp] Regular expression representing a indexed locator segment
+        INDEXED_SEGMENT = /([^\[]+)(?:\[(.+)\])?/
+
+        # @return []
+        SEGMENT = /(\.*)#{INDEXED_SEGMENT}/
 
         # Parses a locator part
         #
         # @param string [String]
         # @return [Array<Integer,String,Symbol>] Locator subparts
         def from_part(string)
-          match = INDEXED_PART.match(string)
-          return [string.to_sym] unless match
-          path = match[1]
-          ids = match[2].split("][").map do |id|
+          match = SEGMENT.match(string)
+          return nil unless match
+          prefix, path, index = match[1..3]
+
+          ids = index.to_s.split("][").map do |id|
             numeric_id?(id) ? id.to_i : id
           end
-          [path.to_sym] + ids
+
+          parts = [path.to_sym] + ids
+          FormElementLocator.new(parts, upto: prefix.size)
         end
 
         # Determines whether the id is numeric or not
@@ -90,11 +123,25 @@ module Y2ConfigurationManagement
       # @return [Array<Integer,String,Symbol>] Locator parts
       attr_reader :parts
 
+      # Zero for absolute locators, nonzero for relative ones
+      # @return [Integer] how many levels up do we go for a relative locator
+      attr_reader :upto
+
       # Constructor
       #
-      # @param parts [Array<Integer,String,Symbol>] Locator parts
-      def initialize(parts)
+      # @param parts [Array<Integer,String,Symbol>,nil] Locator parts; nil for the neutral element
+      def initialize(parts, upto: 0)
         @parts = parts
+        @upto = upto
+      end
+
+      # Determines whether this is a neutral locator
+      #
+      # The neutral locator does not modify any other locator when joining.
+      #
+      # @return [Boolean]
+      def neutral?
+        @parts.nil?
       end
 
       # Locator of the parent element
@@ -115,10 +162,11 @@ module Y2ConfigurationManagement
       #
       # @return [String] String representation
       def to_s
-        parts.reduce("") do |memo, part|
-          part_as_string = part.is_a?(Integer) ? "[#{part}]" : ".#{part}"
+        as_string = parts.reduce("") do |memo, part|
+          part_as_string = part.is_a?(Symbol) ? "##{part}" : "[#{part}]"
           memo << part_as_string
         end
+        "." * upto + as_string[1..-1]
       end
 
       # Extends a locator
@@ -127,11 +175,10 @@ module Y2ConfigurationManagement
       #   to join
       # @return [Locator] Augmented locator
       def join(*locators_or_parts)
-        new_parts = locators_or_parts.reduce([]) do |all, item|
-          item_parts = item.respond_to?(:parts) ? item.parts : [item]
-          all + item_parts
+        locators_or_parts.reduce(self) do |locator, item|
+          other = item.is_a?(FormElementLocator) ? item : FormElementLocator.new([item])
+          locator.join_with_locator(other)
         end
-        self.class.new(parts + new_parts)
       end
 
       # Determines whether two locators are equivalent
@@ -139,7 +186,7 @@ module Y2ConfigurationManagement
       # @param other [Locator] Locator to compare with
       # @return [Boolean] true if both locators are equal; false otherwise
       def ==(other)
-        parts == other.parts
+        upto == other.upto && parts == other.parts
       end
 
       # Removes references to specific collection elements
@@ -147,6 +194,27 @@ module Y2ConfigurationManagement
       # @return [FormElementLocator]
       def unbounded
         self.class.new(parts.select { |i| i.is_a?(Symbol) })
+      end
+
+      # Determines whether a locator is relative or not
+      #
+      # @return [Boolean] true if its relative; false otherwise
+      def relative?
+        !upto.zero?
+      end
+
+    protected
+
+      # Extends a locator with another one
+      #
+      # @param other [FormElementLocator] Locator to join
+      # @return [Locator] Augmented locator
+      # @see join
+      def join_with_locator(other)
+        return self if other.neutral?
+        return other if neutral?
+        limit = -1 - other.upto
+        self.class.new(parts[0..limit] + other.parts, upto: upto)
       end
     end
   end

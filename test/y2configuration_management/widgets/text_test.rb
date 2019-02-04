@@ -32,7 +32,7 @@ describe Y2ConfigurationManagement::Widgets::Text do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.person.name") }
+  let(:locator) { locator_from_string("root#person#name") }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do

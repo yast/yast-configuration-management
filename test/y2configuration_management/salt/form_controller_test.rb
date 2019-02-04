@@ -34,8 +34,8 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller) }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
-  let(:locator) { locator_from_string(".root.person.computers") }
-  let(:collection_locator) { locator_from_string(".person.computers") }
+  let(:locator) { locator_from_string("root#person#computers") }
+  let(:collection_locator) { locator_from_string("person#computers") }
   let(:popup) { instance_double(Y2ConfigurationManagement::Widgets::FormPopup, run: popup_run) }
   let(:popup_run) { :ok }
   let(:widget) do
@@ -135,7 +135,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
         ).as_null_object
       end
 
-      let(:parent_locator) { locator_from_string(".root.person.computers[0]") }
+      let(:parent_locator) { locator_from_string("root#person#computers[0]") }
 
       before do
         allow(builder).to receive(:build).and_return(widget)
@@ -143,7 +143,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
       end
 
       context "when the user accepts the dialog" do
-        let(:collection_locator) { locator_from_string(".disks") }
+        let(:collection_locator) { locator_from_string("disks") }
         let(:result) { { "type" => "HDD", "size" => "1TiB" } }
 
         it "updates the form data" do
@@ -199,13 +199,13 @@ describe Y2ConfigurationManagement::Salt::FormController do
       before do
         allow(builder).to receive(:build).and_return(widget)
         allow(data).to receive(:update).and_call_original
-        state.open_form(locator_from_string(".root.person.computers[1]"), parent_form)
+        state.open_form(locator_from_string("root#person#computers[1]"), parent_form)
       end
 
       context "when the user accepts the dialog" do
-        let(:collection_locator) { locator_from_string(".disks") }
+        let(:collection_locator) { locator_from_string("disks") }
         let(:result) { { "type" => "HDD", "size" => "1TiB" } }
-        let(:disks_locator) { locator_from_string(".root.person.computers[1].disks") }
+        let(:disks_locator) { locator_from_string("root#person#computers[1]#disks") }
 
         it "updates the form data" do
           controller.add(collection_locator)
@@ -216,11 +216,11 @@ describe Y2ConfigurationManagement::Salt::FormController do
   end
 
   describe "#remove" do
-    let(:element_locator) { locator_from_string(".person.computers[1]") }
+    let(:element_locator) { locator_from_string("person#computers[1]") }
 
     it "removes an element" do
       expect { controller.remove(element_locator) }
-        .to change { controller.get(locator_from_string(".root.person.computers[1]")) }
+        .to change { controller.get(locator_from_string("root#person#computers[1]")) }
         .from(Hash)
         .to(nil)
     end

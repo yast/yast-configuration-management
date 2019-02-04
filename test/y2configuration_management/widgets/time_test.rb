@@ -29,7 +29,7 @@ describe Y2ConfigurationManagement::Widgets::Time do
   let(:form) { Y2ConfigurationManagement::Salt::Form.new(form_spec) }
 
   let(:spec) { form.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string(".root.start_time") }
+  let(:locator) { locator_from_string("root#start_time") }
 
   include_examples "CWM::TimeField"
 
