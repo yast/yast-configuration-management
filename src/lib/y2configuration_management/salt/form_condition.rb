@@ -17,6 +17,8 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
+require "y2configuration_management/salt/form_element_locator"
+
 module Y2ConfigurationManagement
   module Salt
     # A boolean condition operating on a value in the form,
@@ -26,43 +28,25 @@ module Y2ConfigurationManagement
       end
 
       # @param s [String]
-      # @param context [FormElement] for resolving relative expressions
       # @return [FormCondition,nil]
-      def self.parse(s, context:)
+      def self.parse(s)
         if s.empty?
           nil
         # This matches checkVisibilityCondition in FormulaComponentGenerator.js
         # TODO: specify it better
         elsif s.include?("==")
           parts = s.split("==").map(&:strip)
-          locator = parse_locator(parts[0].strip, context.locator)
+          locator = FormElementLocator.from_string(parts[0].strip)
           value = parse_value(parts[1].strip)
           EqualCondition.new(locator: locator, value: value)
         elsif s.include?("!=")
           parts = s.split("!=").map(&:strip)
-          locator = parse_locator(parts[0], context.locator)
+          locator = FormElementLocator.from_string(parts[0])
           value = parse_value(parts[1])
           NotEqualCondition.new(locator: locator, value: value)
         else
           raise ParseError, "Expecting equality or inequality: #{s.inspect}"
         end
-      end
-
-      # @param s [String]
-      # @param context_loc [FormElementLocator] for resolving relative expressions
-      # @return [FormElementLocator]
-      def self.parse_locator(s, context_loc)
-        if s.start_with? "."
-          while s.start_with? "."
-            s = s[1..-1]
-            context_loc = context_loc.parent
-          end
-          parent_loc = context_loc
-        else
-          parent_loc = FormElementLocator.new([:root])
-        end
-        s_parts = s.split("#").map(&:to_sym)
-        parent_loc.join(* s_parts)
       end
 
       # @param s [String]
@@ -84,8 +68,10 @@ module Y2ConfigurationManagement
       end
 
       # @param data [FormData]
-      def evaluate(data)
-        left = data.get(@locator).to_s
+      # @param context [FormElement] for resolving relative expressions
+      def evaluate(data, context:)
+        left_locator = @locator.relative? ? context.locator.join(@locator) : @locator
+        left = data.get(left_locator).to_s
         right = @value.to_s
         left == right
       end
@@ -93,7 +79,9 @@ module Y2ConfigurationManagement
 
     # A {FormCondition} checking if a widget is not equal to a constant
     class NotEqualCondition < EqualCondition
-      def evaluate(data)
+      # @param data [FormData]
+      # @param context [FormElement] for resolving relative expressions
+      def evaluate(data, context:)
         !super
       end
     end

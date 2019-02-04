@@ -48,11 +48,13 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param spec       [Y2ConfigurationManagement::Salt::FormElement] Element specification
-      # @param controller [Y2ConfigurationManagement::Salt::FormController] Form controller
-      def initialize(spec, controller)
+      # @param spec         [Salt::FormElement] Element specification
+      # @param controller   [Salt::FormController] Form controller
+      # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
+      #   in case of nested collections)
+      def initialize(spec, controller, data_locator)
         textdomain "configuration_management"
-        initialize_base(spec)
+        initialize_base(spec, data_locator)
         @controller = controller
         @min_items = spec.min_items
         @max_items = spec.max_items

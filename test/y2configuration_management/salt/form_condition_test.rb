@@ -19,6 +19,7 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_condition"
+require "y2configuration_management/salt/form_element_locator"
 
 describe Y2ConfigurationManagement::Salt::FormCondition do
   def locator_new(*args)
@@ -29,23 +30,11 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
 
   describe ".parse" do
     it "parses the empty string as a nil condition" do
-      expect(described_class.parse("", context: nil)).to eq(nil)
+      expect(described_class.parse("")).to eq(nil)
     end
 
     it "raises on an unparsable string" do
-      expect { described_class.parse("***", context: nil) }.to raise_error(RuntimeError)
-    end
-  end
-
-  describe ".parse_locator" do
-    it "parses a .relative locator" do
-      expect(described_class.parse_locator(".baz", context_loc))
-        .to eq(locator_new([:root, :foo, :baz]))
-    end
-
-    it "parses a ..relative locator" do
-      expect(described_class.parse_locator("..qux", context_loc))
-        .to eq(locator_new([:root, :qux]))
+      expect { described_class.parse("***") }.to raise_error(RuntimeError)
     end
   end
 
@@ -69,26 +58,53 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
 
   describe Y2ConfigurationManagement::Salt::EqualCondition do
     describe "#evaluate" do
+      subject(:condition) { described_class.parse("myform#mywidget == '42'") }
+
+      let(:ctxt) { double("form element", locator: context_loc) }
+      let(:data) { double("form data") }
+
       it "compares the string representations" do
-        context = double("form element", locator: context_loc)
-        cond = described_class.parse("myform#mywidget == '42'", context: context)
-        data = double("form data")
-        expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
+        expect(data).to receive(:get)
+          .with(locator_new([:myform, :mywidget]))
           .and_return(42)
-        expect(cond.evaluate(data)).to eq(true)
+        expect(condition.evaluate(data, context: ctxt)).to eq(true)
+      end
+
+      context "when a relative locator is given" do
+        subject(:condition) { described_class.parse(".mywidget == '42'") }
+
+        it "uses joins the context locator and the condition one" do
+          expect(data).to receive(:get)
+            .with(locator_new([:root, :foo, :mywidget]))
+            .and_return(42)
+          expect(condition.evaluate(data, context: ctxt)).to eq(true)
+        end
       end
     end
   end
 
   describe Y2ConfigurationManagement::Salt::NotEqualCondition do
     describe "#evaluate" do
+      subject(:condition) { described_class.parse("myform#mywidget != '42'") }
+
+      let(:ctxt) { double("form element", locator: context_loc) }
+      let(:data) { double("form data") }
+
       it "compares the string representations" do
-        context = double("form element", locator: context_loc)
-        cond = described_class.parse("myform#mywidget != '42'", context: context)
-        data = double("form data")
-        expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
+        expect(data).to receive(:get).with(locator_new([:myform, :mywidget]))
           .and_return(42)
-        expect(cond.evaluate(data)).to eq(false)
+        expect(condition.evaluate(data, context: ctxt)).to eq(false)
+      end
+
+      context "when the locator is relative" do
+        subject(:condition) { described_class.parse(".mywidget != '42'") }
+
+        it "uses joins the context locator and the condition one" do
+          expect(data).to receive(:get)
+            .with(locator_new([:root, :foo, :mywidget]))
+            .and_return(42)
+          expect(condition.evaluate(data, context: ctxt)).to eq(false)
+        end
       end
     end
   end

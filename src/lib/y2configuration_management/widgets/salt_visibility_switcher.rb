@@ -35,7 +35,7 @@ module Y2ConfigurationManagement
       # @param data [FormData]
       def update_visibility(data)
         return unless @visible_if
-        self.visible = @visible_if.evaluate(data)
+        self.visible = @visible_if.evaluate(data, context: self)
       end
     end
   end

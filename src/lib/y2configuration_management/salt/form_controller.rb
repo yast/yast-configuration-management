@@ -65,7 +65,7 @@ module Y2ConfigurationManagement
 
       # Renders the main form's dialog
       def show_main_dialog
-        form_widget = form_builder.build(form.root)
+        form_widget = form_builder.build(form.root.locator)
         form_widget.value = get(form.root.locator)
         state.open_form(form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
@@ -125,9 +125,6 @@ module Y2ConfigurationManagement
       # @return [Pillar]
       attr_reader :pillar
 
-      # @return [FormData]
-      attr_reader :data
-
       # @return [State]
       attr_reader :state
 
@@ -135,13 +132,13 @@ module Y2ConfigurationManagement
       #
       # @return [Y2ConfigurationManagement::Salt::FormBuilder]
       def form_builder
-        @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new(self)
+        @form_builder ||= Y2ConfigurationManagement::Salt::FormBuilder.new(self, form)
       end
 
       # Refreshes the most recently open form widget
       def refresh_top_form
         state.form_widget.refresh(get(state.locator))
-        # state.form_widget.update_visibility(data)
+        state.form_widget.update_visibility(form_data)
       end
 
       # Displays a popup
@@ -174,7 +171,7 @@ module Y2ConfigurationManagement
       def add_or_edit_item(action, relative_locator)
         update_parent
         item_locator = new_item_locator_for_action(action, relative_locator)
-        form_widget = item_form_for(item_locator)
+        form_widget = form_builder.build(item_locator)
         state.open_form(item_locator, form_widget)
         form_widget.value = find_or_create_item(item_locator)
         result = show_popup(form_widget)
@@ -191,17 +188,6 @@ module Y2ConfigurationManagement
         state.form_widget.store
         parent = state.form_widget.result
         form_data.update(state.locator, parent)
-      end
-
-      # Builds a form widget for a given locator
-      #
-      # @param locator [FormElementLocator] Form element to represent
-      # @return [Y2ConfigurationManagement::Widgets::Form] Form widget
-      def item_form_for(locator)
-        element = form.find_element_by(locator: locator.unbounded)
-        form_widget = form_builder.build(element.prototype)
-        form_widget.title = element.name
-        form_widget
       end
 
       # Finds or creates the item to be edited

@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Text do
-  subject(:text) { described_class.new(spec) }
+  subject(:text) { described_class.new(spec, locator) }
 
   include_examples "CWM::AbstractWidget"
 
@@ -36,7 +36,7 @@ describe Y2ConfigurationManagement::Widgets::Text do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      text = described_class.new(spec)
+      text = described_class.new(spec, locator)
       expect(text.locator).to eq(locator)
       expect(text.default).to eq("John Doe")
     end

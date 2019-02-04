@@ -25,7 +25,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::URL do
-  subject(:url) { described_class.new(spec) }
+  subject(:url) { described_class.new(spec, locator) }
 
   include_examples "CWM::AbstractWidget"
 

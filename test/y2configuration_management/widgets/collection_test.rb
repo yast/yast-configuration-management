@@ -27,7 +27,7 @@ require "cwm/rspec"
 describe Y2ConfigurationManagement::Widgets::Collection do
   include Yast::UIShortcuts
 
-  subject(:collection) { described_class.new(spec, controller) }
+  subject(:collection) { described_class.new(spec, controller, locator) }
 
   include_examples "CWM::CustomWidget"
 
@@ -46,7 +46,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      collection = described_class.new(spec, controller)
+      collection = described_class.new(spec, controller, locator)
       expect(collection.min_items).to eq(1)
       expect(collection.max_items).to eq(4)
     end
@@ -102,7 +102,7 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   shared_examples "collection" do
     describe ".new" do
       it "instantiates a new widget according to the spec" do
-        collection = described_class.new(spec, controller)
+        collection = described_class.new(spec, controller, locator)
         expect(collection.locator).to eq(locator)
       end
     end

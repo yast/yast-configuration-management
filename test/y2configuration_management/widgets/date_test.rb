@@ -24,7 +24,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Date do
-  subject(:date) { described_class.new(spec) }
+  subject(:date) { described_class.new(spec, locator) }
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
   end

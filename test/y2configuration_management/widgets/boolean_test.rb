@@ -25,7 +25,7 @@ require "y2configuration_management/salt/form"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Boolean do
-  subject(:widget) { described_class.new(spec) }
+  subject(:widget) { described_class.new(spec, locator) }
 
   include_examples "CWM::CheckBox"
 
@@ -37,7 +37,7 @@ describe Y2ConfigurationManagement::Widgets::Boolean do
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
-      widget = described_class.new(spec)
+      widget = described_class.new(spec, locator)
       expect(widget.locator).to eq(locator)
       expect(widget.default).to eq(true)
     end
