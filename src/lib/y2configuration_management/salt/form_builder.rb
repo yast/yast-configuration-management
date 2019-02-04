@@ -51,8 +51,8 @@ module Y2ConfigurationManagement
 
       # Returns the list of widgets to be included in the form
       #
-      # @param form_element [Y2ConfigurationManagement::Salt::FormElement] Form element
-      # @return [Y2ConfigurationManagement::Widgets::Form] Form
+      # @param locator [FormElementLocator] Form element locator
+      # @return [Widgets::Form] Form widget
       def build(locator)
         form_element = form.find_element_by(locator: locator.unbounded)
         form_element = form_element.prototype if form_element.is_a?(Collection)
