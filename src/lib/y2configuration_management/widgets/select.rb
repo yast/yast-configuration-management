@@ -28,8 +28,6 @@ module Y2ConfigurationManagement
 
       # @return [Array<String>] Widget items
       attr_reader :items
-      # @return [String,nil] Default value
-      attr_reader :default
 
       include SaltVisibilitySwitcher
 
@@ -40,7 +38,6 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default
         @items = spec.values.map { |v| [v, v.to_s] }
         self.widget_id = "select:#{spec.id}"
         # Allow #value= before #init.
@@ -61,8 +58,8 @@ module Y2ConfigurationManagement
 
       # @see CWM::AbstractWidget
       def init
-        return if default.nil? # combo cannot have no value; prevent YUI error
-        self.value = @value || default
+        # combo cannot have no value; prevent YUI error
+        self.value = @value
       end
     end
   end

@@ -26,8 +26,6 @@ module Y2ConfigurationManagement
     class Time < ::CWM::TimeField
       include BaseMixin
 
-      attr_reader :default
-
       # Constructor
       #
       # @param spec    [Y2ConfigurationManagement::Salt::FormInput] Element specification
@@ -35,7 +33,6 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default
         self.widget_id = "time:#{spec.id}"
         @value = nil
       end
@@ -48,8 +45,7 @@ module Y2ConfigurationManagement
 
       # @see CWM::AbstractWidget
       def init
-        return if default.to_s.empty? # date cannot have no value; prevent YUI error
-        self.value = @value || default
+        self.value = @value unless @value.nil?
       end
     end
   end

@@ -55,8 +55,8 @@ describe Y2ConfigurationManagement::Widgets::Time do
     context "when the datetime does not have a cached value" do
       let(:form_spec) { { "start_time" => { "$type" => "time", "$default" => "10:00:00" } } }
 
-      it "inits the widget value with the default one" do
-        expect(time).to receive(:value=).with("10:00:00")
+      it "does not care about a default value" do
+        expect(time).to_not receive(:value=)
         time.init
       end
     end

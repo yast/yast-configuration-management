@@ -36,38 +36,16 @@ describe Y2ConfigurationManagement::Widgets::Email do
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { locator_from_string("root#person#email") }
-  let(:default) { "somebody@example.net" }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       email = described_class.new(spec, locator)
       expect(email.locator).to eq(locator)
-      expect(email.default).to eq(default)
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(email).to receive(:value=).with(default)
-      email.init
-    end
-
-    context "when no default value was given" do
-      let(:spec) do
-        sp = form_spec.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
-      end
-
-      it "initializes the current value to the empty string" do
-        expect(email).to receive(:value=).with("")
-        email.init
-      end
     end
   end
 
   describe "#validate" do
-    let(:value) { default }
+    let(:value) { "somebody@example.net" }
     before do
       allow(email).to receive(:value).and_return(value)
     end

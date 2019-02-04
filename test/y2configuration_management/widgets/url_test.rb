@@ -41,27 +41,6 @@ describe Y2ConfigurationManagement::Widgets::URL do
   describe ".new" do
     it "instantiates a new widget according to the spec" do
       expect(url.locator).to eq(locator)
-      expect(url.default).to eq(default)
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(url).to receive(:value=).with(default)
-      url.init
-    end
-
-    context "when no default value was given" do
-      let(:spec) do
-        sp = form_spec.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
-      end
-
-      it "initializes the current value to the empty string" do
-        expect(url).to receive(:value=).with("")
-        url.init
-      end
     end
   end
 

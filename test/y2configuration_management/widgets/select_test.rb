@@ -41,27 +41,6 @@ describe Y2ConfigurationManagement::Widgets::Select do
       expect(selector.locator).to eq(locator)
       expect(selector.items)
         .to eq([["Czech Republic", "Czech Republic"], ["Germany", "Germany"], ["Spain", "Spain"]])
-      expect(selector.default).to eq("Czech Republic")
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(selector).to receive(:value=).with("Czech Republic")
-      selector.init
-    end
-
-    context "when no default value was given" do
-      let(:spec) do
-        sp = form_spec.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
-      end
-
-      it "does not initializes the current value" do
-        expect(selector).to_not receive(:value=)
-        selector.init
-      end
     end
   end
 

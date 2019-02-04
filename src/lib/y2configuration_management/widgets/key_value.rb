@@ -28,8 +28,6 @@ module Y2ConfigurationManagement
     class KeyValue < ::CWM::CustomWidget
       include BaseMixin
 
-      attr_reader :default
-
       # Constructor
       #
       # @param spec         [Salt::FormInput] Element specification
@@ -39,14 +37,13 @@ module Y2ConfigurationManagement
         textdomain "configuration_management"
 
         initialize_base(spec, data_locator)
-        @default = spec.default
         self.widget_id = "key_value:#{spec.id}"
         @value = nil
       end
 
       # @see CWM::AbstractWidget
       def init
-        self.value = @value || default
+        self.value = @value
       end
 
       # @see CWM::AbstractWidget
