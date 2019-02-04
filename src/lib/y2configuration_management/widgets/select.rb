@@ -41,7 +41,7 @@ module Y2ConfigurationManagement
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
         @default = spec.default
-        @items = spec.values.map { |v| [v, v] }
+        @items = spec.values.map { |v| [v, v.to_s] }
         self.widget_id = "select:#{spec.id}"
         # Allow #value= before #init.
         # Wrap the :value accessor to add an "uninitialized" state
