@@ -29,9 +29,6 @@ module Y2ConfigurationManagement
     class Boolean < VisibilitySwitcher
       include BaseMixin
 
-      # @return [Boolean] Default value
-      attr_reader :default
-
       include SaltVisibilitySwitcher
 
       # A helper to go inside a ReplacePoint
@@ -57,16 +54,15 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default == true # nil -> false
 
         inner = CheckBox.new(id: "boolean:#{spec.id}", label: spec.label)
         super(id: "vis:#{spec.id}", widget: inner)
         initialize_salt_visibility_switcher(spec.visible_if)
       end
 
-      # @see CWM::AbstractWidget
-      def init
-        super(default)
+      # @see CWM::ValueBasedWidget
+      def value=(val)
+        super(val == true) # nil -> false
       end
     end
   end
