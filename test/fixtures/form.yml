@@ -33,6 +33,7 @@ person:
         - Czech Republic
         - Germany
         - Spain
+  # Array collection, hash values
   computers:
     "$type": edit-group
     "$minItems": 1
@@ -51,6 +52,7 @@ person:
           - Acer
           - Dell
           - Lenovo
+      # Array collection, hash values
       disks:
         "$type": edit-group
         "$minItems": 1
@@ -65,6 +67,7 @@ person:
               - SSD
           size:
             "$type": text
+  # Hash collection, hash values
   projects:
     "$type": edit-group
     "$minItems": 1
@@ -80,6 +83,7 @@ person:
         "$name": Project name
       url:
         "$type": text
+      # Hash collection, scalar values
       properties:
         "$type": edit-group
         "$minItems": 0
@@ -92,6 +96,7 @@ person:
           "$name": Property
           "$key":
             "$type": text
+      # Array collection, scalar values
       platforms:
         "$type": edit-group
         "$minItems": 0

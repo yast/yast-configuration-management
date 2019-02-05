@@ -88,5 +88,18 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
         expect(form_data.get(locator)).to eq([{ "$value" => "Linux" }])
       end
     end
+
+    context "when an array collection of hash values is given" do
+      let(:locator) { locator_from_string("root#person#computers[0]#disks") }
+
+      it "returns a plain array of plain hashes" do
+        form_data = reader.form_data
+        expected = [
+          { "size" => "32GB", "type" => "SSD" },
+          { "size" => "1TB", "type" => "HDD" }
+        ]
+        expect(form_data.get(locator)).to eq(expected)
+      end
+    end
   end
 end
