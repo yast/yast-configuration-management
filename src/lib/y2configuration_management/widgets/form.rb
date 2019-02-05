@@ -108,7 +108,8 @@ module Y2ConfigurationManagement
       #   `nil` when the form has been removed from the UI.
       def current_values
         return children_values unless scalar?
-        { "$value" => children_values.values.first }
+        first_value = children_values.values.first
+        first_value.is_a?(Hash) ? first_value : { "$value" => first_value }
       end
 
       # Refreshes the widget's content
@@ -166,7 +167,7 @@ module Y2ConfigurationManagement
       end
 
       def set_child_content
-        children.first.value = value["$value"]
+        children.first.value = value.key?("$key") ? value : value["$value"]
       end
 
       def set_children_contents
