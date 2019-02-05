@@ -33,8 +33,9 @@ module Y2ConfigurationManagement
         pillar_file = "test/fixtures/pillar/test-formula.sls"
         pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
         pillar.load
-        formula = Salt::Formula.new(Pathname.new("test/fixtures"), pillar)
-        controller = Salt::FormController.new(formula.form, pillar)
+        formula_path = Pathname.pwd.join("test", "fixtures", "formulas-ng", "test-formula")
+        formula = Salt::Formula.new(formula_path, pillar)
+        controller = Salt::FormController.new(formula)
         controller.show_main_dialog
       end
     end

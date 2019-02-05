@@ -29,7 +29,9 @@ describe Y2ConfigurationManagement::Widgets::Group do
   include_examples "CWM::CustomWidget"
 
   let(:form_spec) do
-    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { locator_from_string("root#person#address") }

@@ -26,7 +26,9 @@ describe Y2ConfigurationManagement::Salt::FormData do
   subject(:form_data) { described_class.from_pillar(form, pillar) }
 
   let(:form) do
-    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
   end
   let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new(data: {}) }
 

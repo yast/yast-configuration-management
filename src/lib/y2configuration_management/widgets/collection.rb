@@ -22,6 +22,8 @@ require "y2configuration_management/widgets/base_mixin"
 require "y2configuration_management/widgets/visibility_switcher"
 require "y2configuration_management/widgets/salt_visibility_switcher"
 
+Yast.import "Report"
+
 module Y2ConfigurationManagement
   # This module contains the widgets which are used to display forms for Salt formulas
   module Widgets
@@ -117,6 +119,12 @@ module Y2ConfigurationManagement
         nil
       end
 
+      def validate
+        return true if valid_items_qty?
+        Yast::Report.Error(items_qty_error_message)
+        false
+      end
+
     private
 
       # @return [Array<String>] Header identifiers
@@ -183,6 +191,31 @@ module Y2ConfigurationManagement
           [item["$value"].to_s]
         else
           headers_ids.map { |h| item[h] }
+        end
+      end
+
+      # Determines whether the quantity of items is valid or not
+      #
+      # @return [Boolean]
+      def valid_items_qty?
+        return false if @min_items && value.size < @min_items
+        return false if @max_items && value.size > @max_items
+        true
+      end
+
+      # Returns an error message for the valid size of the collection
+      #
+      # @return [String]
+      def items_qty_error_message
+        if @min_items && !@max_items
+          # TRANSLATORS: "Expected at least 4 elements for 'Computers'"
+          format(_("Expected at least %s items for '%s'"), @min_items, label)
+        elsif !@min_items && @max_items
+          # TRANSLATORS: "Expected at most 4 elements for 'Computers'"
+          format(_("Expected at most %s items for '%s'"), @max_items, label)
+        else
+          # TRANSLATORS: "Expected between 2 and 4 elements for 'Computers'"
+          format(_("Expected between %s and %s items for '%s'"), @min_items, @max_items, label)
         end
       end
     end
