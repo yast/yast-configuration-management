@@ -32,7 +32,9 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   include_examples "CWM::CustomWidget"
 
   let(:form_spec) do
-    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
   end
   let(:form) { Y2ConfigurationManagement::Widgets::Form.new([], controller) }
   let(:spec) { form_spec.find_element_by(locator: locator) }
@@ -118,6 +120,98 @@ describe Y2ConfigurationManagement::Widgets::Collection do
     describe "#format_items" do
       it "formats the items" do
         expect(collection.send(:format_items, spec.default)).to eq(formatted_default)
+      end
+    end
+
+    describe "#validate" do
+      let(:min_items) { nil }
+      let(:max_items) { nil }
+
+      before do
+        allow(spec).to receive(:min_items).and_return(min_items)
+        allow(spec).to receive(:max_items).and_return(max_items)
+        allow(Yast::Report).to receive(:Error)
+        collection.value = [double("item1"), double("item2")]
+      end
+
+      context "when no minItems or maxItems are expected" do
+        it "returns true" do
+          expect(collection.validate).to eq(true)
+        end
+      end
+
+      context "when minItems is specified" do
+        context "and there are lesser items than minItems" do
+          let(:min_items) { 3 }
+
+          it "returns false" do
+            expect(collection.validate).to eq(false)
+          end
+
+          it "reports the error to the user" do
+            expect(Yast::Report).to receive(:Error)
+              .with("Expected at least 3 items for 'Computers'")
+            collection.validate
+          end
+        end
+
+        context "and there are equal or more items than minItems" do
+          let(:min_items) { 2 }
+
+          it "returns true" do
+            expect(collection.validate).to eq(true)
+          end
+        end
+      end
+
+      context "when maxItems is specified" do
+        let(:max_items) { 2 }
+
+        context "and there are lesser items than maxItems" do
+          it "returns true" do
+            expect(collection.validate).to eq(true)
+          end
+        end
+
+        context "and there are more items than maxItems" do
+          let(:max_items) { 1 }
+
+          it "returns false" do
+            expect(collection.validate).to eq(false)
+          end
+
+          it "reports the error to the user" do
+            expect(Yast::Report).to receive(:Error)
+              .with("Expected at most 1 items for 'Computers'")
+            collection.validate
+          end
+        end
+      end
+
+      context "when minItems and maxItems are given" do
+        let(:min_items) { 2 }
+        let(:max_items) { 5 }
+
+        context "and there quantity of items is within the range" do
+          it "returns true" do
+            expect(collection.validate).to eq(true)
+          end
+        end
+
+        context "and there quantity of items is not within the range" do
+          let(:min_items) { 3 }
+          let(:max_items) { 5 }
+
+          it "returns false" do
+            expect(collection.validate).to eq(false)
+          end
+
+          it "reports the error to the user" do
+            expect(Yast::Report).to receive(:Error)
+              .with("Expected between 3 and 5 items for 'Computers'")
+            collection.validate
+          end
+        end
       end
     end
   end

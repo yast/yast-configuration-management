@@ -20,17 +20,18 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_builder"
 require "y2configuration_management/salt/form"
+require "y2configuration_management/salt/formula"
 require "y2configuration_management/salt/pillar"
 require "y2configuration_management/salt/form_controller"
 
 describe Y2ConfigurationManagement::Salt::FormController do
-  subject(:controller) { described_class.new(form, pillar) }
+  subject(:controller) { described_class.new(formula) }
 
-  let(:form) do
-    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
-  end
   let(:pillar_path) { FIXTURES_PATH.join("pillar/test-formula.sls") }
   let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
+  let(:formula_path) { FIXTURES_PATH.join("formulas-ng", "test-formula") }
+  let(:formula) { Y2ConfigurationManagement::Salt::Formula.new(formula_path, pillar) }
+  let(:form) { formula.form }
 
   let(:builder) { Y2ConfigurationManagement::Salt::FormBuilder.new(controller, form) }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
@@ -48,7 +49,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Salt::FormControllerState).to receive(:new)
       .and_return(state)
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
-      .with(controller, form).and_return(builder)
+      .with(controller, formula.form).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
     state.open_form(form.root.locator, builder.build(form.root.locator))
   end

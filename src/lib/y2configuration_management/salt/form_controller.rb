@@ -54,12 +54,10 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param form [Y2ConfigurationManagement::Salt::Form]
-      # @param pillar [Y2ConfigurationManagement::Salt::Pillar]
-      def initialize(form, pillar)
-        @form = form
-        @pillar = pillar
-        data = FormData.from_pillar(form, pillar)
+      # @param formula [Y2ConfigurationManagement::Salt::Formula]
+      def initialize(formula)
+        @formula = formula
+        data = FormData.from_pillar(formula.form, formula.pillar)
         @state = FormControllerState.new(data)
       end
 
@@ -71,7 +69,7 @@ module Y2ConfigurationManagement
         Yast::Wizard.CreateDialog
         ret = Yast::CWM.show(
           HBox(form_widget),
-          caption: form.root.name, next_handler: method(:next_handler)
+          caption: formula.id, next_handler: method(:next_handler)
         )
         state.close_form
         ret
@@ -119,14 +117,11 @@ module Y2ConfigurationManagement
 
     private
 
-      # @return [Form]
-      attr_reader :form
-
-      # @return [Pillar]
-      attr_reader :pillar
-
       # @return [State]
       attr_reader :state
+
+      # @return [Formula]
+      attr_reader :formula
 
       # Returns the form builder
       #
@@ -217,6 +212,20 @@ module Y2ConfigurationManagement
       # @return [FormData] Form data
       def form_data
         @state.form_data
+      end
+
+      # Returns the Salt form
+      #
+      # @return [Form]
+      def form
+        formula.form
+      end
+
+      # Returns the current pillar
+      #
+      # @return [Pillar]
+      def pillar
+        formula.pillar
       end
     end
   end
