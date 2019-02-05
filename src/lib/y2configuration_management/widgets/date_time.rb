@@ -27,8 +27,6 @@ module Y2ConfigurationManagement
     class DateTime < ::CWM::CustomWidget
       include BaseMixin
 
-      attr_reader :default
-
       # Constructor
       #
       # @param spec         [Salt::FormInput] Element specification
@@ -36,7 +34,6 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default.to_s
         self.widget_id = "datetime:#{spec.id}"
         @value = nil
       end
@@ -55,7 +52,7 @@ module Y2ConfigurationManagement
       end
 
       def init
-        self.value = @value || default
+        self.value = @value
       end
 
       def value

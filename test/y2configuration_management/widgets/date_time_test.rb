@@ -47,13 +47,6 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
         datetime.init
       end
     end
-
-    context "when the datetime does not have a cached value" do
-      it "inits the widget value with the default one" do
-        expect(datetime).to receive(:value=).with("")
-        datetime.init
-      end
-    end
   end
 
   describe "value" do
@@ -89,7 +82,6 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
 
     it "caches the value of the date and time fields" do
       subject.value = value
-      expect(subject).to_not receive(:default)
       subject.init
     end
   end

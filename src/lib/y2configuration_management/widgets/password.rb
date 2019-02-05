@@ -26,8 +26,6 @@ module Y2ConfigurationManagement
     class Password < ::CWM::Password
       include BaseMixin
 
-      attr_reader :default
-
       # Constructor
       #
       # @param spec    [Salt::FormInput] Element specification
@@ -35,18 +33,19 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default.to_s
         self.widget_id = "password:#{spec.id}"
+        @value = nil
       end
 
       # @see CWM::AbstractWidget
       def init
-        self.value = default if value.nil? || value.empty?
+        self.value = @value
       end
 
       # @see CWM::ValueBasedWidget
       def value=(val)
-        super(val.to_s)
+        @value = val.to_s
+        super(@value)
       end
     end
   end
