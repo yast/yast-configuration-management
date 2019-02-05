@@ -25,7 +25,9 @@ require "y2configuration_management/widgets"
 describe Y2ConfigurationManagement::Salt::FormBuilder do
   subject(:builder) { described_class.new(controller, form) }
   let(:form) do
-    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
   end
   let(:element) { form.find_element_by(locator: locator) }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }

@@ -7,7 +7,7 @@ describe Y2ConfigurationManagement::Salt::Form do
   subject(:form) { described_class.from_file(form_path) }
 
   let(:formula_path) { FIXTURES_PATH.join("formulas").join("test-formula") }
-  let(:form_path) { FIXTURES_PATH.join("form.yml") }
+  let(:form_path) { FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml") }
 
   describe ".from_file" do
     it "reads the form specification from a YAML file" do
@@ -99,7 +99,7 @@ describe Y2ConfigurationManagement::Salt::FormElement do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
 
   describe "#locator" do
-    let(:file_path) { FIXTURES_PATH.join("form.yml") }
+    let(:file_path) { FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml") }
     let(:locator_form) { Y2ConfigurationManagement::Salt::Form.from_file(file_path) }
 
     it "returns the absolute form element locator in the Form" do
@@ -135,7 +135,9 @@ describe Y2ConfigurationManagement::Salt::Container do
   describe "#collection_key?" do
     subject(:form_element) { form.find_element_by(locator: locator) }
     let(:form) do
-      Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+      Y2ConfigurationManagement::Salt::Form.from_file(
+        FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+      )
     end
 
     context "when the element is named '$key'" do
@@ -163,7 +165,9 @@ describe Y2ConfigurationManagement::Salt::Collection do
     subject(:collection) { form.find_element_by(locator: locator) }
 
     let(:form) do
-      Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+      Y2ConfigurationManagement::Salt::Form.from_file(
+        FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+      )
     end
 
     context "when it is a collection indexed by a key" do

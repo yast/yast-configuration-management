@@ -7,9 +7,21 @@ person:
   email:
     "$name": "E-mail"
     "$type": email
+    "$default": "somebody@example.net"
+  birth_date:
+    "$type": date
+  password:
+    "$type": password
+    "$default": DefaultSecret
+  homepage:
+    "$type": url
+    "$default": "http://myhomepage.com"
   wants_newsletter:
     "$type": boolean
     "$default": true
+  newsletter_color:
+    $type: color
+    $default: "#73ba25"
   address:
     "$type": group
     street:
@@ -25,9 +37,13 @@ person:
     "$type": edit-group
     "$minItems": 1
     "$maxItems": 4
+    "$default":
+      - brand: ACME
+        disks: []
     "$prototype":
       $type: group
       brand:
+        "$name": Brand
         "$default": Dell
         "$type": select
         "$values":
@@ -36,6 +52,51 @@ person:
           - Dell
           - Lenovo
       disks:
-        "$name": Number of Disks
-        "$type": number
-        "$default": 1
+        "$type": edit-group
+        "$minItems": 1
+        "$maxItems": 3
+        "$prototype":
+          $type: group
+          type:
+            "$name": Type
+            "$type": select
+            "$values":
+              - HDD
+              - SSD
+          size:
+            "$type": text
+  projects:
+    "$type": edit-group
+    "$minItems": 1
+    "$name": Project
+    "$itemName": ${i} project
+    "$default":
+      yast2:
+        url: https://yast.opensuse.org
+    "$prototype":
+      "$type": group
+      "$key":
+        "$type": text
+        "$name": Project name
+      url:
+        "$type": text
+      properties:
+        "$type": edit-group
+        "$minItems": 0
+        "$name": Properties
+        "$default":
+          license:
+            GPL
+        "$prototype":
+          "$type": text
+          "$name": Property
+          "$key":
+            "$type": text
+      platforms:
+        "$type": edit-group
+        "$minItems": 0
+        "$name": Platforms
+        "$default":
+          - Linux
+        "$prototype":
+          "$type": text

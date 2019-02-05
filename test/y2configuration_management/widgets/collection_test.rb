@@ -32,7 +32,9 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   include_examples "CWM::CustomWidget"
 
   let(:form_spec) do
-    Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml"))
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
   end
   let(:form) { Y2ConfigurationManagement::Widgets::Form.new([], controller) }
   let(:spec) { form_spec.find_element_by(locator: locator) }

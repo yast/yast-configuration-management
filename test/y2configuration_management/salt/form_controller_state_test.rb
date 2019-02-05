@@ -33,7 +33,11 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
   let(:form_widget_1) { instance_double(Y2ConfigurationManagement::Widgets::Form) }
   let(:locator) { locator_from_string("root#person") }
   let(:locator_1) { locator_from_string("root#person#computers[0]#brand") }
-  let(:form) { Y2ConfigurationManagement::Salt::Form.from_file(FIXTURES_PATH.join("form.yml")) }
+  let(:form) do
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
+  end
   let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new }
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
 
