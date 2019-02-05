@@ -290,7 +290,7 @@ module Y2ConfigurationManagement
         prototype.elements.any? { |e| e.respond_to?(:collection_key?) && e.collection_key? }
       end
 
-      # Determines whether the collection is an scalar one (with or without index)
+      # Determines whether the collection has scalar values (with or without keys)
       #
       # @return [Boolean] `true` if it is an scalar collection
       #
