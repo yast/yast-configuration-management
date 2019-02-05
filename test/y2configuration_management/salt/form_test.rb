@@ -184,12 +184,12 @@ describe Y2ConfigurationManagement::Salt::Collection do
     end
   end
 
-  describe "#scalar?" do
+  describe "#simple_scalar?" do
     context "when an scalar collection is given" do
       let(:locator) { locator_from_string("root#person#projects#platforms") }
 
       it "returns true" do
-        expect(collection).to be_scalar
+        expect(collection).to be_simple_scalar
       end
     end
 
@@ -197,7 +197,7 @@ describe Y2ConfigurationManagement::Salt::Collection do
       let(:locator) { locator_from_string("root#person#computers") }
 
       it "returns false" do
-        expect(collection).to_not be_scalar
+        expect(collection).to_not be_simple_scalar
       end
     end
   end

@@ -132,7 +132,7 @@ module Y2ConfigurationManagement
           data.map { |k, v| { "$key" => k }.merge(hash_from_pillar(v, locator.join(k))) }
         elsif element.keyed_scalar?
           data.map { |k, v| { "$key" => k, "$value" => v } }
-        elsif element.scalar?
+        elsif element.simple_scalar?
           data.map { |v| { "$value" => v } }
         else
           data.map { |d| hash_from_pillar(d, locator) }
