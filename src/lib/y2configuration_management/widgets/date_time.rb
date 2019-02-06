@@ -20,6 +20,8 @@
 require "cwm"
 require "time"
 require "y2configuration_management/widgets/base_mixin"
+require "y2configuration_management/widgets/visibility_switcher"
+require "y2configuration_management/widgets/salt_visibility_switcher"
 
 module Y2ConfigurationManagement
   module Widgets
