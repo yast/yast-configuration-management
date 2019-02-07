@@ -76,8 +76,8 @@ describe Y2ConfigurationManagement::Widgets::Form do
     context "when using an scalar form" do
       subject(:form) { described_class.new(widget, double("controller"), scalar: true) }
 
-      it "returns just a scalar value" do
-        expect(form.result).to eq("foobar")
+      it "returns a hash with a single '$value' key" do
+        expect(form.result).to eq("$value" => "foobar")
       end
     end
   end

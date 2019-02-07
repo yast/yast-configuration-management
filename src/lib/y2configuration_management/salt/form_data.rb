@@ -167,6 +167,8 @@ module Y2ConfigurationManagement
         return [] if first.nil?
         if first.respond_to?(:key?) && first.key?("$key")
           hash_collection_for_pillar(collection)
+        elsif first.respond_to?(:key?) && first.key?("$value")
+          scalar_collection_for_pillar(collection)
         else
           collection.map { |d| data_for_pillar(d) }
         end
@@ -184,6 +186,15 @@ module Y2ConfigurationManagement
           val = new_item.delete("$value") || data_for_pillar(new_item)
           all.merge(key => val)
         end
+      end
+
+      # Converts a collection into an array to be used in a Pillar
+      #
+      # @param collection [Array<Hash>] This method expects an array containing hashes which include
+      #   `$value` element.
+      # @return [Array]
+      def scalar_collection_for_pillar(collection)
+        collection.map { |i| i["$value"] }
       end
 
       # Convenience method which converts a value to be used as key for a array or a hash

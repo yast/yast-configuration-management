@@ -159,17 +159,17 @@ describe Y2ConfigurationManagement::Salt::Container do
 end
 
 describe Y2ConfigurationManagement::Salt::Collection do
+  subject(:collection) { form.find_element_by(locator: locator) }
+
+  let(:form) do
+    Y2ConfigurationManagement::Salt::Form.from_file(
+      FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+    )
+  end
+
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
 
   describe "#keyed?" do
-    subject(:collection) { form.find_element_by(locator: locator) }
-
-    let(:form) do
-      Y2ConfigurationManagement::Salt::Form.from_file(
-        FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
-      )
-    end
-
     context "when it is a collection indexed by a key" do
       let(:locator) { locator_from_string("root#person#projects") }
 
@@ -183,6 +183,42 @@ describe Y2ConfigurationManagement::Salt::Collection do
 
       it "returns false" do
         expect(collection).to_not be_keyed
+      end
+    end
+  end
+
+  describe "#simple_scalar?" do
+    context "when an scalar collection is given" do
+      let(:locator) { locator_from_string("root#person#projects#platforms") }
+
+      it "returns true" do
+        expect(collection).to be_simple_scalar
+      end
+    end
+
+    context "when another kind of collection is given" do
+      let(:locator) { locator_from_string("root#person#computers") }
+
+      it "returns false" do
+        expect(collection).to_not be_simple_scalar
+      end
+    end
+  end
+
+  describe "#keyed_scalar?" do
+    context "when a hash based collection with scalar values is given" do
+      let(:locator) { locator_from_string("root#person#projects#properties") }
+
+      it "returns true" do
+        expect(collection).to be_keyed_scalar
+      end
+    end
+
+    context "when another kind of collection is given" do
+      let(:locator) { locator_from_string("root#person#computers") }
+
+      it "returns false" do
+        expect(collection).to_not be_keyed_scalar
       end
     end
   end

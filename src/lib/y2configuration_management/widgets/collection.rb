@@ -187,6 +187,8 @@ module Y2ConfigurationManagement
       def format_hash_item(item)
         if item.keys == ["$key", "$value"]
           ["#{item["$key"]}: #{item["$value"]}"]
+        elsif item.keys == ["$value"]
+          [item["$value"].to_s]
         else
           headers_ids.map { |h| item[h] }
         end
