@@ -41,27 +41,6 @@ describe Y2ConfigurationManagement::Widgets::Boolean do
     it "instantiates a new widget according to the spec" do
       widget = described_class.new(spec, locator)
       expect(widget.locator).to eq(locator)
-      expect(widget.default).to eq(true)
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(widget).to receive(:value=).with(true)
-      widget.init
-    end
-
-    context "when no default value was given" do
-      let(:spec) do
-        sp = form_spec.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
-      end
-
-      it "initializes the current value to false" do
-        expect(widget).to receive(:value=).with(false)
-        widget.init
-      end
     end
   end
 end

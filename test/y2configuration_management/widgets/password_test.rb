@@ -41,27 +41,6 @@ describe Y2ConfigurationManagement::Widgets::Password do
     it "instantiates a new widget according to the spec" do
       password = described_class.new(spec, locator)
       expect(password.locator).to eq(locator)
-      expect(password.default).to eq("DefaultSecret")
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(password).to receive(:value=).with("DefaultSecret")
-      password.init
-    end
-
-    context "when no default value was given" do
-      let(:spec) do
-        sp = form_spec.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
-      end
-
-      it "initializes the current value to the empty string" do
-        expect(password).to receive(:value=).with("")
-        password.init
-      end
     end
   end
 end

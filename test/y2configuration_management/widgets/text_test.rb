@@ -40,27 +40,6 @@ describe Y2ConfigurationManagement::Widgets::Text do
     it "instantiates a new widget according to the spec" do
       text = described_class.new(spec, locator)
       expect(text.locator).to eq(locator)
-      expect(text.default).to eq("John Doe")
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(text).to receive(:value=).with("John Doe")
-      text.init
-    end
-
-    context "when no default value was given" do
-      let(:spec) do
-        sp = form_spec.find_element_by(locator: locator)
-        sp.instance_variable_set(:@default, nil)
-        sp
-      end
-
-      it "initializes the current value to the empty string" do
-        expect(text).to receive(:value=).with("")
-        text.init
-      end
     end
   end
 end

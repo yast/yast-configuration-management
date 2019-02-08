@@ -27,9 +27,6 @@ module Y2ConfigurationManagement
   module Widgets
     # This class represents a simple text field
     class Text < VisibilitySwitcher
-      # @return [String] Default value
-      attr_reader :default
-
       include BaseMixin
 
       include SaltVisibilitySwitcher
@@ -57,7 +54,6 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default.to_s
 
         inner = InputField.new(id: "text:#{spec.id}", label: spec.label)
         super(id: "vis:#{spec.id}", widget: inner)
@@ -68,11 +64,7 @@ module Y2ConfigurationManagement
       def init
         saved_value = value
         replace(inner)
-        self.value = if saved_value.nil? || saved_value.empty?
-          default
-        else
-          saved_value
-        end
+        self.value = saved_value
       end
 
       # @see CWM::ValueBasedWidget

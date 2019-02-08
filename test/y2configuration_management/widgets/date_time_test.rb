@@ -32,8 +32,8 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
   let(:yast_release) { "#{yast_release_date} #{yast_release_time}" }
   let(:yast_release_date) { "1996-05-01" }
   let(:yast_release_time) { "16:30:00" }
-  let(:date) { datetime.send(:date) }
-  let(:time) { datetime.send(:time) }
+  let(:date) { datetime.inner.send(:date) }
+  let(:time) { datetime.inner.send(:time) }
   include_examples "CWM::CustomWidget"
 
   describe "#init" do
@@ -44,13 +44,6 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
 
       it "inits the widget value with the cached one" do
         expect(datetime).to receive(:value=).with(yast_release)
-        datetime.init
-      end
-    end
-
-    context "when the datetime does not have a cached value" do
-      it "inits the widget value with the default one" do
-        expect(datetime).to receive(:value=).with("")
         datetime.init
       end
     end
@@ -69,8 +62,6 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
 
   describe "#value=" do
     let(:value) { yast_release }
-    let(:date) { datetime.send(:date) }
-    let(:time) { datetime.send(:time) }
 
     before do
       allow(date).to receive(:value).and_return(yast_release_date)
@@ -89,15 +80,15 @@ describe Y2ConfigurationManagement::Widgets::DateTime do
 
     it "caches the value of the date and time fields" do
       subject.value = value
-      expect(subject).to_not receive(:default)
       subject.init
     end
   end
 
   describe "#contents" do
-    it "contains a DateField and a TimField" do
-      date_widget = subject.contents.nested_find { |i| i.is_a?(::CWM::DateField) }
-      time_widget = subject.contents.nested_find { |i| i.is_a?(::CWM::TimeField) }
+    it "contains a DateField and a TimeField" do
+      inner = subject.inner
+      date_widget = inner.contents.nested_find { |i| i.is_a?(::CWM::DateField) }
+      time_widget = inner.contents.nested_find { |i| i.is_a?(::CWM::TimeField) }
 
       expect(date_widget).to_not eql(nil)
       expect(time_widget).to_not eql(nil)

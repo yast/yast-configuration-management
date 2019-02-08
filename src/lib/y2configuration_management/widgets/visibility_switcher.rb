@@ -41,6 +41,8 @@ module Y2ConfigurationManagement
         # Wrap the :value accessor to add an "uninitialized" state
         # (which the YUI/CWM widget does not have)
         # so that we can give it a default
+        # It also remembers the last widget value
+        # in case we are hiding it and showing again
         @value = nil
       end
 
@@ -48,19 +50,26 @@ module Y2ConfigurationManagement
       # @param visible [Boolean]
       def visible=(visible)
         return if @visible == visible
-        @visible = visible
         if visible
           replace(@inner)
+          @visible = visible
+          # restore the previous value
+          self.value = @value
         else
+          # save the last value
+          @value = value
+          @visible = visible
           replace(EMPTY_WIDGET)
         end
       end
 
       def value
+        return nil unless @visible
         @value = @inner.value
       end
 
       def value=(value)
+        return unless @visible
         @value = value
         @inner.value = value
       end
@@ -75,9 +84,9 @@ module Y2ConfigurationManagement
         ReplacePoint(Id(widget_id), @inner)
       end
 
-      def init(value = nil)
+      def init
         replace(@inner)
-        self.value = value.nil? ? @value : value
+        self.value = @value
       end
     end
   end

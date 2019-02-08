@@ -19,18 +19,14 @@
 
 require "cwm"
 require "y2configuration_management/widgets/base_mixin"
+require "y2configuration_management/widgets/visibility_switcher"
+require "y2configuration_management/widgets/salt_visibility_switcher"
 
 module Y2ConfigurationManagement
   module Widgets
     # This class represents a select widget
-    class Select < ::CWM::ComboBox
+    class Select < VisibilitySwitcher
       include BaseMixin
-
-      # @return [Array<String>] Widget items
-      attr_reader :items
-      # @return [String,nil] Default value
-      attr_reader :default
-
       include SaltVisibilitySwitcher
 
       # Constructor
@@ -40,29 +36,36 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default
-        @items = spec.values.map { |v| [v, v.to_s] }
-        self.widget_id = "select:#{spec.id}"
-        # Allow #value= before #init.
-        # Wrap the :value accessor to add an "uninitialized" state
-        # (which the YUI/CWM widget does not have)
-        # so that we can give it a default
-        @value = nil
+
+        items = spec.values.map { |v| [v, v.to_s] }
+        inner = AlwaysVisibleSelect.new(id:    "select:#{spec.id}",
+                                        label: spec.label,
+                                        items: items)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
       end
 
-      def value
-        @value = super
+      def items
+        inner.items
+      end
+    end
+
+    # An always visible select widget
+    class AlwaysVisibleSelect < ::CWM::ComboBox
+      # @return [String] Widget label
+      attr_reader :label
+      # @return [Array<String>] Widget items
+      attr_reader :items
+
+      def initialize(id:, label:, items:)
+        self.widget_id = id
+        @label = label
+        @items = items
       end
 
-      def value=(value)
-        @value = value
-        super
-      end
-
-      # @see CWM::AbstractWidget
-      def init
-        return if default.nil? # combo cannot have no value; prevent YUI error
-        self.value = @value || default
+      # TODO: only if I am mentioned in a visible_if
+      def opt
+        [:notify]
       end
     end
   end

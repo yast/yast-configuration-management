@@ -37,25 +37,6 @@ describe Y2ConfigurationManagement::Widgets::Color do
     it "instantiates a new widget according to the spec" do
       color = described_class.new(spec, locator)
       expect(color.locator).to eq(locator)
-      expect(color.default).to eq(default)
-    end
-  end
-
-  describe "#init" do
-    it "initializes the current value to the default one" do
-      expect(color).to receive(:value=).with(default)
-      color.init
-    end
-
-    context "when no default value was given" do
-      before do
-        allow(spec).to receive(:default).and_return(nil)
-      end
-
-      it "initializes the current value to the empty string" do
-        expect(color).to receive(:value=).with("")
-        color.init
-      end
     end
   end
 
@@ -65,6 +46,7 @@ describe Y2ConfigurationManagement::Widgets::Color do
     before do
       allow(color).to receive(:value).and_return(value)
     end
+
     context "when the value is empty" do
       it "returns true" do
         expect(color.validate).to eql(true)

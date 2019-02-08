@@ -19,14 +19,15 @@
 
 require "cwm"
 require "y2configuration_management/widgets/base_mixin"
+require "y2configuration_management/widgets/visibility_switcher"
+require "y2configuration_management/widgets/salt_visibility_switcher"
 
 module Y2ConfigurationManagement
   module Widgets
     # This class represents a simple password field
-    class Password < ::CWM::Password
+    class Password < VisibilitySwitcher
       include BaseMixin
-
-      attr_reader :default
+      include SaltVisibilitySwitcher
 
       # Constructor
       #
@@ -35,13 +36,25 @@ module Y2ConfigurationManagement
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
-        @default = spec.default.to_s
-        self.widget_id = "password:#{spec.id}"
+        inner = AlwaysVisiblePassword.new(id: "password:#{spec.id}", label: spec.label)
+        super(id: "vis:#{spec.id}", widget: inner)
+        initialize_salt_visibility_switcher(spec.visible_if)
+      end
+    end
+
+    # This class represents a simple password field
+    class AlwaysVisiblePassword < ::CWM::Password
+      # @return [String] Widget label
+      attr_reader :label
+
+      def initialize(id:, label:)
+        self.widget_id = id
+        @label = label
       end
 
-      # @see CWM::AbstractWidget
-      def init
-        self.value = default if value.nil? || value.empty?
+      # TODO: only if I am mentioned in a visible_if
+      def opt
+        [:notify]
       end
 
       # @see CWM::ValueBasedWidget

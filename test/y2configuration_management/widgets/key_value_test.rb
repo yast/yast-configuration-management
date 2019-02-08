@@ -43,30 +43,6 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
   subject(:dictionary) { described_class.new(spec, locator) }
   include_examples "CWM::CustomWidget"
 
-  describe "#init" do
-    let(:cached_value) { { "$key" => "YaST", "$value" => "Team" } }
-
-    before do
-      subject.value = cached_value
-    end
-
-    context "when there is some value cached" do
-      it "initializes the widget with the cached value" do
-        expect(subject).to_not receive(:default)
-        subject.init
-      end
-    end
-
-    context "when there is no value cached" do
-      let(:cached_value) { nil }
-
-      it "initializes the widget with the default" do
-        expect(subject).to receive(:default)
-        subject.init
-      end
-    end
-  end
-
   describe "#contents" do
     it "contains a InputFIeld for the $key and $value" do
       key_input = subject.contents.nested_find { |i| i.label == subject.label }
@@ -92,7 +68,6 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
 
     it "caches the value" do
       subject.value = value
-      expect(subject).to_not receive(:default)
       expect(subject).to receive(:value=).with(value)
       subject.init
     end
