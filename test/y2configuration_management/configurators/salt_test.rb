@@ -98,7 +98,7 @@ describe Y2ConfigurationManagement::Configurators::Salt do
 
       it "runs the configuration_management_formula client" do
         expect(Y2ConfigurationManagement::Salt::FormulaSequence).to receive(:new)
-          .with(config).and_return(formula_sequence)
+          .with(config, reverse: false).and_return(formula_sequence)
         configurator.prepare
       end
 

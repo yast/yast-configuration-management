@@ -27,7 +27,7 @@ describe Y2ConfigurationManagement::Clients::Main do
   subject(:main) { described_class.new }
 
   describe "#run" do
-    let(:prepared) { true }
+    let(:prepared) { :finish }
     let(:config) do
       { "configuration_management" =>  { "type" => "salt" } }
     end
@@ -106,7 +106,7 @@ describe Y2ConfigurationManagement::Clients::Main do
     end
 
     context "when the formulas configuration is not prepared correctly" do
-      let(:prepared) { false }
+      let(:prepared) { :abort }
 
       it "does not run the provisioner" do
         expect(provision).not_to receive(:run)

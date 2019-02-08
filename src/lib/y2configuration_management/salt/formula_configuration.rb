@@ -33,9 +33,10 @@ module Y2ConfigurationManagement
       #
       # @macro seeSequence
       # @param formulas [Array<Formula>]
-      def initialize(formulas)
+      def initialize(formulas, reverse: false)
         textdomain "configuration_management"
         @formulas = formulas.select(&:enabled?)
+        @reverse = reverse
       end
 
       # @macro seeSequence
@@ -45,6 +46,8 @@ module Y2ConfigurationManagement
       end
 
     private
+
+      attr_reader :reverse
 
       # @param current_index [Integer]
       def next_formula(current_index)
@@ -65,11 +68,12 @@ module Y2ConfigurationManagement
 
       # @return [Hash]
       def sequence_hash
-        sequence = { START => formulas[0].id }
+        starting_formula = reverse ? formulas.last : formulas.first
+        sequence = { START => starting_formula.id }
         formulas.each_with_index do |formula, idx|
           sequence[formula.id] = {
             next:   next_formula(idx),
-            back:   previous_formula(idx),
+            prev:   previous_formula(idx),
             cancel: :cancel
           }
         end
@@ -82,7 +86,8 @@ module Y2ConfigurationManagement
       # @param formula [Formula]
       def configure_formula(formula)
         controller = FormController.new(formula)
-        controller.show_main_dialog
+        ret = controller.show_main_dialog
+        ret == :back ? :prev : ret
       end
     end
   end

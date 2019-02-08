@@ -62,7 +62,8 @@ module Y2ConfigurationManagement
         log.info("Provisioning Configuration Management")
         config = Y2ConfigurationManagement::Configurations::Base.import(settings)
         configurator = Y2ConfigurationManagement::Configurators::Base.for(config)
-        return :abort unless configurator.prepare
+        ret = configurator.prepare
+        return ret unless ret == :finish
         if !Yast::PackageSystem.CheckAndInstallPackages(configurator.packages.fetch("install", []))
           return :abort
         end

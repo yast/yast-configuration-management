@@ -32,7 +32,7 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
   let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true) }
   let(:selector) { instance_double(Y2ConfigurationManagement::Salt::FormulaSelection, run: :next) }
   let(:formula_config_sequence) do
-    instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration)
+    instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration, run: :abort)
   end
   let(:config) do
     Y2ConfigurationManagement::Configurations::Salt.new(
@@ -40,10 +40,13 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     )
   end
   let(:tmpdir) { Pathname(Dir.mktmpdir) }
-  subject(:sequence) { described_class.new(config) }
+  let(:reverse) { false }
+  subject(:sequence) { described_class.new(config, reverse: reverse) }
 
   before do
     allow(config).to receive(:work_dir).and_return(tmpdir)
+    allow(Y2ConfigurationManagement::Salt::FormulaConfiguration)
+      .to receive(:new).with(formulas, reverse: reverse).and_return(formula_config_sequence)
   end
 
   after do
@@ -74,6 +77,16 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
 
       it "writes the pillars associated to the selected formulas" do
         expect(sequence).to receive(:write_data)
+        sequence.run
+      end
+    end
+
+    context "when running in reverse order" do
+      let(:reverse) { true }
+
+      it "starts at the end of the formulas configuration step" do
+        expect(sequence).to_not receive("choose_formulas")
+        expect(formula_config_sequence).to receive(:run).and_return(:abort)
         sequence.run
       end
     end
@@ -128,15 +141,19 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
   end
 
   describe "#configure_formulas" do
-    before do
-      allow(Y2ConfigurationManagement::Salt::FormulaConfiguration)
-        .to receive(:new).with(formulas).and_return(formula_config_sequence)
-    end
-
     it "runs the formulas configuration sequence" do
       expect(formula_config_sequence).to receive(:run)
-
       sequence.configure_formulas
+    end
+
+    context "when running in reverse order" do
+      let(:reverse) { true }
+
+      it "runs the formulas configuration sequence in reverse order" do
+        allow(Y2ConfigurationManagement::Salt::FormulaConfiguration)
+          .to receive(:new).with(formulas, reverse: true).and_return(formula_config_sequence)
+        sequence.configure_formulas
+      end
     end
   end
 

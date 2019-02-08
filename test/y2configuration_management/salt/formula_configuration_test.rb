@@ -32,8 +32,9 @@ describe Y2ConfigurationManagement::Salt::FormulaConfiguration do
   let(:controller) do
     instance_double("Y2ConfigurationManagement::Salt::FormController", show_main_dialog: :cancel)
   end
+  let(:reverse) { false }
 
-  subject(:sequence) { described_class.new(formulas) }
+  subject(:sequence) { described_class.new(formulas, reverse: reverse) }
 
   describe "#run" do
     context "when there are no formulas to be configured" do
@@ -82,6 +83,25 @@ describe Y2ConfigurationManagement::Salt::FormulaConfiguration do
         it "returns :next" do
           expect(sequence.run).to eql(:next)
         end
+      end
+    end
+
+    context "when running in reverse order" do
+      let(:reverse) { true }
+
+      before do
+        formulas.each { |f| f.enabled = true }
+        allow(controller).to receive(:show_main_dialog).and_return(:back)
+      end
+
+      it "processes formulas in reverse order" do
+        formulas.reverse.each do |formula|
+          expect(Y2ConfigurationManagement::Salt::FormController)
+            .to receive(:new).with(formula).ordered
+            .and_return(controller)
+        end
+
+        sequence.run
       end
     end
   end

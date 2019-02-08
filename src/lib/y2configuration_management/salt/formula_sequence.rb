@@ -45,10 +45,11 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @macro seeSequence
-      # @param config [Y2ConfigurationManagement::Configurations::Salt]
-      def initialize(config)
+      # @param config [Yast::ConfigurationManagement::Configurations::Salt]
+      def initialize(config, reverse: false)
         textdomain "configuration_management"
         @config = config
+        @reverse = reverse
         read_formulas
       end
 
@@ -75,7 +76,7 @@ module Y2ConfigurationManagement
       # Iterates over the enabled {Formula}s running the {FormController} for
       # each of them.
       def configure_formulas
-        Y2ConfigurationManagement::Salt::FormulaConfiguration.new(formulas).run
+        Y2ConfigurationManagement::Salt::FormulaConfiguration.new(formulas, reverse: reverse).run
       end
 
       # Write the data associated to the selected {Formula}s into the current system
@@ -99,13 +100,16 @@ module Y2ConfigurationManagement
 
     private
 
+      attr_reader :reverse
+
       # @macro seeSequence
       def sequence_hash
         {
-          START                => "choose_formulas",
+          START                => reverse ? "configure_formulas" : "choose_formulas",
           "choose_formulas"    => {
             abort: :abort,
-            next:  "configure_formulas"
+            next:  "configure_formulas",
+            back:  :back
           },
           "configure_formulas" => {
             cancel: "choose_formulas",
