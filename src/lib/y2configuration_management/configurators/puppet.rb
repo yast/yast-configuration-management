@@ -27,14 +27,18 @@ module Y2ConfigurationManagement
       PRIVATE_KEY_BASE_PATH = "/var/lib/puppet/ssl/private_keys".freeze
       PUBLIC_KEY_BASE_PATH = "/var/lib/puppet/ssl/public_keys".freeze
 
+      # @return [Symbol] :finish when configuration was successful; :back when the user
+      #   :abort when configuration failed or was aborted.
       mode(:masterless) do |_opts|
         update_configuration
-        fetch_config(config.modules_url, config.work_dir)
+        fetch_config(config.modules_url, config.work_dir) ? :finish : :abort
       end
 
+      # @return [Symbol] :finish when configuration was successful; :abort when configuration failed
+      #   or was aborted.
       mode(:client) do |_opts|
         update_configuration
-        fetch_keys(config.keys_url, private_key_path, public_key_path)
+        fetch_keys(config.keys_url, private_key_path, public_key_path) ? :finish : :abort
       end
 
       # List of packages to install

@@ -108,7 +108,8 @@ module Y2ConfigurationManagement
           START                => reverse ? "configure_formulas" : "choose_formulas",
           "choose_formulas"    => {
             abort: :abort,
-            next:  "configure_formulas"
+            next:  "configure_formulas",
+            back:  :back
           },
           "configure_formulas" => {
             cancel: "choose_formulas",

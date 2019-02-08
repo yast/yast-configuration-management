@@ -112,6 +112,10 @@ module Y2ConfigurationManagement
       # in the given configurator.
       #
       # @param opts [Hash] Configurator options
+      # @return [Symbol] :finish when configuration was successful; :back when the user
+      #   asked to go back and configuration did not finihed; :abort when configuration
+      #   failed or was aborted.
+      #
       # @see .mode
       def prepare(opts = {})
         ::FileUtils.mkdir_p(config.work_dir) if mode?(:masterless)
