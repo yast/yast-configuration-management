@@ -90,7 +90,7 @@ module Y2ConfigurationManagement
       #
       # @return [Hash]
       def to_h
-        data_for_pillar(@data)
+        data_for_pillar(@data, FormElementLocator.neutral)
       end
 
       # Returns a copy of this object
@@ -131,25 +131,27 @@ module Y2ConfigurationManagement
       # Returns data in a format to be used by the Pillar
       #
       # @param data [Object]
+      # @param locator [FormElementLocator] Element locator
       # @return [Object]
-      def data_for_pillar(data)
+      def data_for_pillar(data, locator)
         case data
         when Array
-          collection_for_pillar(data)
+          collection_for_pillar(data, locator)
         when Hash
-          hash_for_pillar(data)
+          hash_for_pillar(data, locator)
         else
-          data
+          scalar_for_pillar(data, locator)
         end
       end
 
       # Recursively converts a hash into one suitable to be used in a Pillar
       #
       # @param data [Hash]
+      # @param locator [FormElementLocator] Element locator
       # @return [Hash]
-      def hash_for_pillar(data)
+      def hash_for_pillar(data, locator)
         data.reduce({}) do |all, (k, v)|
-          value = data_for_pillar(v)
+          value = data_for_pillar(v, locator.join(k.to_sym))
           next all if value.nil?
           all.merge(k.to_s => value)
         end
@@ -161,16 +163,17 @@ module Y2ConfigurationManagement
       # using the `$key` values as hash keys. See #hash_collection_for_pillar.
       #
       # @param collection [Array]
+      # @param locator [FormElementLocator] Element locator
       # @return [Array,Hash]
-      def collection_for_pillar(collection)
+      def collection_for_pillar(collection, locator)
         first = collection.first
         return [] if first.nil?
         if first.respond_to?(:key?) && first.key?("$key")
-          hash_collection_for_pillar(collection)
+          hash_collection_for_pillar(collection, locator)
         elsif first.respond_to?(:key?) && first.key?("$value")
           scalar_collection_for_pillar(collection)
         else
-          collection.map { |d| data_for_pillar(d) }
+          collection.map { |d| data_for_pillar(d, locator) }
         end
       end
 
@@ -178,12 +181,13 @@ module Y2ConfigurationManagement
       #
       # @param collection [Array<Hash>] This method expects an array containing hashes which include
       #   `$key` element.
+      # @param locator [FormElementLocator] Element locator
       # @return [Array,Hash]
-      def hash_collection_for_pillar(collection)
+      def hash_collection_for_pillar(collection, locator)
         collection.reduce({}) do |all, item|
           new_item = item.clone
           key = new_item.delete("$key")
-          val = new_item.delete("$value") || data_for_pillar(new_item)
+          val = new_item.delete("$value") || data_for_pillar(new_item, locator)
           all.merge(key => val)
         end
       end
@@ -195,6 +199,23 @@ module Y2ConfigurationManagement
       # @return [Array]
       def scalar_collection_for_pillar(collection)
         collection.map { |i| i["$value"] }
+      end
+
+      # Converts a scalar value into its Pillar representation
+      #
+      # @param locator [FormElementLocator] Element locator
+      # @return [Object]
+      def scalar_for_pillar(value, locator)
+        return nil if value.to_s.empty?
+        element = form.find_element_by(locator: locator)
+        case element.type
+        when :date
+          Date.parse(value)
+        when :datetime
+          Time.parse(value)
+        else
+          value
+        end
       end
 
       # Convenience method which converts a value to be used as key for a array or a hash

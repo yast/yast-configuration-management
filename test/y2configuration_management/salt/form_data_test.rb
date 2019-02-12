@@ -161,6 +161,18 @@ describe Y2ConfigurationManagement::Salt::FormData do
       platforms = form_data.to_h.dig("root", "person", "projects", "yast2", "platforms")
       expect(platforms).to eq(["Linux"])
     end
+
+    it "exports numbers as integer objects" do
+      expect(form_data.to_h.dig("root", "person", "siblings")).to eq(2)
+    end
+
+    it "exports dates as date objects" do
+      expect(form_data.to_h.dig("root", "person", "birth_date")).to be_a(Date)
+    end
+
+    it "exports datetimes as time objects" do
+      expect(form_data.to_h.dig("root", "person", "started_working_at")).to be_a(Time)
+    end
   end
 
   describe "#copy" do

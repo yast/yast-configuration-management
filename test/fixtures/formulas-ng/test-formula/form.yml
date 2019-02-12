@@ -10,6 +10,8 @@ person:
     "$default": "somebody@example.net"
   birth_date:
     "$type": date
+  started_working_at:
+    "$type": datetime
   password:
     "$type": password
     "$default": DefaultSecret
