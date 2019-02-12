@@ -90,7 +90,7 @@ module Y2ConfigurationManagement
       #
       # @return [Hash]
       def to_h
-        data_for_pillar(@data, FormElementLocator.neutral)
+        { "root" => data_for_pillar(@data["root"], form.root) }
       end
 
       # Returns a copy of this object
@@ -131,30 +131,30 @@ module Y2ConfigurationManagement
       # Returns data in a format to be used by the Pillar
       #
       # @param data [Object]
-      # @param locator [FormElementLocator] Element locator
+      # @param element [FormElement] Form element corresponding to `data`
       # @return [Object]
-      def data_for_pillar(data, locator)
+      def data_for_pillar(data, element)
+        return data if element.nil?
         case data
         when Array
-          collection_for_pillar(data, locator)
+          collection_for_pillar(data, element)
         when Hash
-          hash_for_pillar(data, locator)
+          hash_for_pillar(data, element)
         else
-          scalar_for_pillar(data, locator)
+          scalar_for_pillar(data, element)
         end
       end
 
       # Recursively converts a hash into one suitable to be used in a Pillar
       #
       # @param data [Hash]
-      # @param locator [FormElementLocator] Element locator
+      # @param element [FormElement] Form element corresponding to `data`
       # @return [Hash]
-      def hash_for_pillar(data, locator)
+      def hash_for_pillar(data, element)
         data.reduce({}) do |all, (k, v)|
-          new_locator = locator.join(k.to_sym)
-          element = form.find_element_by(locator: new_locator)
-          value = data_for_pillar(v, new_locator)
-          next all if value.nil? && element.optional?
+          children = element.find_element_by(locator: element.locator.join(k.to_sym))
+          value = data_for_pillar(v, children)
+          next all if value.nil? && children && children.optional?
           all.merge(k.to_s => value)
         end
       end
@@ -165,17 +165,17 @@ module Y2ConfigurationManagement
       # using the `$key` values as hash keys. See #hash_collection_for_pillar.
       #
       # @param collection [Array]
-      # @param locator [FormElementLocator] Element locator
+      # @param element [FormElement] Form element corresponding to `data`
       # @return [Array,Hash]
-      def collection_for_pillar(collection, locator)
+      def collection_for_pillar(collection, element)
         first = collection.first
         return [] if first.nil?
         if first.respond_to?(:key?) && first.key?("$key")
-          hash_collection_for_pillar(collection, locator)
+          hash_collection_for_pillar(collection, element)
         elsif first.respond_to?(:key?) && first.key?("$value")
           scalar_collection_for_pillar(collection)
         else
-          collection.map { |d| data_for_pillar(d, locator) }
+          collection.map { |d| data_for_pillar(d, element) }
         end
       end
 
@@ -183,13 +183,13 @@ module Y2ConfigurationManagement
       #
       # @param collection [Array<Hash>] This method expects an array containing hashes which include
       #   `$key` element.
-      # @param locator [FormElementLocator] Element locator
+      # @param element [FormElement] Form element corresponding to `data`
       # @return [Array,Hash]
-      def hash_collection_for_pillar(collection, locator)
+      def hash_collection_for_pillar(collection, element)
         collection.reduce({}) do |all, item|
           new_item = item.clone
           key = new_item.delete("$key")
-          val = new_item.delete("$value") || data_for_pillar(new_item, locator)
+          val = new_item.delete("$value") || data_for_pillar(new_item, element)
           all.merge(key => val)
         end
       end
@@ -205,10 +205,10 @@ module Y2ConfigurationManagement
 
       # Converts a scalar value into its Pillar representation
       #
-      # @param locator [FormElementLocator] Element locator
+      # @param value [Object] Value to convert
+      # @param element [FormElement] Form element corresponding to `data`
       # @return [Object]
-      def scalar_for_pillar(value, locator)
-        element = form.find_element_by(locator: locator)
+      def scalar_for_pillar(value, element)
         return element.if_empty if value.to_s.empty?
         case element.type
         when :date
