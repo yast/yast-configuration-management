@@ -218,6 +218,8 @@ module Y2ConfigurationManagement
         else
           value
         end
+      rescue ArgumentError # Date.parse or Time.parse failed
+        nil
       end
 
       # Convenience method which converts a value to be used as key for a array or a hash
