@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "yaml"
+require "date"
 require "yast"
 
 module Y2ConfigurationManagement
@@ -56,7 +57,7 @@ module Y2ConfigurationManagement
       # @return [Boolean] whether the configuration was read
       def load
         return false unless path
-        @data = YAML.safe_load(File.read(path))
+        @data = YAML.safe_load(File.read(path), [Date, Time])
         true
       rescue IOError, SystemCallError, RuntimeError => error
         log.error("Reading #{path} failed with exception: #{error.inspect}")
