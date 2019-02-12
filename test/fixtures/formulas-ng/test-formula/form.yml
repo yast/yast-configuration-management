@@ -22,6 +22,9 @@ person:
   newsletter_color:
     $type: color
     $default: "#73ba25"
+  siblings:
+    $type: number
+    $name: "Number of siblings"
   address:
     "$type": group
     street:
