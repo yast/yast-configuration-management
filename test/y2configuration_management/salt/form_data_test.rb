@@ -173,6 +173,36 @@ describe Y2ConfigurationManagement::Salt::FormData do
     it "exports datetimes as time objects" do
       expect(form_data.to_h.dig("root", "person", "started_working_at")).to be_a(Time)
     end
+
+    context "when the value is empty" do
+      before do
+        form_data.update(locator, "")
+      end
+
+      context "and it is optional" do
+        let(:locator) { locator_from_string("root#person#email") }
+
+        it "does not export the value" do
+          expect(form_data.to_h.dig("root", "person")).to_not have_key("email")
+        end
+      end
+
+      context "and it mandatory" do
+        let(:locator) { locator_from_string("root#person#name") }
+
+        it "exports the value as 'null'" do
+          expect(form_data.to_h.dig("root", "person")).to have_key("name")
+        end
+      end
+
+      context "and it fallback value was defined" do
+        let(:locator) { locator_from_string("root#person#password") }
+
+        it "exports the fallback value" do
+          expect(form_data.to_h.dig("root", "person", "password")).to eq("***")
+        end
+      end
+    end
   end
 
   describe "#copy" do

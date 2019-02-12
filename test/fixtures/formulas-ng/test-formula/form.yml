@@ -4,10 +4,12 @@ person:
   name:
     "$type": text
     "$default": "John Doe"
+    "$optional": false
   email:
     "$name": "E-mail"
     "$type": email
     "$default": "somebody@example.net"
+    "$optional": true
   birth_date:
     "$type": date
   started_working_at:
@@ -15,6 +17,7 @@ person:
   password:
     "$type": password
     "$default": DefaultSecret
+    "$ifEmpty": "***"
   homepage:
     "$type": url
     "$default": "http://myhomepage.com"

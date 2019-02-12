@@ -151,8 +151,10 @@ module Y2ConfigurationManagement
       # @return [Hash]
       def hash_for_pillar(data, locator)
         data.reduce({}) do |all, (k, v)|
-          value = data_for_pillar(v, locator.join(k.to_sym))
-          next all if value.nil?
+          new_locator = locator.join(k.to_sym)
+          element = form.find_element_by(locator: new_locator)
+          value = data_for_pillar(v, new_locator)
+          next all if value.nil? && element.optional?
           all.merge(k.to_s => value)
         end
       end
@@ -206,8 +208,8 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Element locator
       # @return [Object]
       def scalar_for_pillar(value, locator)
-        return nil if value.to_s.empty?
         element = form.find_element_by(locator: locator)
+        return element.if_empty if value.to_s.empty?
         case element.type
         when :date
           Date.parse(value)
