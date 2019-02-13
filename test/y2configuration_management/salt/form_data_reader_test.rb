@@ -26,13 +26,14 @@ require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/pillar"
 
 describe Y2ConfigurationManagement::Salt::FormDataReader do
-  subject(:reader) { described_class.new(form, pillar) }
+  subject(:reader) { described_class.new(form.root, pillar.data) }
 
   let(:form) do
     Y2ConfigurationManagement::Salt::Form.from_file(
       FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
     )
   end
+
   let(:pillar) do
     Y2ConfigurationManagement::Salt::Pillar.from_file(
       FIXTURES_PATH.join("pillar", "test-formula.sls")

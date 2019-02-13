@@ -169,6 +169,23 @@ describe Y2ConfigurationManagement::Salt::Collection do
 
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
 
+  describe "#find_element_by" do
+    let(:locator) { locator_from_string("root#person#projects") }
+
+    context "when the locator matches its own locator" do
+      it "returns itself" do
+        expect(collection).to be_a(described_class)
+      end
+    end
+
+    context "when the locator matches some prototype element" do
+      it "returns the element from the protoype" do
+        element = collection.find_element_by(locator: locator.join(:url))
+        expect(element).to be_a(Y2ConfigurationManagement::Salt::FormInput)
+      end
+    end
+  end
+
   describe "#keyed?" do
     context "when it is a collection indexed by a key" do
       let(:locator) { locator_from_string("root#person#projects") }

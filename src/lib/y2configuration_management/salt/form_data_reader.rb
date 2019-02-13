@@ -68,27 +68,27 @@ module Y2ConfigurationManagement
     #   [{ "$key" => "vers", "$value" => "4" }, { "$key" => "timeout", "$value" => "0" }]
     class FormDataReader
       include Yast::Logger
-      # @return [Form] Form definition
-      attr_reader :form
-      # @return [Pillar]
-      attr_reader :pillar
+      # @return [FormElement] Form element
+      attr_reader :form_element
+      # @return [Hash]
+      attr_reader :raw_pillar
 
       # Constructor
       #
       # @param form   [Form] Form definition
-      # @param pillar [Pillar] Pillar to read the data from
-      def initialize(form, pillar)
-        @pillar = pillar
-        @form = form
+      # @param pillar [Hash] Data from pillar
+      def initialize(form_element, raw_pillar)
+        @raw_pillar = raw_pillar
+        @form_element = form_element
       end
 
       # Builds a FormData object containing the form data
       #
       # @return [FormData] Form data object
       def form_data
-        data_from_pillar = { "root" => hash_from_pillar(pillar.data, form.root.locator) }
-        defaults = defaults_for_element(form.root)
-        FormData.new(simple_merge(defaults, data_from_pillar))
+        from_pillar = { form_element.id => data_from_pillar(raw_pillar, form_element.locator) }
+        defaults = defaults_for_element(form_element)
+        FormData.new(simple_merge(defaults, from_pillar))
       end
 
     private
@@ -99,7 +99,7 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Locator
       # @return [Hash<String, Object>]
       def data_from_pillar(data, locator)
-        element = form.find_element_by(locator: locator.unbounded)
+        element = form_element.find_element_by(locator: locator.unbounded)
         case element
         when Collection
           collection_from_pillar(data, locator)
@@ -127,7 +127,7 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Element locator
       # @return [Array<Hash>]
       def collection_from_pillar(data, locator)
-        element = form.find_element_by(locator: locator.unbounded)
+        element = form_element.find_element_by(locator: locator.unbounded)
         if element.keyed?
           data.map { |k, v| { "$key" => k }.merge(hash_from_pillar(v, locator.join(k))) }
         elsif element.keyed_scalar?

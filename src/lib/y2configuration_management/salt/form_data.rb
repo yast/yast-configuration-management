@@ -29,7 +29,8 @@ module Y2ConfigurationManagement
         # @param pillar [Pillar] Pillar to read the data from
         # @return [FormData] Form data merging defaults and pillar values
         def from_pillar(form, pillar)
-          FormDataReader.new(form, pillar).form_data
+          reader = FormDataReader.new(form.root, pillar.data)
+          reader.form_data
         end
       end
 

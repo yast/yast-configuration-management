@@ -274,6 +274,8 @@ module Y2ConfigurationManagement
       # @return [FormElement, nil]
       # @see Form#find_element_by
       def find_element_by(arg)
+        return self if arg.any? { |k, v| public_send(k) == v }
+
         Array(prototype).each do |element|
           nested_element = element.find_element_by(arg)
           return nested_element if nested_element
@@ -314,6 +316,13 @@ module Y2ConfigurationManagement
       def keyed_scalar?
         return false if prototype.nil?
         scalar? && prototype.type == :key_value
+      end
+
+      # Returns default data
+      #
+      # @return [FormData]
+      def default_data
+        FormDataReader.new(self, @default).form_data
       end
 
     private
