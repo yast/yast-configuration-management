@@ -152,14 +152,14 @@ describe Y2ConfigurationManagement::Salt::FormData do
       )
     end
 
-    it "exports hash based collections as hashes" do
+    it "exports hash based collections as arrays" do
       projects = form_data.to_h.dig("root", "person", "projects")
-      expect(projects["yast2"]).to include("url" => "https://yast.opensuse.org")
+      expect(projects.first).to include("url" => "https://yast.opensuse.org")
     end
 
-    it "exports scalar collections as arrays of scalar objects" do
-      platforms = form_data.to_h.dig("root", "person", "projects", "yast2", "platforms")
-      expect(platforms).to eq(["Linux"])
+    it "exports scalar collections as arrays of hashes" do
+      project = form_data.to_h.dig("root", "person", "projects").first
+      expect(project["platforms"]).to eq([{ "$value" => "Linux" }])
     end
   end
 

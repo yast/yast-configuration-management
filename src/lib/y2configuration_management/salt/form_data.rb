@@ -18,6 +18,7 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/form_data_reader"
+require "y2configuration_management/salt/form_data_writer"
 
 module Y2ConfigurationManagement
   module Salt
@@ -86,11 +87,18 @@ module Y2ConfigurationManagement
         collection.delete_at(locator.last)
       end
 
-      # Returns a hash containing the form data
+      # Returns a hash containing the form data in raw format
       #
       # @return [Hash]
       def to_h
-        data_for_pillar(@data)
+        @data
+      end
+
+      # Returns a hash containing the information to be used in a data pillar
+      #
+      # @return [Hash]
+      def to_pillar_data
+        FormDataWriter.new(form, self).to_pillar_data
       end
 
       # Returns a copy of this object
@@ -126,75 +134,6 @@ module Y2ConfigurationManagement
       def default_for(locator)
         element = form.find_element_by(locator: locator)
         element ? element.default : nil
-      end
-
-      # Returns data in a format to be used by the Pillar
-      #
-      # @param data [Object]
-      # @return [Object]
-      def data_for_pillar(data)
-        case data
-        when Array
-          collection_for_pillar(data)
-        when Hash
-          hash_for_pillar(data)
-        else
-          data
-        end
-      end
-
-      # Recursively converts a hash into one suitable to be used in a Pillar
-      #
-      # @param data [Hash]
-      # @return [Hash]
-      def hash_for_pillar(data)
-        data.reduce({}) do |all, (k, v)|
-          value = data_for_pillar(v)
-          next all if value.nil?
-          all.merge(k.to_s => value)
-        end
-      end
-
-      # Converts a collection to be used in a Pillar
-      #
-      # Arrays containing hashes with a `$key` element will be converted into a hash
-      # using the `$key` values as hash keys. See #hash_collection_for_pillar.
-      #
-      # @param collection [Array]
-      # @return [Array,Hash]
-      def collection_for_pillar(collection)
-        first = collection.first
-        return [] if first.nil?
-        if first.respond_to?(:key?) && first.key?("$key")
-          hash_collection_for_pillar(collection)
-        elsif first.respond_to?(:key?) && first.key?("$value")
-          scalar_collection_for_pillar(collection)
-        else
-          collection.map { |d| data_for_pillar(d) }
-        end
-      end
-
-      # Converts a collection into a hash to be used in a Pillar
-      #
-      # @param collection [Array<Hash>] This method expects an array containing hashes which include
-      #   `$key` element.
-      # @return [Array,Hash]
-      def hash_collection_for_pillar(collection)
-        collection.reduce({}) do |all, item|
-          new_item = item.clone
-          key = new_item.delete("$key")
-          val = new_item.delete("$value") || data_for_pillar(new_item)
-          all.merge(key => val)
-        end
-      end
-
-      # Converts a collection into an array to be used in a Pillar
-      #
-      # @param collection [Array<Hash>] This method expects an array containing hashes which include
-      #   `$value` element.
-      # @return [Array]
-      def scalar_collection_for_pillar(collection)
-        collection.map { |i| i["$value"] }
       end
 
       # Convenience method which converts a value to be used as key for a array or a hash
