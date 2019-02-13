@@ -88,7 +88,7 @@ module Y2ConfigurationManagement
       def form_data
         data_from_pillar = { "root" => hash_from_pillar(pillar.data, form.root.locator) }
         defaults = defaults_for_element(form.root)
-        FormData.new(form, simple_merge(defaults, data_from_pillar))
+        FormData.new(simple_merge(defaults, data_from_pillar))
       end
 
     private

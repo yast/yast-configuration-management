@@ -24,9 +24,6 @@ module Y2ConfigurationManagement
   module Salt
     # This class holds data for a given Salt Formula Form
     class FormData
-      # @return [Y2ConfigurationManagement::Salt::Form] Form
-      attr_reader :form
-
       class << self
         # @param form   [Form] Form definition
         # @param pillar [Pillar] Pillar to read the data from
@@ -38,10 +35,8 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param form    [Form] Form definition
       # @param initial [Hash] Initial data in hash form
-      def initialize(form, initial = {})
-        @form = form
+      def initialize(initial = {})
         @data = initial
       end
 
@@ -49,9 +44,7 @@ module Y2ConfigurationManagement
       #
       # @param locator [FormElementLocator] Locator of the element
       def get(locator)
-        value = find_by_locator(@data, locator)
-        value = default_for(locator) if value.nil?
-        value
+        find_by_locator(@data, locator)
       end
 
       # Updates an element's value
@@ -97,7 +90,7 @@ module Y2ConfigurationManagement
       # Returns a hash containing the information to be used in a data pillar
       #
       # @return [Hash]
-      def to_pillar_data
+      def to_pillar_data(form)
         FormDataWriter.new(form, self).to_pillar_data
       end
 
@@ -105,7 +98,7 @@ module Y2ConfigurationManagement
       #
       # @return [FormData]
       def copy
-        self.class.new(form, Marshal.load(Marshal.dump(@data)))
+        self.class.new(Marshal.load(Marshal.dump(@data)))
       end
 
     private
@@ -126,14 +119,6 @@ module Y2ConfigurationManagement
             data[key_for(key)]
           end
         find_by_locator(next_data, locator.rest)
-      end
-
-      # Default value for a given element
-      #
-      # @param locator [FormElementLocator] Element locator
-      def default_for(locator)
-        element = form.find_element_by(locator: locator)
-        element ? element.default : nil
       end
 
       # Convenience method which converts a value to be used as key for a array or a hash
