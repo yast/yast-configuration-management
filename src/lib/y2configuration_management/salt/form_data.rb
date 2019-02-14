@@ -44,10 +44,10 @@ module Y2ConfigurationManagement
       # Returns the value of a given element
       #
       # @param locator [FormElementLocator] Locator of the element
+      # @return [FormData,nil] Form data or nil if no data was found for the given {locator}
       def get(locator)
         value = find_by_locator(@data, locator)
-        return FormData.new(value) if value.is_a?(Enumerable)
-        value
+        value ? FormData.new(value) : nil
       end
 
       # Updates an element's value
@@ -83,12 +83,15 @@ module Y2ConfigurationManagement
         collection.delete_at(locator.last)
       end
 
-      # Returns a hash containing the form data in raw format
+      # Returns the stored data in raw form
       #
-      # @return [Hash]
-      def to_h
+      # @return [Hash,Array]
+      def value
         @data
       end
+
+      # FIXME: remove
+      alias_method :to_h, :value
 
       # Returns a hash containing the information to be used in a data pillar
       #
@@ -113,12 +116,18 @@ module Y2ConfigurationManagement
         FormData.new(simple_merge(to_h, other.to_h))
       end
 
+      # Determines whether the instance is data
+      #
+      # @return [Boolean]
       def empty?
-        @data.empty?
+        @data.is_a?(Enumerable) ? @data.empty? : false
       end
 
+      # Returns the number of included elements
+      #
+      # @return [Integer]
       def size
-        @data.size
+        @data.is_a?(Enumerable) ? @data.size : 1
       end
 
     private
