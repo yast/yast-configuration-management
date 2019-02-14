@@ -64,7 +64,8 @@ module Y2ConfigurationManagement
       # Renders the main form's dialog
       def show_main_dialog
         form_widget = form_builder.build(form.root.locator)
-        form_widget.value = get(form.root.locator)
+        root_data = get(form.root.locator)
+        form_widget.value = root_data.value
         state.open_form(form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
         ret = Yast::CWM.show(
@@ -132,7 +133,7 @@ module Y2ConfigurationManagement
 
       # Refreshes the most recently open form widget
       def refresh_top_form
-        state.form_widget.refresh(get(state.locator))
+        state.form_widget.refresh(get(state.locator).value)
         state.form_widget.update_visibility(form_data)
       end
 
@@ -168,7 +169,7 @@ module Y2ConfigurationManagement
         item_locator = new_item_locator_for_action(action, relative_locator)
         form_widget = form_builder.build(item_locator)
         state.open_form(item_locator, form_widget)
-        form_widget.value = find_or_create_item(item_locator)
+        form_widget.value = find_or_create_item(item_locator).value
         result = show_popup(form_widget)
         form_data.update(state.locator, result) unless result.nil?
         state.close_form(rollback: result.nil?)
