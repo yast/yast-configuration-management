@@ -30,22 +30,24 @@ module Y2ConfigurationManagement
         # @return [FormData] Form data merging defaults and pillar values
         def from_pillar(form, pillar)
           reader = FormDataReader.new(form.root, pillar.data)
-          reader.form_data
+          FormData.new(form.root.id => reader.form_data.to_h)
         end
       end
 
       # Constructor
       #
       # @param initial [Hash] Initial data in hash form
-      def initialize(initial = {})
-        @data = initial
+      def initialize(initial)
+        @data = initial || {}
       end
 
       # Returns the value of a given element
       #
       # @param locator [FormElementLocator] Locator of the element
       def get(locator)
-        find_by_locator(@data, locator)
+        value = find_by_locator(@data, locator)
+        return FormData.new(value) if value.is_a?(Enumerable)
+        value
       end
 
       # Updates an element's value
@@ -53,7 +55,7 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Locator of the collection
       # @param value   [Object] New value
       def update(locator, value)
-        parent = get(locator.parent)
+        parent = find_by_locator(@data, locator.parent)
         parent[key_for(locator.last)] = value
       end
 
@@ -62,14 +64,14 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Locator of the collection
       # @param value   [Object] Value to add
       def add_item(locator, value)
-        collection = get(locator)
+        collection = find_by_locator(@data, locator)
         collection.push(value)
       end
 
       # @param locator [FormElementLocator] Locator of the collection
       # @param value   [Object] New value
       def update_item(locator, value)
-        collection = get(locator.parent)
+        collection = find_by_locator(@data, locator.parent)
         collection[key_for(locator.last)] = value
       end
 
@@ -77,7 +79,7 @@ module Y2ConfigurationManagement
       #
       # @param locator [FormElementLocator] Locator of the collection
       def remove_item(locator)
-        collection = get(locator.parent)
+        collection = find_by_locator(@data, locator.parent)
         collection.delete_at(locator.last)
       end
 
@@ -109,6 +111,14 @@ module Y2ConfigurationManagement
       # @return [FormData] Form data containing the merged information
       def merge(other)
         FormData.new(simple_merge(to_h, other.to_h))
+      end
+
+      def empty?
+        @data.empty?
+      end
+
+      def size
+        @data.size
       end
 
     private

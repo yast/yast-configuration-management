@@ -30,39 +30,42 @@ describe Y2ConfigurationManagement::Salt::FormData do
       FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
     )
   end
-  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new(data: {}) }
+  let(:pillar_path) { FIXTURES_PATH.join("pillar").join("test-formula.sls") }
+  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
   describe "#get" do
-    context "when the value has not been set" do
-      it "returns the default value" do
-        expect(form_data.get(locator_from_string("root#person#name"))).to eq("John Doe")
-      end
-
-      context "and it is a collection" do
-        it "returns an array with the default values" do
-          expect(form_data.get(locator_from_string("root#person#computers")))
-            .to eq([{ "brand" => "ACME", "disks" => [] }])
-        end
+    context "when the locator refers to a scalar value" do
+      it "returns the value" do
+        expect(form_data.get(locator_from_string("root#person#name"))).to eq("Jane Doe")
       end
     end
 
-    context "when the value has been set" do
-      let(:locator) { locator_from_string("root#person#name") }
-
-      before do
-        form_data.update(locator, "Mr. Doe")
+    context "when the locator refers to an index based collection locator is given" do
+      it "returns a FormData instance containing the collection values" do
+        computers = form_data.get(locator_from_string("root#person#computers"))
+        expect(computers.to_h).to include(
+          { "brand" => "Dell", "disks" => [{ "size" => "1TB", "type" => "HDD" }] }
+        )
       end
+    end
 
-      it "returns the already set value" do
-        expect(form_data.get(locator)).to eq("Mr. Doe")
+    context "when the locator refers to a hash based collection" do
+      let(:locator) { locator_from_string("root#person#projects") }
+
+      it "returns an array containing all the elements" do
+        projects = form_data.get(locator)
+        expect(projects.to_h.first).to include("$key" => "yast2", "url" => "https://yast.opensuse.org")
       end
     end
 
     context "when a collection locator and an index are given" do
-      let(:locator) { locator_from_string("root#person#computers[0]") }
+      let(:locator) { locator_from_string("root#person#computers[1]") }
 
-      it "returns the item in the given position" do
-        expect(form_data.get(locator)).to eq("brand" => "ACME", "disks" => [])
+      it "returns a FormData instance containing the element" do
+        computer = form_data.get(locator)
+        expect(computer.to_h).to eq(
+          "brand" => "Dell", "disks" => [{ "size" => "1TB", "type" => "HDD" }]
+        )
       end
     end
 
@@ -70,38 +73,21 @@ describe Y2ConfigurationManagement::Salt::FormData do
       let(:locator) { locator_from_string("root#person#projects[yast2]") }
 
       it "returns the item in the given position" do
-        expect(form_data.get(locator))
-          .to eq("$key" => "yast2", "url" => "https://yast.opensuse.org")
+        project = form_data.get(locator)
+        expect(project.to_h)
+          .to include("$key" => "yast2", "url" => "https://yast.opensuse.org")
       end
     end
 
-    context "when an index based collection locator is given" do
-      let(:locator) { locator_from_string("root#person#projects") }
-
-      it "returns an array containing all the elements" do
-        expect(form_data.get(locator)).to eq(
-          [{ "$key" => "yast2", "url" => "https://yast.opensuse.org" }]
-        )
-      end
-    end
-
-    context "when a hash based collection locator is given" do
-      let(:locator) { locator_from_string("root#person#computers") }
-
-      it "returns an array containing all the elements" do
-        expect(form_data.get(locator)).to eq(
-          [{ "brand" => "ACME", "disks" => [] }]
-        )
-      end
-    end
   end
 
   describe "#add_item" do
     let(:locator) { locator_from_string("root#person#computers") }
 
     it "adds the element to the collection" do
-      form_data.add_item(locator, "brand" => "Dell", "disks" => 2)
-      expect(form_data.get(locator.join(1))).to eq("brand" => "Dell", "disks" => 2)
+      form_data.add_item(locator, "brand" => "ACME")
+      new_disk = form_data.get(locator.join(2))
+      expect(new_disk.to_h).to eq("brand" => "ACME")
     end
 
     context "when a hash based collection is referred" do
@@ -109,11 +95,8 @@ describe Y2ConfigurationManagement::Salt::FormData do
 
       it "adds the element to the collection" do
         form_data.add_item(locator, "$key" => "openSUSE", "url" => "https://opensuse.org")
-        expect(form_data.get(locator)).to eq(
-          [
-            { "$key" => "yast2", "url" => "https://yast.opensuse.org" },
-            { "$key" => "openSUSE", "url" => "https://opensuse.org" }
-          ]
+        expect(form_data.get(locator).to_h).to include(
+          "$key" => "openSUSE", "url" => "https://opensuse.org"
         )
       end
     end
@@ -123,15 +106,14 @@ describe Y2ConfigurationManagement::Salt::FormData do
     let(:locator) { locator_from_string("root#person#computers[0]") }
 
     it "updates the item in the collection" do
-      form_data.update_item(locator, "brand" => "Lenovo", "disks" => 3)
-      expect(form_data.get(locator.parent)).to eq(
-        [{ "brand" => "Lenovo", "disks" => 3 }]
-      )
+      form_data.update_item(locator, "brand" => "ACME")
+      expect(form_data.get(locator).to_h).to include("brand" => "ACME")
     end
   end
 
   describe "#remove_item" do
     it "removes the element from the collection" do
+      form_data.remove_item(locator_from_string("root#person#computers[1]"))
       form_data.remove_item(locator_from_string("root#person#computers[0]"))
       expect(form_data.get(locator_from_string("root#person#computers"))).to be_empty
     end
