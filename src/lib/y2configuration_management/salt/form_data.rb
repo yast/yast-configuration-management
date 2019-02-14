@@ -102,6 +102,15 @@ module Y2ConfigurationManagement
         self.class.new(Marshal.load(Marshal.dump(@data)))
       end
 
+      # Merges the data from another FormData instance
+      #
+      # @param other [FormData] Form data to merge with. In case of conflict, the data from
+      #   this object has precedence.
+      # @return [FormData] Form data containing the merged information
+      def merge(other)
+        FormData.new(simple_merge(to_h, other.to_h))
+      end
+
     private
 
       # Recursively finds a value
@@ -128,6 +137,22 @@ module Y2ConfigurationManagement
       # @return [String,Integer]
       def key_for(key)
         key.is_a?(Symbol) ? key.to_s : key
+      end
+
+      # Simple deep merge
+      #
+      # @param a_hash       [Hash] Default values
+      # @param another_hash [Hash] Pillar data
+      # @return [Hash]
+      def simple_merge(a_hash, another_hash)
+        a_hash.reduce({}) do |all, (k, v)|
+          next all.merge(k => v) if another_hash[k].nil?
+          if v.is_a?(Hash)
+            all.merge(k => simple_merge(a_hash[k], another_hash[k]))
+          else
+            all.merge(k => another_hash[k])
+          end
+        end
       end
     end
   end

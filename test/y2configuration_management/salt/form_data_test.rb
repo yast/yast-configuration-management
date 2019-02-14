@@ -177,4 +177,22 @@ describe Y2ConfigurationManagement::Salt::FormData do
       expect(copy.get(locator)).to_not eq(malkovich)
     end
   end
+
+  describe "#merge" do
+    subject(:form_data) do
+      described_class.new("person" => { "name" => "John", "surname" => "Doe" })
+    end
+
+    let(:other_form_data) do
+      described_class.new("person" => { "name" => "Jane" })
+    end
+
+    it "recursively merges the content" do
+      merged = form_data.merge(other_form_data)
+      expect(merged).to be_a(described_class)
+      expect(merged.to_h).to eq(
+        "person" => { "name" => "Jane", "surname" => "Doe" }
+      )
+    end
+  end
 end
