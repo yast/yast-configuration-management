@@ -23,6 +23,7 @@ require "y2configuration_management/salt/form_condition"
 require "y2configuration_management/salt/form_element_locator"
 require "y2configuration_management/salt/form_element_factory"
 require "y2configuration_management/salt/form_element_helpers"
+require "y2configuration_management/salt/form_data_reader"
 
 module Y2ConfigurationManagement
   module Salt
@@ -225,6 +226,20 @@ module Y2ConfigurationManagement
         nil
       end
 
+      # Returns default data
+      #
+      # @return [FormData]
+      def default_data
+        FormDataReader.new(self, default).form_data
+      end
+
+      # Default values for included elements
+      #
+      # @return [Hash]
+      def default
+        elements.reduce({}) { |a, e| a.merge(e.id => e.default) }
+      end
+
     private
 
       # @param spec [Hash] form element specification
@@ -322,7 +337,20 @@ module Y2ConfigurationManagement
       #
       # @return [FormData]
       def default_data
-        FormDataReader.new(self, @default).form_data
+        FormDataReader.new(self, default).form_data
+      end
+
+      # Returns the default value for the prototype
+      #
+      # @return [FormData]
+      def prototype_default_data
+        if keyed_scalar?
+          FormDataReader.new(self, prototype.default || value).form_data.first
+        elsif simple_scalar?
+          FormDataReader.new(self, [prototype.default]).form_data.first
+        else
+          FormDataReader.new(prototype, prototype.default).form_data
+        end
       end
 
     private

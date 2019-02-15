@@ -67,6 +67,7 @@ person:
               - SSD
           size:
             "$type": text
+            "$default": "50GiB"
   # Hash collection, hash values
   projects:
     "$type": edit-group
@@ -83,6 +84,7 @@ person:
         "$name": Project name
       url:
         "$type": text
+        "$default": https://github.com/yast
       # Hash collection, scalar values
       properties:
         "$type": edit-group
@@ -94,6 +96,9 @@ person:
         "$prototype":
           "$type": text
           "$name": Property
+          "$default":
+            key1:
+              value1
           "$key":
             "$type": text
       # Array collection, scalar values
@@ -105,3 +110,4 @@ person:
           - Linux
         "$prototype":
           "$type": text
+          "$default": Platform

@@ -130,6 +130,13 @@ module Y2ConfigurationManagement
         @data.is_a?(Enumerable) ? @data.size : 1
       end
 
+      # Returns the first element
+      #
+      # @return [FormData]
+      def first
+        FormData.new(@data.first)
+      end
+
     private
 
       # Recursively finds a value

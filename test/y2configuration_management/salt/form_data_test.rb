@@ -55,7 +55,9 @@ describe Y2ConfigurationManagement::Salt::FormData do
 
       it "returns an array containing all the elements" do
         projects = form_data.get(locator)
-        expect(projects.value.first).to include("$key" => "yast2", "url" => "https://yast.opensuse.org")
+        expect(projects.value.first).to include(
+          "$key" => "yast2", "url" => "https://yast.opensuse.org"
+        )
       end
     end
 
@@ -226,6 +228,14 @@ describe Y2ConfigurationManagement::Salt::FormData do
       it "returns 1" do
         expect(form_data.size).to eq(1)
       end
+    end
+  end
+
+  describe "#first" do
+    subject(:form_data) { described_class.new([{ "brand" => "ACME" }]) }
+
+    it "returns first element" do
+      expect(form_data.first.value).to eq("brand" => "ACME")
     end
   end
 end
