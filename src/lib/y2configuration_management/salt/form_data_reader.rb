@@ -86,9 +86,8 @@ module Y2ConfigurationManagement
       #
       # @return [FormData] Form data object
       def form_data
-        from_pillar = { form_element.id => data_from_pillar(raw_pillar, form_element.locator) }
-        defaults = defaults_for_element(form_element)
-        FormData.new(simple_merge(defaults, from_pillar))
+        from_pillar = data_from_pillar(raw_pillar, form_element.locator)
+        FormData.new(from_pillar)
       end
 
     private

@@ -65,6 +65,7 @@ module Y2ConfigurationManagement
       def show_main_dialog
         form_widget = form_builder.build(form.root.locator)
         root_data = get(form.root.locator)
+        root_data = default_for(form.root.locator) if root_data.empty?
         form_widget.value = root_data.value
         state.open_form(form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
@@ -192,7 +193,7 @@ module Y2ConfigurationManagement
       def find_or_create_item(item_locator)
         new_item = get(item_locator)
         return new_item if new_item
-        new_item = {}
+        new_item = default_for(item_locator)
         form_data.add_item(item_locator.parent, new_item)
         new_item
       end
@@ -227,6 +228,15 @@ module Y2ConfigurationManagement
       # @return [Pillar]
       def pillar
         formula.pillar
+      end
+
+      # Default for a given locator
+      #
+      # @param [FormElementLocator] Form element locator
+      # @return [FormData]
+      def default_for(locator)
+        element = form.find_element_by(locator: locator.unbounded)
+        element.is_a?(Collection) ? element.prototype_default_data : element.default_data
       end
     end
   end
