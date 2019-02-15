@@ -88,7 +88,7 @@ module Y2ConfigurationManagement
       # @see CWM::AbstractWidget
       def contents
         VBox(
-          *children,
+          *children.map { |w| Left(w) },
           VStretch()
         )
       end

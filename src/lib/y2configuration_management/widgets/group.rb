@@ -45,7 +45,8 @@ module Y2ConfigurationManagement
       #
       # @return [Yast::Term]
       def contents
-        c = VBox(*children)
+        aligned_children = children.map { |w| Left(w) }
+        c = VBox(*aligned_children)
         if @has_frame
           Frame(label, c)
         else
