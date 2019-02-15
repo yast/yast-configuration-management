@@ -30,7 +30,7 @@ module Y2ConfigurationManagement
         # @return [FormData] Form data merging defaults and pillar values
         def from_pillar(form, pillar)
           reader = FormDataReader.new(form.root, pillar.data)
-          FormData.new(form.root.id => reader.form_data.to_h)
+          FormData.new(form.root.id => reader.form_data.value)
         end
       end
 
@@ -90,9 +90,6 @@ module Y2ConfigurationManagement
         @data
       end
 
-      # FIXME: remove
-      alias_method :to_h, :value
-
       # Returns a hash containing the information to be used in a data pillar
       #
       # @return [Hash]
@@ -113,7 +110,7 @@ module Y2ConfigurationManagement
       #   this object has precedence.
       # @return [FormData] Form data containing the merged information
       def merge(other)
-        FormData.new(simple_merge(to_h, other.to_h))
+        FormData.new(simple_merge(value, other.value))
       end
 
       # Determines whether the instance is data

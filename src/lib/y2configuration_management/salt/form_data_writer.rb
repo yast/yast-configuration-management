@@ -46,7 +46,7 @@ module Y2ConfigurationManagement
       #
       # @return [Hash]
       def to_pillar_data
-        data_for_pillar(form_data.to_h)
+        data_for_pillar(form_data.value)
       end
 
     private

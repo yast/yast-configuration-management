@@ -137,51 +137,6 @@ module Y2ConfigurationManagement
           data.map { |d| hash_from_pillar(d, locator) }
         end
       end
-
-      # Extracts default values for a given element
-      #
-      # @param element [FormElement]
-      # @return [Object]
-      def defaults_for_element(element)
-        case element
-        when Container
-          defaults = element.elements.reduce({}) { |a, e| a.merge(defaults_for_element(e)) }
-          { element.id => defaults }
-        when Collection
-          { element.id => defaults_for_collection(element) }
-        else
-          { element.id => element.default }
-        end
-      end
-
-      # Extracts default values for a given collection
-      #
-      # @param collection [Collection]
-      # @return [Array<Hash>]
-      def defaults_for_collection(collection)
-        if collection.keyed?
-          collection.default.map { |k, v| { "$key" => k }.merge(v) }
-        elsif collection.prototype.is_a?(FormInput) && collection.prototype.type == :key_value
-          collection.default.map { |k, v| { "$key" => k, "$value" => v } }
-        else
-          collection.default
-        end
-      end
-
-      # Simple deep merge
-      #
-      # @param defaults [Hash] Default values
-      # @param data [Hash] Pillar data
-      def simple_merge(defaults, data)
-        defaults.reduce({}) do |all, (k, v)|
-          next all.merge(k => v) if data[k].nil?
-          if v.is_a?(Hash)
-            all.merge(k => simple_merge(defaults[k], data[k]))
-          else
-            all.merge(k => data[k])
-          end
-        end
-      end
     end
   end
 end
