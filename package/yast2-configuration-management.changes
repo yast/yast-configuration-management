@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb 15 14:44:19 UTC 2019 - mvidner@suse.com
+
+- Fixed test-suite instability by adding missing requires. (fate#322722)
+- 4.1.4
+
+-------------------------------------------------------------------
 Fri Feb  8 16:30:04 UTC 2019 - Imobach Gonzalez Sosa <igonzalezsosa@suse.com>
 
 - fate#322722:
