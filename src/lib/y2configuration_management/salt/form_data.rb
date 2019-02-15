@@ -44,7 +44,7 @@ module Y2ConfigurationManagement
       # Returns the value of a given element
       #
       # @param locator [FormElementLocator] Locator of the element
-      # @return [FormData,nil] Form data or nil if no data was found for the given {locator}
+      # @return [FormData,nil] Form data or nil if no data was found for the given locator
       def get(locator)
         value = find_by_locator(@data, locator)
         value ? FormData.new(value) : nil

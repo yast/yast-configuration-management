@@ -24,11 +24,12 @@ require "y2configuration_management/salt/form_data"
 
 module Y2ConfigurationManagement
   module Salt
-    # This class is responsible for reading the form data from its definition and a data pillar.
+    # This class is responsible for reading data for a form element.
     #
     # The format used in the pillar is slightly different from the internal representation of this
     # module, so this class takes care of the conversion. However, the initial intentation is to not
-    # use it directly but through the {FormData.from_pillar} class method.
+    # use it directly but through the {FormData.from_pillar} class method and
+    # {Container#default_data} and {Collection#default_data} instance methods.
     #
     # ## Handling collections
     #
@@ -75,8 +76,8 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param form   [Form] Form definition
-      # @param pillar [Hash] Data from pillar
+      # @param form_element [Form] Form definition
+      # @param raw_pillar   [Hash] Data from pillar
       def initialize(form_element, raw_pillar)
         @raw_pillar = raw_pillar
         @form_element = form_element

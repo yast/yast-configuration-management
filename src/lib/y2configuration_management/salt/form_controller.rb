@@ -232,7 +232,7 @@ module Y2ConfigurationManagement
 
       # Default for a given locator
       #
-      # @param [FormElementLocator] Form element locator
+      # @param locator [FormElementLocator] Form element locator
       # @return [FormData]
       def default_for(locator)
         element = form.find_element_by(locator: locator.unbounded)
