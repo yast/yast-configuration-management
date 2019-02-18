@@ -130,7 +130,7 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Form]
       def build_single_value_form(form_element, locator)
         widget = build_element(form_element, locator)
-        Y2ConfigurationManagement::Widgets::SingleValueForm.new(widget)
+        Y2ConfigurationManagement::Widgets::SingleValueForm.new(widget, title: form_element.name)
       end
 
       # @param form_element [FormElement] Root form element for the form
@@ -139,7 +139,9 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Form]
       def build_form(form_element, locator, controller)
         tree_pager = build_tree_pager(form_element, locator)
-        Y2ConfigurationManagement::Widgets::Form.new(tree_pager, controller)
+        Y2ConfigurationManagement::Widgets::Form.new(
+          tree_pager, controller, title: form_element.name
+        )
       end
 
       # Builds a tree pager for a form
