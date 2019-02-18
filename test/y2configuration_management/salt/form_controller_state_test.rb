@@ -38,7 +38,12 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
       FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
     )
   end
-  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new }
+
+  let(:pillar) do
+    Y2ConfigurationManagement::Salt::Pillar.new(
+      data: { "person" => { "computers" => [{ "brand" => "Lenovo" }] } }
+    )
+  end
   let(:data) { Y2ConfigurationManagement::Salt::FormData.from_pillar(form, pillar) }
 
   describe "#open_form" do
@@ -76,7 +81,7 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
       it "restores the form data backup" do
         state.form_data.update(locator_1, "Dell")
         state.close_form(rollback: true)
-        expect(state.form_data.get(locator_1)).to eq("ACME")
+        expect(state.form_data.get(locator_1).value).to eq("Lenovo")
       end
     end
 
@@ -84,7 +89,7 @@ describe Y2ConfigurationManagement::Salt::FormControllerState do
       it "keeps the most recent form data" do
         state.form_data.update(locator_1, "ACME")
         state.close_form(rollback: false)
-        expect(state.form_data.get(locator_1)).to eq("ACME")
+        expect(state.form_data.get(locator_1).value).to eq("ACME")
       end
     end
   end

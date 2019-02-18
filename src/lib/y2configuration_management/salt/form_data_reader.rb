@@ -26,11 +26,12 @@ require "time"
 
 module Y2ConfigurationManagement
   module Salt
-    # This class is responsible for reading the form data from its definition and a data pillar.
+    # This class is responsible for reading data for a form element.
     #
     # The format used in the pillar is slightly different from the internal representation of this
     # module, so this class takes care of the conversion. However, the initial intentation is to not
-    # use it directly but through the {FormData.from_pillar} class method.
+    # use it directly but through the {FormData.from_pillar} class method and
+    # {Container#default_data} and {Collection#default_data} instance methods.
     #
     # ## Handling collections
     #
@@ -70,27 +71,26 @@ module Y2ConfigurationManagement
     #   [{ "$key" => "vers", "$value" => "4" }, { "$key" => "timeout", "$value" => "0" }]
     class FormDataReader
       include Yast::Logger
-      # @return [Form] Form definition
-      attr_reader :form
-      # @return [Pillar]
-      attr_reader :pillar
+      # @return [FormElement] Form element
+      attr_reader :form_element
+      # @return [Hash]
+      attr_reader :raw_pillar
 
       # Constructor
       #
-      # @param form   [Form] Form definition
-      # @param pillar [Pillar] Pillar to read the data from
-      def initialize(form, pillar)
-        @pillar = pillar
-        @form = form
+      # @param form_element [Form] Form definition
+      # @param raw_pillar   [Hash] Data from pillar
+      def initialize(form_element, raw_pillar)
+        @raw_pillar = raw_pillar
+        @form_element = form_element
       end
 
       # Builds a FormData object containing the form data
       #
       # @return [FormData] Form data object
       def form_data
-        data_from_pillar = { "root" => hash_from_pillar(pillar.data, form.root.locator) }
-        defaults = defaults_for_element(form.root)
-        FormData.new(form, simple_merge(defaults, data_from_pillar))
+        from_pillar = data_from_pillar(raw_pillar, form_element.locator)
+        FormData.new(from_pillar)
       end
 
     private
@@ -101,7 +101,7 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Locator
       # @return [Hash<String, Object>]
       def data_from_pillar(data, locator)
-        element = form.find_element_by(locator: locator.unbounded)
+        element = form_element.find_element_by(locator: locator.unbounded)
         case element
         when Collection
           collection_from_pillar(data, locator)
@@ -139,7 +139,7 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Element locator
       # @return [Array<Hash>]
       def collection_from_pillar(data, locator)
-        element = form.find_element_by(locator: locator.unbounded)
+        element = form_element.find_element_by(locator: locator.unbounded)
         if element.keyed?
           data.map { |k, v| { "$key" => k }.merge(hash_from_pillar(v, locator.join(k))) }
         elsif element.keyed_scalar?
@@ -148,51 +148,6 @@ module Y2ConfigurationManagement
           data.map { |v| { "$value" => v } }
         else
           data.map { |d| hash_from_pillar(d, locator) }
-        end
-      end
-
-      # Extracts default values for a given element
-      #
-      # @param element [FormElement]
-      # @return [Object]
-      def defaults_for_element(element)
-        case element
-        when Container
-          defaults = element.elements.reduce({}) { |a, e| a.merge(defaults_for_element(e)) }
-          { element.id => defaults }
-        when Collection
-          { element.id => defaults_for_collection(element) }
-        else
-          { element.id => element.default }
-        end
-      end
-
-      # Extracts default values for a given collection
-      #
-      # @param collection [Collection]
-      # @return [Array<Hash>]
-      def defaults_for_collection(collection)
-        if collection.keyed?
-          collection.default.map { |k, v| { "$key" => k }.merge(v) }
-        elsif collection.prototype.is_a?(FormInput) && collection.prototype.type == :key_value
-          collection.default.map { |k, v| { "$key" => k, "$value" => v } }
-        else
-          collection.default
-        end
-      end
-
-      # Simple deep merge
-      #
-      # @param defaults [Hash] Default values
-      # @param data [Hash] Pillar data
-      def simple_merge(defaults, data)
-        defaults.reduce({}) do |all, (k, v)|
-          next all.merge(k => v) if data[k].nil?
-          if v.is_a?(Hash)
-            all.merge(k => simple_merge(defaults[k], data[k]))
-          else
-            all.merge(k => data[k])
-          end
         end
       end
     end

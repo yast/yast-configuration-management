@@ -30,39 +30,45 @@ describe Y2ConfigurationManagement::Salt::FormData do
       FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
     )
   end
-  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.new(data: {}) }
+  let(:pillar_path) { FIXTURES_PATH.join("pillar").join("test-formula.sls") }
+  let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
   describe "#get" do
-    context "when the value has not been set" do
-      it "returns the default value" do
-        expect(form_data.get(locator_from_string("root#person#name"))).to eq("John Doe")
-      end
-
-      context "and it is a collection" do
-        it "returns an array with the default values" do
-          expect(form_data.get(locator_from_string("root#person#computers")))
-            .to eq([{ "brand" => "ACME", "disks" => [] }])
-        end
+    context "when the locator refers to a scalar value" do
+      it "returns the value" do
+        name = form_data.get(locator_from_string("root#person#name"))
+        expect(name.value).to eq("Jane Doe")
       end
     end
 
-    context "when the value has been set" do
-      let(:locator) { locator_from_string("root#person#name") }
-
-      before do
-        form_data.update(locator, "Mr. Doe")
+    context "when the locator refers to an index based collection locator is given" do
+      it "returns a FormData instance containing the collection values" do
+        computers = form_data.get(locator_from_string("root#person#computers"))
+        expect(computers.value).to include(
+          "brand" => "Dell", "disks" => [{ "size" => "1TB", "type" => "HDD" }]
+        )
       end
+    end
 
-      it "returns the already set value" do
-        expect(form_data.get(locator)).to eq("Mr. Doe")
+    context "when the locator refers to a hash based collection" do
+      let(:locator) { locator_from_string("root#person#projects") }
+
+      it "returns an array containing all the elements" do
+        projects = form_data.get(locator)
+        expect(projects.value.first).to include(
+          "$key" => "yast2", "url" => "https://yast.opensuse.org"
+        )
       end
     end
 
     context "when a collection locator and an index are given" do
-      let(:locator) { locator_from_string("root#person#computers[0]") }
+      let(:locator) { locator_from_string("root#person#computers[1]") }
 
-      it "returns the item in the given position" do
-        expect(form_data.get(locator)).to eq("brand" => "ACME", "disks" => [])
+      it "returns a FormData instance containing the element" do
+        computer = form_data.get(locator)
+        expect(computer.value).to eq(
+          "brand" => "Dell", "disks" => [{ "size" => "1TB", "type" => "HDD" }]
+        )
       end
     end
 
@@ -70,38 +76,21 @@ describe Y2ConfigurationManagement::Salt::FormData do
       let(:locator) { locator_from_string("root#person#projects[yast2]") }
 
       it "returns the item in the given position" do
-        expect(form_data.get(locator))
-          .to eq("$key" => "yast2", "url" => "https://yast.opensuse.org")
+        project = form_data.get(locator)
+        expect(project.value)
+          .to include("$key" => "yast2", "url" => "https://yast.opensuse.org")
       end
     end
 
-    context "when an index based collection locator is given" do
-      let(:locator) { locator_from_string("root#person#projects") }
-
-      it "returns an array containing all the elements" do
-        expect(form_data.get(locator)).to eq(
-          [{ "$key" => "yast2", "url" => "https://yast.opensuse.org" }]
-        )
-      end
-    end
-
-    context "when a hash based collection locator is given" do
-      let(:locator) { locator_from_string("root#person#computers") }
-
-      it "returns an array containing all the elements" do
-        expect(form_data.get(locator)).to eq(
-          [{ "brand" => "ACME", "disks" => [] }]
-        )
-      end
-    end
   end
 
   describe "#add_item" do
     let(:locator) { locator_from_string("root#person#computers") }
 
     it "adds the element to the collection" do
-      form_data.add_item(locator, "brand" => "Dell", "disks" => 2)
-      expect(form_data.get(locator.join(1))).to eq("brand" => "Dell", "disks" => 2)
+      form_data.add_item(locator, "brand" => "ACME")
+      new_disk = form_data.get(locator.join(2))
+      expect(new_disk.value).to eq("brand" => "ACME")
     end
 
     context "when a hash based collection is referred" do
@@ -109,11 +98,8 @@ describe Y2ConfigurationManagement::Salt::FormData do
 
       it "adds the element to the collection" do
         form_data.add_item(locator, "$key" => "openSUSE", "url" => "https://opensuse.org")
-        expect(form_data.get(locator)).to eq(
-          [
-            { "$key" => "yast2", "url" => "https://yast.opensuse.org" },
-            { "$key" => "openSUSE", "url" => "https://opensuse.org" }
-          ]
+        expect(form_data.get(locator).value).to include(
+          "$key" => "openSUSE", "url" => "https://opensuse.org"
         )
       end
     end
@@ -123,85 +109,16 @@ describe Y2ConfigurationManagement::Salt::FormData do
     let(:locator) { locator_from_string("root#person#computers[0]") }
 
     it "updates the item in the collection" do
-      form_data.update_item(locator, "brand" => "Lenovo", "disks" => 3)
-      expect(form_data.get(locator.parent)).to eq(
-        [{ "brand" => "Lenovo", "disks" => 3 }]
-      )
+      form_data.update_item(locator, "brand" => "ACME")
+      expect(form_data.get(locator).value).to include("brand" => "ACME")
     end
   end
 
   describe "#remove_item" do
     it "removes the element from the collection" do
+      form_data.remove_item(locator_from_string("root#person#computers[1]"))
       form_data.remove_item(locator_from_string("root#person#computers[0]"))
       expect(form_data.get(locator_from_string("root#person#computers"))).to be_empty
-    end
-  end
-
-  describe "#to_h" do
-    let(:pillar) do
-      Y2ConfigurationManagement::Salt::Pillar.from_file(
-        FIXTURES_PATH.join("pillar", "test-formula.sls")
-      )
-    end
-
-    it "exports array collections as arrays" do
-      computers = form_data.to_h.dig("root", "person", "computers")
-      expect(computers).to contain_exactly(
-        a_hash_including("brand" => "Dell"),
-        a_hash_including("brand" => "Lenovo")
-      )
-    end
-
-    it "exports hash based collections as hashes" do
-      projects = form_data.to_h.dig("root", "person", "projects")
-      expect(projects["yast2"]).to include("url" => "https://yast.opensuse.org")
-    end
-
-    it "exports scalar collections as arrays of scalar objects" do
-      platforms = form_data.to_h.dig("root", "person", "projects", "yast2", "platforms")
-      expect(platforms).to eq(["Linux"])
-    end
-
-    it "exports numbers as integer objects" do
-      expect(form_data.to_h.dig("root", "person", "siblings")).to eq(2)
-    end
-
-    it "exports dates as date objects" do
-      expect(form_data.to_h.dig("root", "person", "birth_date")).to be_a(Date)
-    end
-
-    it "exports datetimes as time objects" do
-      expect(form_data.to_h.dig("root", "person", "started_working_at")).to be_a(Time)
-    end
-
-    context "when the value is empty" do
-      before do
-        form_data.update(locator, "")
-      end
-
-      context "and it is optional" do
-        let(:locator) { locator_from_string("root#person#email") }
-
-        it "does not export the value" do
-          expect(form_data.to_h.dig("root", "person")).to_not have_key("email")
-        end
-      end
-
-      context "and it mandatory" do
-        let(:locator) { locator_from_string("root#person#name") }
-
-        it "exports the value as 'null'" do
-          expect(form_data.to_h.dig("root", "person")).to have_key("name")
-        end
-      end
-
-      context "and it fallback value was defined" do
-        let(:locator) { locator_from_string("root#person#password") }
-
-        it "exports the fallback value" do
-          expect(form_data.to_h.dig("root", "person", "password")).to eq("***")
-        end
-      end
     end
   end
 
@@ -209,7 +126,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     it "returns a deep-copy of the object" do
       copy = form_data.copy
       # the copy looks the same
-      expect(copy.to_h).to eq(form_data.to_h)
+      expect(copy.value).to eq(form_data.value)
       # but *is* not the same at the top
       expect(copy).to_not be(form_data)
       # ... nor at a lower level
@@ -217,6 +134,82 @@ describe Y2ConfigurationManagement::Salt::FormData do
       malkovich = "John Malkovich"
       form_data.update_item(locator, malkovich)
       expect(copy.get(locator)).to_not eq(malkovich)
+    end
+  end
+
+  describe "#merge" do
+    subject(:form_data) do
+      described_class.new("person" => { "name" => "John", "surname" => "Doe" })
+    end
+
+    let(:other_form_data) do
+      described_class.new("person" => { "name" => "Jane" })
+    end
+
+    it "recursively merges the content" do
+      merged = form_data.merge(other_form_data)
+      expect(merged).to be_a(described_class)
+      expect(merged.value).to eq(
+        "person" => { "name" => "Jane", "surname" => "Doe" }
+      )
+    end
+  end
+
+  describe "#empty?" do
+    context "when an empty instance is given" do
+      subject(:form_data) { described_class.new({}) }
+
+      it "returns true" do
+        expect(form_data).to be_empty
+      end
+    end
+
+    context "when an empty instance is given" do
+      subject(:form_data) { described_class.new("name" => "Jane") }
+
+      it "returns false" do
+        expect(form_data).to_not be_empty
+      end
+    end
+
+    context "when a scalar value is given" do
+      subject(:form_data) { described_class.new("some-value") }
+
+      it "returns false" do
+        expect(form_data).to_not be_empty
+      end
+    end
+  end
+
+  describe "#size" do
+    subject(:form_data) { described_class.new([{ "brand" => "ACME" }]) }
+
+    it "returns the number of elements" do
+      expect(form_data.size).to eq(1)
+    end
+
+    context "when an empty instance is given" do
+      subject(:form_data) { described_class.new({}) }
+
+      it "returns 0" do
+        expect(form_data.size).to eq(0)
+      end
+    end
+
+    context "when a scalar value is given" do
+      subject(:form_data) { described_class.new("some-value") }
+
+      it "returns 1" do
+        expect(form_data.size).to eq(1)
+      end
+    end
+  end
+
+  describe "#first" do
+    subject(:form_data) { described_class.new([{ "brand" => "ACME" }]) }
+
+    it "returns first element" do
+      expect(form_data.first.value).to eq("brand" => "ACME")
     end
   end
 end

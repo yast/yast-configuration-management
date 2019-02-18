@@ -18,39 +18,36 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/form_data_reader"
+require "y2configuration_management/salt/form_data_writer"
 
 module Y2ConfigurationManagement
   module Salt
     # This class holds data for a given Salt Formula Form
     class FormData
-      # @return [Y2ConfigurationManagement::Salt::Form] Form
-      attr_reader :form
-
       class << self
         # @param form   [Form] Form definition
         # @param pillar [Pillar] Pillar to read the data from
         # @return [FormData] Form data merging defaults and pillar values
         def from_pillar(form, pillar)
-          FormDataReader.new(form, pillar).form_data
+          reader = FormDataReader.new(form.root, pillar.data)
+          FormData.new(form.root.id => reader.form_data.value)
         end
       end
 
       # Constructor
       #
-      # @param form    [Form] Form definition
       # @param initial [Hash] Initial data in hash form
-      def initialize(form, initial = {})
-        @form = form
-        @data = initial
+      def initialize(initial)
+        @data = initial || {}
       end
 
       # Returns the value of a given element
       #
       # @param locator [FormElementLocator] Locator of the element
+      # @return [FormData,nil] Form data or nil if no data was found for the given locator
       def get(locator)
         value = find_by_locator(@data, locator)
-        value = default_for(locator) if value.nil?
-        value
+        value ? FormData.new(value) : nil
       end
 
       # Updates an element's value
@@ -58,7 +55,7 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Locator of the collection
       # @param value   [Object] New value
       def update(locator, value)
-        parent = get(locator.parent)
+        parent = find_by_locator(@data, locator.parent)
         parent[key_for(locator.last)] = value
       end
 
@@ -67,14 +64,14 @@ module Y2ConfigurationManagement
       # @param locator [FormElementLocator] Locator of the collection
       # @param value   [Object] Value to add
       def add_item(locator, value)
-        collection = get(locator)
+        collection = find_by_locator(@data, locator)
         collection.push(value)
       end
 
       # @param locator [FormElementLocator] Locator of the collection
       # @param value   [Object] New value
       def update_item(locator, value)
-        collection = get(locator.parent)
+        collection = find_by_locator(@data, locator.parent)
         collection[key_for(locator.last)] = value
       end
 
@@ -82,22 +79,59 @@ module Y2ConfigurationManagement
       #
       # @param locator [FormElementLocator] Locator of the collection
       def remove_item(locator)
-        collection = get(locator.parent)
+        collection = find_by_locator(@data, locator.parent)
         collection.delete_at(locator.last)
       end
 
-      # Returns a hash containing the form data
+      # Returns the stored data in raw form
+      #
+      # @return [Hash,Array]
+      def value
+        @data
+      end
+
+      # Returns a hash containing the information to be used in a data pillar
       #
       # @return [Hash]
-      def to_h
-        { "root" => data_for_pillar(@data["root"], form.root) }
+      def to_pillar_data(form)
+        FormDataWriter.new(form, self).to_pillar_data
       end
 
       # Returns a copy of this object
       #
       # @return [FormData]
       def copy
-        self.class.new(form, Marshal.load(Marshal.dump(@data)))
+        self.class.new(Marshal.load(Marshal.dump(@data)))
+      end
+
+      # Merges the data from another FormData instance
+      #
+      # @param other [FormData] Form data to merge with. In case of conflict, the data from
+      #   this object has precedence.
+      # @return [FormData] Form data containing the merged information
+      def merge(other)
+        FormData.new(simple_merge(value, other.value))
+      end
+
+      # Determines whether the instance is data
+      #
+      # @return [Boolean]
+      def empty?
+        @data.is_a?(Enumerable) ? @data.empty? : false
+      end
+
+      # Returns the number of included elements
+      #
+      # @return [Integer]
+      def size
+        @data.is_a?(Enumerable) ? @data.size : 1
+      end
+
+      # Returns the first element
+      #
+      # @return [FormData]
+      def first
+        FormData.new(@data.first)
       end
 
     private
@@ -120,114 +154,28 @@ module Y2ConfigurationManagement
         find_by_locator(next_data, locator.rest)
       end
 
-      # Default value for a given element
-      #
-      # @param locator [FormElementLocator] Element locator
-      def default_for(locator)
-        element = form.find_element_by(locator: locator)
-        element ? element.default : nil
-      end
-
-      # Returns data in a format to be used by the Pillar
-      #
-      # @param data [Object]
-      # @param element [FormElement] Form element corresponding to `data`
-      # @return [Object]
-      def data_for_pillar(data, element)
-        return data if element.nil?
-        case data
-        when Array
-          collection_for_pillar(data, element)
-        when Hash
-          hash_for_pillar(data, element)
-        else
-          scalar_for_pillar(data, element)
-        end
-      end
-
-      # Recursively converts a hash into one suitable to be used in a Pillar
-      #
-      # @param data [Hash]
-      # @param element [FormElement] Form element corresponding to `data`
-      # @return [Hash]
-      def hash_for_pillar(data, element)
-        data.reduce({}) do |all, (k, v)|
-          children = element.find_element_by(locator: element.locator.join(k.to_sym))
-          value = data_for_pillar(v, children)
-          next all if value.nil? && children && children.optional?
-          all.merge(k.to_s => value)
-        end
-      end
-
-      # Converts a collection to be used in a Pillar
-      #
-      # Arrays containing hashes with a `$key` element will be converted into a hash
-      # using the `$key` values as hash keys. See #hash_collection_for_pillar.
-      #
-      # @param collection [Array]
-      # @param element [FormElement] Form element corresponding to `data`
-      # @return [Array,Hash]
-      def collection_for_pillar(collection, element)
-        first = collection.first
-        return [] if first.nil?
-        if first.respond_to?(:key?) && first.key?("$key")
-          hash_collection_for_pillar(collection, element)
-        elsif first.respond_to?(:key?) && first.key?("$value")
-          scalar_collection_for_pillar(collection)
-        else
-          collection.map { |d| data_for_pillar(d, element) }
-        end
-      end
-
-      # Converts a collection into a hash to be used in a Pillar
-      #
-      # @param collection [Array<Hash>] This method expects an array containing hashes which include
-      #   `$key` element.
-      # @param element [FormElement] Form element corresponding to `data`
-      # @return [Array,Hash]
-      def hash_collection_for_pillar(collection, element)
-        collection.reduce({}) do |all, item|
-          new_item = item.clone
-          key = new_item.delete("$key")
-          val = new_item.delete("$value") || data_for_pillar(new_item, element)
-          all.merge(key => val)
-        end
-      end
-
-      # Converts a collection into an array to be used in a Pillar
-      #
-      # @param collection [Array<Hash>] This method expects an array containing hashes which include
-      #   `$value` element.
-      # @return [Array]
-      def scalar_collection_for_pillar(collection)
-        collection.map { |i| i["$value"] }
-      end
-
-      # Converts a scalar value into its Pillar representation
-      #
-      # @param value [Object] Value to convert
-      # @param element [FormElement] Form element corresponding to `data`
-      # @return [Object]
-      def scalar_for_pillar(value, element)
-        return element.if_empty if value.to_s.empty?
-        case element.type
-        when :date
-          Date.parse(value)
-        when :datetime
-          Time.parse(value)
-        else
-          value
-        end
-      rescue ArgumentError # Date.parse or Time.parse failed
-        nil
-      end
-
       # Convenience method which converts a value to be used as key for a array or a hash
       #
       # @param key [String,Symbol,Integer]
       # @return [String,Integer]
       def key_for(key)
         key.is_a?(Symbol) ? key.to_s : key
+      end
+
+      # Simple deep merge
+      #
+      # @param a_hash       [Hash] Default values
+      # @param another_hash [Hash] Pillar data
+      # @return [Hash]
+      def simple_merge(a_hash, another_hash)
+        a_hash.reduce({}) do |all, (k, v)|
+          next all.merge(k => v) if another_hash[k].nil?
+          if v.is_a?(Hash)
+            all.merge(k => simple_merge(a_hash[k], another_hash[k]))
+          else
+            all.merge(k => another_hash[k])
+          end
+        end
       end
     end
   end

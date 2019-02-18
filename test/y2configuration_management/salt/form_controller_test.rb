@@ -115,7 +115,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "updates the form data" do
         controller.add(collection_locator)
-        expect(controller.get(locator)).to eq([result])
+        expect(controller.get(locator).value).to eq([result])
       end
     end
 
@@ -150,7 +150,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
         it "updates the form data" do
           controller.add(collection_locator)
           collection = controller.get(parent_locator.join(collection_locator))
-          expect(collection).to eq([result])
+          expect(collection.value).to eq([result])
         end
       end
     end
@@ -176,7 +176,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
       it "updates the form data" do
         controller.edit(collection_locator.join(0))
-        expect(controller.get(item_locator)).to include(result)
+        expect(controller.get(item_locator).value).to include(result)
       end
     end
 
@@ -210,7 +210,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
 
         it "updates the form data" do
           controller.add(collection_locator)
-          expect(controller.get(disks_locator)).to include(result)
+          expect(controller.get(disks_locator).value).to include(result)
         end
       end
     end
@@ -222,7 +222,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
     it "removes an element" do
       expect { controller.remove(element_locator) }
         .to change { controller.get(locator_from_string("root#person#computers[1]")) }
-        .from(Hash)
+        .from(Y2ConfigurationManagement::Salt::FormData)
         .to(nil)
     end
   end

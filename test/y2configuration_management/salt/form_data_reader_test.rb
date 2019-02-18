@@ -26,13 +26,14 @@ require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/pillar"
 
 describe Y2ConfigurationManagement::Salt::FormDataReader do
-  subject(:reader) { described_class.new(form, pillar) }
+  subject(:reader) { described_class.new(form.root, pillar.data) }
 
   let(:form) do
     Y2ConfigurationManagement::Salt::Form.from_file(
       FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
     )
   end
+
   let(:pillar) do
     Y2ConfigurationManagement::Salt::Pillar.from_file(
       FIXTURES_PATH.join("pillar", "test-formula.sls")
@@ -40,41 +41,30 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
   end
 
   describe "#form_data" do
-    context "when a value is defined in the pillar" do
-      let(:locator) { locator_from_string("root#person#name") }
+    let(:locator) { locator_from_string("person#name") }
 
-      it "uses the value from the pillar" do
-        form_data = reader.form_data
-        expect(form_data.get(locator)).to eq("Jane Doe")
-      end
-    end
-
-    context "when a value is not defined in the pillar" do
-      let(:locator) { locator_from_string("root#person#email") }
-
-      it "uses the default value from the form definition" do
-        form_data = reader.form_data
-        expect(form_data.get(locator)).to eq("somebody@example.net")
-      end
+    it "returns the value from the pillar" do
+      form_data = reader.form_data
+      expect(form_data.get(locator).value).to eq("Jane Doe")
     end
 
     context "when a hash based collection is given" do
-      let(:locator) { locator_from_string("root#person#projects") }
+      let(:locator) { locator_from_string("person#projects") }
 
       it "converts it to an array of hashes adding a '$key' key" do
         form_data = reader.form_data
-        projects = form_data.get(locator)
+        projects = form_data.get(locator).value
         expect(projects).to be_a(Array)
         expect(projects[0]).to include("$key" => "yast2")
       end
     end
 
     context "when a simple hash based collection is given" do
-      let(:locator) { locator_from_string("root#person#projects[0]#properties") }
+      let(:locator) { locator_from_string("person#projects[0]#properties") }
 
       it "converts it to an array of hashes adding '$key' and '$value' keys" do
         form_data = reader.form_data
-        expect(form_data.get(locator)).to eq(
+        expect(form_data.get(locator).value).to eq(
           [
             { "$key" => "license", "$value" => "GPL-2.0-only" }
           ]
@@ -83,16 +73,16 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
     end
 
     context "when a simple values based collection is given" do
-      let(:locator) { locator_from_string("root#person#projects[0]#platforms") }
+      let(:locator) { locator_from_string("person#projects[0]#platforms") }
 
       it "keeps it as an array" do
         form_data = reader.form_data
-        expect(form_data.get(locator)).to eq([{ "$value" => "Linux" }])
+        expect(form_data.get(locator).value).to eq([{ "$value" => "Linux" }])
       end
     end
 
     context "when an array collection of hash values is given" do
-      let(:locator) { locator_from_string("root#person#computers[0]#disks") }
+      let(:locator) { locator_from_string("person#computers[0]#disks") }
 
       it "returns a plain array of plain hashes" do
         form_data = reader.form_data
@@ -100,19 +90,19 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
           { "size" => "32GB", "type" => "SSD" },
           { "size" => "1TB", "type" => "HDD" }
         ]
-        expect(form_data.get(locator)).to eq(expected)
+        expect(form_data.get(locator).value).to eq(expected)
       end
     end
 
     it "reads times as strings" do
       form_data = reader.form_data
-      expect(form_data.get(locator_from_string("root#person#started_working_at")))
+      expect(form_data.get(locator_from_string("person#started_working_at")).value)
         .to be_a(String)
     end
 
     it "reads dates as strings" do
       form_data = reader.form_data
-      expect(form_data.get(locator_from_string("root#person#birth_date")))
+      expect(form_data.get(locator_from_string("person#birth_date")).value)
         .to be_a(String)
     end
   end

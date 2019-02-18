@@ -190,6 +190,23 @@ describe Y2ConfigurationManagement::Salt::Container do
       end
     end
   end
+
+  describe "#default_data" do
+    subject(:form_element) { form.find_element_by(locator: locator) }
+    let(:locator) { locator_from_string("root#person") }
+    let(:form) do
+      Y2ConfigurationManagement::Salt::Form.from_file(
+        FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
+      )
+    end
+
+    it "returns form data containing default values from included elements" do
+      defaults = form_element.default_data
+      expect(defaults).to be_a(Y2ConfigurationManagement::Salt::FormData)
+      expect(defaults.value)
+        .to include("address" => { "country" => "Czech Republic", "street" => nil })
+    end
+  end
 end
 
 describe Y2ConfigurationManagement::Salt::Collection do
@@ -202,6 +219,23 @@ describe Y2ConfigurationManagement::Salt::Collection do
   end
 
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
+
+  describe "#find_element_by" do
+    let(:locator) { locator_from_string("root#person#projects") }
+
+    context "when the locator matches its own locator" do
+      it "returns itself" do
+        expect(collection).to be_a(described_class)
+      end
+    end
+
+    context "when the locator matches some prototype element" do
+      it "returns the element from the protoype" do
+        element = collection.find_element_by(locator: locator.join(:url))
+        expect(element).to be_a(Y2ConfigurationManagement::Salt::FormInput)
+      end
+    end
+  end
 
   describe "#keyed?" do
     context "when it is a collection indexed by a key" do
@@ -253,6 +287,58 @@ describe Y2ConfigurationManagement::Salt::Collection do
 
       it "returns false" do
         expect(collection).to_not be_keyed_scalar
+      end
+    end
+  end
+
+  describe "#default_data" do
+    let(:locator) { locator_from_string("root#person#projects#platforms") }
+
+    it "returns the form data containing the default values" do
+      default = collection.default_data
+      expect(default).to be_a(Y2ConfigurationManagement::Salt::FormData)
+      expect(default.value).to eq([{ "$value" => "Linux" }])
+    end
+  end
+
+  describe "#prototype_default_data" do
+    context "given an array based collection" do
+      let(:locator) { locator_from_string("root#person#computers") }
+
+      it "returns the form data containing the default values for the prototype" do
+        default = collection.prototype_default_data
+        expect(default.value).to eq(
+          "brand" => "Dell", "disks" => []
+        )
+      end
+    end
+
+    context "given a hash based collection" do
+      let(:locator) { locator_from_string("root#person#projects") }
+
+      it "returns the form data containing the default values for the prototype" do
+        default = collection.prototype_default_data
+        expect(default.value).to include(
+          "$key" => nil, "url" => "https://github.com/yast"
+        )
+      end
+    end
+
+    context "given a key-value scalar collection" do
+      let(:locator) { locator_from_string("root#person#projects#properties") }
+
+      it "returns the form data containing the default values for the prototype" do
+        default = collection.prototype_default_data
+        expect(default.value).to eq("$key" => "key1", "$value" => "value1")
+      end
+    end
+
+    context "given a simple scalar collection" do
+      let(:locator) { locator_from_string("root#person#projects#platforms") }
+
+      it "returns the form data containing the default values for the prototype" do
+        default = collection.prototype_default_data
+        expect(default.value).to eq("$value" => "Platform")
       end
     end
   end

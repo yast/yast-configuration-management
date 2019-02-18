@@ -64,7 +64,9 @@ module Y2ConfigurationManagement
       # Renders the main form's dialog
       def show_main_dialog
         form_widget = form_builder.build(form.root.locator)
-        form_widget.value = get(form.root.locator)
+        root_data = get(form.root.locator)
+        root_data = default_for(form.root.locator) if root_data.empty?
+        form_widget.value = root_data.value
         state.open_form(form.root.locator, form_widget)
         Yast::Wizard.CreateDialog
         ret = Yast::CWM.show(
@@ -132,7 +134,7 @@ module Y2ConfigurationManagement
 
       # Refreshes the most recently open form widget
       def refresh_top_form
-        state.form_widget.refresh(get(state.locator))
+        state.form_widget.refresh(get(state.locator).value)
         state.form_widget.update_visibility(form_data)
       end
 
@@ -150,7 +152,7 @@ module Y2ConfigurationManagement
       def next_handler
         state.form_widget.store
         form_data.update(form.root.locator, state.form_widget.result)
-        pillar.data = form_data.to_h.fetch("root", {})
+        pillar.data = form_data.to_pillar_data(formula.form)
         puts pillar.dump
         true
       end
@@ -168,7 +170,7 @@ module Y2ConfigurationManagement
         item_locator = new_item_locator_for_action(action, relative_locator)
         form_widget = form_builder.build(item_locator)
         state.open_form(item_locator, form_widget)
-        form_widget.value = find_or_create_item(item_locator)
+        form_widget.value = find_or_create_item(item_locator).value
         result = show_popup(form_widget)
         form_data.update(state.locator, result) unless result.nil?
         state.close_form(rollback: result.nil?)
@@ -191,7 +193,7 @@ module Y2ConfigurationManagement
       def find_or_create_item(item_locator)
         new_item = get(item_locator)
         return new_item if new_item
-        new_item = {}
+        new_item = default_for(item_locator)
         form_data.add_item(item_locator.parent, new_item)
         new_item
       end
@@ -226,6 +228,15 @@ module Y2ConfigurationManagement
       # @return [Pillar]
       def pillar
         formula.pillar
+      end
+
+      # Default for a given locator
+      #
+      # @param locator [FormElementLocator] Form element locator
+      # @return [FormData]
+      def default_for(locator)
+        element = form.find_element_by(locator: locator.unbounded)
+        element.is_a?(Collection) ? element.prototype_default_data : element.default_data
       end
     end
   end
