@@ -93,5 +93,17 @@ describe Y2ConfigurationManagement::Salt::FormDataReader do
         expect(form_data.get(locator).value).to eq(expected)
       end
     end
+
+    it "reads times as strings" do
+      form_data = reader.form_data
+      expect(form_data.get(locator_from_string("person#started_working_at")).value)
+        .to be_a(String)
+    end
+
+    it "reads dates as strings" do
+      form_data = reader.form_data
+      expect(form_data.get(locator_from_string("person#birth_date")).value)
+        .to be_a(String)
+    end
   end
 end

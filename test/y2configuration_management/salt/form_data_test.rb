@@ -122,32 +122,6 @@ describe Y2ConfigurationManagement::Salt::FormData do
     end
   end
 
-  describe "#value" do
-    let(:pillar) do
-      Y2ConfigurationManagement::Salt::Pillar.from_file(
-        FIXTURES_PATH.join("pillar", "test-formula.sls")
-      )
-    end
-
-    it "exports array collections as arrays" do
-      computers = form_data.value.dig("root", "person", "computers")
-      expect(computers).to contain_exactly(
-        a_hash_including("brand" => "Dell"),
-        a_hash_including("brand" => "Lenovo")
-      )
-    end
-
-    it "exports hash based collections as arrays" do
-      projects = form_data.value.dig("root", "person", "projects")
-      expect(projects.first).to include("url" => "https://yast.opensuse.org")
-    end
-
-    it "exports scalar collections as arrays of hashes" do
-      project = form_data.value.dig("root", "person", "projects").first
-      expect(project["platforms"]).to eq([{ "$value" => "Linux" }])
-    end
-  end
-
   describe "#copy" do
     it "returns a deep-copy of the object" do
       copy = form_data.copy

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
@@ -24,38 +26,56 @@ require "y2configuration_management/widgets/salt_visibility_switcher"
 
 module Y2ConfigurationManagement
   module Widgets
-    # This class represents a simple date field
-    class Date < VisibilitySwitcher
+    # This class represents a number field
+    class Number < VisibilitySwitcher
       include BaseMixin
+
       include SaltVisibilitySwitcher
+
+      # A helper to go inside a ReplacePoint
+      class NumberField < ::CWM::InputField
+        attr_reader :label
+
+        def initialize(id:, label:)
+          self.widget_id = id
+          @label = label
+        end
+
+        # TODO: only if I am mentioned in a visible_if
+        def opt
+          [:notify]
+        end
+
+        def value
+          ret = super
+          return nil if ret.nil? || ret.empty?
+          ret.to_i
+        end
+      end
 
       # Constructor
       #
-      # @param spec         [Salt::FormInput] Input specification
+      # @param spec    [Y2ConfigurationManagement::Salt::FormInput] Input specification
       # @param data_locator [Salt::FormElementLocator] Data locator (this locator include indexes
       #   in case of nested collections)
       def initialize(spec, data_locator)
         initialize_base(spec, data_locator)
 
-        inner = AlwaysVisibleDate.new(id: "date:#{spec.id}", label: spec.label)
+        inner = NumberField.new(id: "number:#{spec.id}", label: spec.label)
         super(id: "vis:#{spec.id}", widget: inner)
         initialize_salt_visibility_switcher(spec.visible_if)
       end
-    end
 
-    # This class represents a simple date field
-    class AlwaysVisibleDate < ::CWM::DateField
-      # @return [String] Widget label
-      attr_reader :label
-
-      def initialize(id:, label:)
-        self.widget_id = id
-        @label = label
+      # @see CWM::AbstractWidget
+      def init
+        saved_value = value
+        replace(inner)
+        self.value = saved_value.to_s
       end
 
-      # TODO: only if I am mentioned in a visible_if
-      def opt
-        [:notify]
+      # @see CWM::ValueBasedWidget
+      def value=(val)
+        super(val.to_s)
       end
     end
   end

@@ -45,7 +45,7 @@ describe Y2ConfigurationManagement::Salt::FormDataWriter do
 
   describe "#to_pillar_data" do
     it "exports array collections as arrays" do
-      computers = writer.to_pillar_data.dig("root", "person", "computers")
+      computers = writer.to_pillar_data.dig("person", "computers")
       expect(computers).to contain_exactly(
         a_hash_including("brand" => "Dell"),
         a_hash_including("brand" => "Lenovo")
@@ -53,13 +53,61 @@ describe Y2ConfigurationManagement::Salt::FormDataWriter do
     end
 
     it "exports hash based collections as hashes" do
-      projects = writer.to_pillar_data.dig("root", "person", "projects")
+      projects = writer.to_pillar_data.dig("person", "projects")
       expect(projects["yast2"]).to include("url" => "https://yast.opensuse.org")
     end
 
     it "exports scalar collections as arrays of scalar objects" do
-      platforms = writer.to_pillar_data.dig("root", "person", "projects", "yast2", "platforms")
+      platforms = writer.to_pillar_data.dig("person", "projects", "yast2", "platforms")
       expect(platforms).to eq(["Linux"])
+    end
+
+    it "exports numbers as integer objects" do
+      data = writer.to_pillar_data
+      expect(data.dig("person", "siblings")).to eq(2)
+    end
+
+    it "exports dates as date objects" do
+      data = writer.to_pillar_data
+      expect(data.dig("person", "birth_date")).to be_a(Date)
+    end
+
+    it "exports datetimes as time objects" do
+      data = writer.to_pillar_data
+      expect(data.dig("person", "started_working_at")).to be_a(Time)
+    end
+
+    context "when the value is empty" do
+      before do
+        form_data.update(locator, "")
+      end
+
+      context "and it is optional" do
+        let(:locator) { locator_from_string("root#person#email") }
+
+        it "does not export the value" do
+          data = writer.to_pillar_data
+          expect(data.dig("person")).to_not have_key("email")
+        end
+      end
+
+      context "and it mandatory" do
+        let(:locator) { locator_from_string("root#person#name") }
+
+        it "exports the value as 'null'" do
+          data = writer.to_pillar_data
+          expect(data.dig("person")).to have_key("name")
+        end
+      end
+
+      context "and it fallback value was defined" do
+        let(:locator) { locator_from_string("root#person#password") }
+
+        it "exports the fallback value" do
+          data = writer.to_pillar_data
+          expect(data.to_h.dig("person", "password")).to eq("***")
+        end
+      end
     end
   end
 end

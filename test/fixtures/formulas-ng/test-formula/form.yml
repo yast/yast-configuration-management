@@ -4,15 +4,20 @@ person:
   name:
     "$type": text
     "$default": "John Doe"
+    "$optional": false
   email:
     "$name": "E-mail"
     "$type": email
     "$default": "somebody@example.net"
+    "$optional": true
   birth_date:
     "$type": date
+  started_working_at:
+    "$type": datetime
   password:
     "$type": password
     "$default": DefaultSecret
+    "$ifEmpty": "***"
   homepage:
     "$type": url
     "$default": "http://myhomepage.com"
@@ -22,6 +27,9 @@ person:
   newsletter_color:
     $type: color
     $default: "#73ba25"
+  siblings:
+    $type: number
+    $name: "Number of siblings"
   address:
     "$type": group
     street:

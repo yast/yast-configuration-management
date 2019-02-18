@@ -112,7 +112,7 @@ module Y2ConfigurationManagement
         @type = type_for(spec)
         @help = spec["$help"] if spec ["$help"]
         @scope = spec.fetch("$scope", "system").to_sym
-        @optional = spec["$optional"] if spec["$optional"]
+        @optional = !!spec["$optional"]
         @parent = parent
         @visible_if = FormCondition.parse(spec.fetch("$visibleIf", ""))
       end
@@ -124,6 +124,13 @@ module Y2ConfigurationManagement
         return FormElementLocator.new([id.to_sym]) if parent.nil?
         return parent.locator if parent.is_a?(Collection)
         parent.locator.join(id.to_sym)
+      end
+
+      # Determines whether the element can be omitted from the Pillar
+      #
+      # @return [Boolean] true if it can be omitted; false otherwise
+      def optional?
+        @optional
       end
 
     private
@@ -155,6 +162,8 @@ module Y2ConfigurationManagement
       attr_reader :default
       # @return [Array<String>] a list of possible values for a select input
       attr_reader :values
+      # @return [Object] value to use when the user did not specify one
+      attr_reader :if_empty
 
       # Constructor
       #
@@ -165,6 +174,7 @@ module Y2ConfigurationManagement
         @values = spec["$values"] if spec["$values"]
         @placeholder = spec["$placeholder"] if spec["$placeholder"]
         @default = spec["$default"]
+        @if_empty = spec["$ifEmpty"] if spec["$ifEmpty"]
         super
       end
 
