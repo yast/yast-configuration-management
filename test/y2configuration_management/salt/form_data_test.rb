@@ -161,6 +161,48 @@ describe Y2ConfigurationManagement::Salt::FormData do
       platforms = form_data.to_h.dig("root", "person", "projects", "yast2", "platforms")
       expect(platforms).to eq(["Linux"])
     end
+
+    it "exports numbers as integer objects" do
+      expect(form_data.to_h.dig("root", "person", "siblings")).to eq(2)
+    end
+
+    it "exports dates as date objects" do
+      expect(form_data.to_h.dig("root", "person", "birth_date")).to be_a(Date)
+    end
+
+    it "exports datetimes as time objects" do
+      expect(form_data.to_h.dig("root", "person", "started_working_at")).to be_a(Time)
+    end
+
+    context "when the value is empty" do
+      before do
+        form_data.update(locator, "")
+      end
+
+      context "and it is optional" do
+        let(:locator) { locator_from_string("root#person#email") }
+
+        it "does not export the value" do
+          expect(form_data.to_h.dig("root", "person")).to_not have_key("email")
+        end
+      end
+
+      context "and it mandatory" do
+        let(:locator) { locator_from_string("root#person#name") }
+
+        it "exports the value as 'null'" do
+          expect(form_data.to_h.dig("root", "person")).to have_key("name")
+        end
+      end
+
+      context "and it fallback value was defined" do
+        let(:locator) { locator_from_string("root#person#password") }
+
+        it "exports the fallback value" do
+          expect(form_data.to_h.dig("root", "person", "password")).to eq("***")
+        end
+      end
+    end
   end
 
   describe "#copy" do

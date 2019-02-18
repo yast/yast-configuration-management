@@ -60,7 +60,7 @@ end
 
 shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
   let(:id) { "test" }
-  let(:spec) { { id => { "$type" => "text", "$name" => "My Element" } } }
+  let(:spec) { { "$type" => "text", "$name" => "My Element" } }
 
   let(:form_element) { described_class.new(id, spec, parent: nil) }
 
@@ -70,7 +70,7 @@ shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
     end
 
     context "when a name is not given in the specification" do
-      let(:spec) { { id => { "$type" => "text" } } }
+      let(:spec) { { "$type" => "text" } }
 
       it "uses the humanized 'id' as the default 'label'" do
         expect(form_element.label).to eql("Test")
@@ -86,10 +86,24 @@ shared_examples "Y2ConfigurationManagement::Salt::FormElement" do
     end
 
     context "when a 'scope' is not given in the specification" do
-      let(:spec) { { id => { "$type" => "text" } } }
+      let(:spec) { { "$type" => "text" } }
 
       it "uses :system as the default 'scope'" do
         expect(form_element.scope).to eql(:system)
+      end
+    end
+  end
+
+  describe "#optional?" do
+    it "returns false by default" do
+      expect(form_element).to_not be_optional
+    end
+
+    context "when the element is optional" do
+      let(:spec) { { "$type" => "text", "$optional" => true } }
+
+      it "returns true" do
+        expect(form_element).to be_optional
       end
     end
   end
@@ -113,6 +127,26 @@ end
 
 describe Y2ConfigurationManagement::Salt::FormInput do
   include_examples "Y2ConfigurationManagement::Salt::FormElement"
+
+  describe "#if_empty" do
+    let(:form_element) { described_class.new(id, spec, parent: nil) }
+
+    context "when a fallback value is given" do
+      let(:spec) { { "$type" => "text", "$ifEmpty" => "fallback" } }
+
+      it "returns the fallback value" do
+        expect(form_element.if_empty).to eq("fallback")
+      end
+    end
+
+    context "when no fallback value is given" do
+      let(:spec) { { "$type" => "text" } }
+
+      it "returns nil" do
+        expect(form_element.if_empty).to be_nil
+      end
+    end
+  end
 end
 
 describe Y2ConfigurationManagement::Salt::Container do

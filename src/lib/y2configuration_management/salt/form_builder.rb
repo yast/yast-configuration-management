@@ -29,7 +29,7 @@ module Y2ConfigurationManagement
       INPUT_WIDGET_CLASS = {
         color:     Y2ConfigurationManagement::Widgets::Color,
         text:      Y2ConfigurationManagement::Widgets::Text,
-        number:    Y2ConfigurationManagement::Widgets::Text,
+        number:    Y2ConfigurationManagement::Widgets::Number,
         email:     Y2ConfigurationManagement::Widgets::Email,
         password:  Y2ConfigurationManagement::Widgets::Password,
         url:       Y2ConfigurationManagement::Widgets::URL,

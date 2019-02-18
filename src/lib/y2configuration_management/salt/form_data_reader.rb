@@ -21,6 +21,8 @@
 
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/form_data"
+require "date"
+require "time"
 
 module Y2ConfigurationManagement
   module Salt
@@ -106,7 +108,7 @@ module Y2ConfigurationManagement
         when Container
           hash_from_pillar(data, locator)
         else
-          data
+          scalar_from_pillar(data)
         end
       end
 
@@ -119,6 +121,16 @@ module Y2ConfigurationManagement
         data.reduce({}) do |all, (k, v)|
           all.merge(k => data_from_pillar(v, locator.join(k.to_sym)))
         end
+      end
+
+      # Reads a scalar value from the Pillar
+      #
+      # Dates and times are converted into strings because is the representation
+      # used by the widgets.
+      #
+      # @return [value]
+      def scalar_from_pillar(value)
+        [Time, Date].include?(value.class) ? value.to_s : value
       end
 
       # Converts a collection from the pillar
