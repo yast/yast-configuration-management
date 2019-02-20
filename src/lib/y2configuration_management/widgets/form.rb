@@ -46,12 +46,9 @@ module Y2ConfigurationManagement
       #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       attr_accessor :value
 
-      attr_reader :scalar
-
       # Constructor
       #
-      # Usually, a form stores a set of keys and values. However, it is possible to define a
-      # "scalar" form, which holds a single value only.
+      # A form stores a set of keys and values.
       #
       # @example Regular form
       #   form.value = { "name" => "John Doe" }
@@ -65,11 +62,9 @@ module Y2ConfigurationManagement
       #
       # @param children   [Array<CWM::AbstractWidget>] Widgets included in the form
       # @param controller [Salt::FormController] Form controller
-      # @param scalar     [Boolean] Determines whether the form stores are scalar value
       # @param title      [String] Form title
-      def initialize(children, controller, scalar: false, title: "")
-        @value = scalar ? nil : {}
-        @scalar = scalar
+      def initialize(children, controller, title: "")
+        @value = {}
         add_children(*children)
         @controller = controller
         @title = title
@@ -82,7 +77,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget#init
       def init
-        set_widgets_content
+        set_children_contents
       end
 
       # Widget's content
@@ -107,9 +102,7 @@ module Y2ConfigurationManagement
       # @return [Hash] values including the ones from the underlying widgets; values are
       #   `nil` when the form has been removed from the UI.
       def current_values
-        return children_values unless scalar?
-        first_value = children_values.values.first
-        first_value.is_a?(Hash) ? first_value : { "$value" => first_value }
+        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
       end
 
       # Refreshes the widget's content
@@ -145,30 +138,7 @@ module Y2ConfigurationManagement
         Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
 
-      def scalar?
-        @scalar
-      end
-
     private
-
-      # Returns children values
-      #
-      # @return [Hash] Hash containing the children ids and their values
-      def children_values
-        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
-      end
-
-      def set_widgets_content
-        if scalar?
-          set_child_content
-        else
-          set_children_contents
-        end
-      end
-
-      def set_child_content
-        children.first.value = value.key?("$key") ? value : value["$value"]
-      end
 
       def set_children_contents
         set_children_contents_precond!

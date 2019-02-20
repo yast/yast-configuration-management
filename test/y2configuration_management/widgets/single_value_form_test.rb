@@ -1,7 +1,7 @@
 #!/usr/bin/env rspec
 # encoding: utf-8
 
-# Copyright (c) [2018] SUSE LLC
+# Copyright (c) [2019] SUSE LLC
 #
 # All Rights Reserved.
 #
@@ -21,56 +21,47 @@
 # find current contact information at www.suse.com.
 
 require_relative "../../spec_helper"
-require "y2configuration_management/widgets/form"
+require "y2configuration_management/widgets/single_value_form"
 require "y2configuration_management/widgets/text"
 
-describe Y2ConfigurationManagement::Widgets::Form do
-  subject(:form) { described_class.new(widget, double("controller")) }
+describe Y2ConfigurationManagement::Widgets::SingleValueForm do
+  subject(:form) { described_class.new(widget, title: "title1") }
 
   let(:widget) do
     instance_double(
-      Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil,
-      :parent= => nil
-    )
+      Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar"
+    ).as_null_object
   end
-  let(:new_val) { { "text1" => "example" } }
+  let(:new_val) { { "$value" => "example" } }
 
   describe "#init" do
     before { form.value = new_val }
 
-    it "sets values for underlying widgets" do
+    it "sets the widget's value" do
       expect(widget).to receive(:value=).with("example")
       form.init
     end
   end
 
-  describe "#refresh" do
-    it "sets values for underlying widgets" do
-      expect(widget).to receive(:value=).with("example")
-      form.refresh(new_val)
-    end
-
-    it "sets the widget's value" do
-      expect { form.refresh(new_val) }.to change { form.value }.to(new_val)
-    end
-
-    it "resets the widget's result" do
-      form.store
-      expect { form.refresh(new_val) }.to change { form.result }.from(Hash).to(nil)
-    end
-  end
-
-  describe "#store" do
-    it "stores the final result" do
-      expect { form.store }.to change { form.result }.from(nil).to("text1" => "foobar")
+  describe "#title" do
+    it "returns the form's title" do
+      expect(form.title).to eq("title1")
     end
   end
 
   describe "#result" do
     before { form.store }
 
-    it "returns an hash including the values" do
-      expect(form.result).to eq("text1" => "foobar")
+    it "returns a hash including the widget's value" do
+      expect(form.result).to eq("$value" => "foobar")
+    end
+
+    context "when using a widget with a complex value" do
+      let(:widget) { double("key_value_widget", value: { "foo" => "bar" }).as_null_object }
+      
+      it "returns the widget's value" do
+        expect(form.result).to eq("foo" => "bar")
+      end
     end
   end
 end

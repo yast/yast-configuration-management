@@ -56,13 +56,12 @@ module Y2ConfigurationManagement
       def build(locator)
         form_element = form.find_element_by(locator: locator.unbounded)
         form_element = form_element.prototype if form_element.is_a?(Collection)
-        scalar = !form_element.respond_to?(:elements)
         root_locator = form_element.is_a?(Container) ? locator : locator.parent
-        elements = scalar ? [form_element] : form_element.elements
-        widgets = Array(elements).map { |e| build_element(e, root_locator) }
-        Y2ConfigurationManagement::Widgets::Form.new(
-          widgets, controller, scalar: scalar
-        )
+        if form_element.respond_to?(:elements)
+          build_form(form_element, root_locator, controller)
+        else
+          build_single_value_form(form_element, root_locator)
+        end
       end
 
     private
@@ -124,6 +123,23 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Collection]
       def build_collection(collection_spec, locator)
         Y2ConfigurationManagement::Widgets::Collection.new(collection_spec, controller, locator)
+      end
+
+      # @param form_element [FormElement] Form element to include in the form
+      # @param locator      [FormElementLocator] Form element locator
+      # @return [Y2ConfigurationManagement::Widgets::Form]
+      def build_single_value_form(form_element, locator)
+        widget = build_element(form_element, locator)
+        Y2ConfigurationManagement::Widgets::SingleValueForm.new(widget)
+      end
+
+      # @param form_element [FormElement] Root form element for the form
+      # @param locator      [FormElementLocator] Form element locator
+      # @param controller   [FormController] Controller to inject into the form
+      # @return [Y2ConfigurationManagement::Widgets::Form]
+      def build_form(form_element, locator, controller)
+        widgets = form_element.elements.map { |e| build_element(e, locator) }
+        Y2ConfigurationManagement::Widgets::Form.new(widgets, controller)
       end
     end
   end

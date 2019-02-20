@@ -38,17 +38,14 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
 
       it "returns a form containing a text widget" do
         form_widget = builder.build(locator)
-        expect(form_widget.children).to be_all(Y2ConfigurationManagement::Widgets::Text)
-        expect(form_widget.children).to contain_exactly(
-          an_object_having_attributes(
-            "locator" => locator_from_string("root#person#name")
-          )
-        )
+        widget = form_widget.widget
+        expect(widget).to be_a(Y2ConfigurationManagement::Widgets::Text)
+        expect(widget.locator).to eq(locator_from_string("root#person#name"))
       end
 
       it "returns a single value form" do
         form_widget = builder.build(locator)
-        expect(form_widget).to be_scalar
+        expect(form_widget).to be_a(Y2ConfigurationManagement::Widgets::SingleValueForm)
       end
     end
 
