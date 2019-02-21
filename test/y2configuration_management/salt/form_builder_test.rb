@@ -54,7 +54,7 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
 
       it "returns a form containing group widgets" do
         form_widget = builder.build(locator)
-        expect(form_widget.children.map(&:relative_locator)).to contain_exactly(
+        expect(form_widget.widgets.map(&:relative_locator)).to contain_exactly(
           locator_from_string("#street"),
           locator_from_string("#country")
         )
@@ -66,7 +66,7 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
 
       it "returns a form containing a collection widget" do
         form_widget = builder.build(locator)
-        expect(form_widget.children).to contain_exactly(
+        expect(form_widget.widgets).to contain_exactly(
           an_object_having_attributes(
             "relative_locator" => locator_from_string("brand")
           ),
@@ -74,6 +74,31 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
             "relative_locator" => locator_from_string("disks")
           )
         )
+      end
+    end
+
+    context "when the locator of the root element is given" do
+      let(:locator) { locator_from_string("root") }
+
+      it "returns a form including the containers but excluding 'root'" do
+        form_widget = builder.build(locator)
+        person = form_widget.tree_pager.items.first
+        expect(person.id).to eq("page:person")
+        expect(person.children.values.map(&:id))
+          .to eq(["page:address", "page:computers", "page:projects"])
+      end
+    end
+
+    context "when the locator of a container element is given" do
+      let(:locator) { locator_from_string("root#person#computers") }
+
+      it "returns a form including the container" do
+        form_widget = builder.build(locator)
+        computers = form_widget.tree_pager.items.first
+        expect(computers.page.children).to contain_exactly(
+          an_object_having_attributes("relative_locator" => locator_from_string("brand"))
+        )
+        expect(computers.children.values.map(&:id)).to eq(["page:disks"])
       end
     end
   end

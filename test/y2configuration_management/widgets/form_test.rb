@@ -22,16 +22,13 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/form"
-require "y2configuration_management/widgets/text"
+require "y2configuration_management/widgets/tree_pager"
 
 describe Y2ConfigurationManagement::Widgets::Form do
-  subject(:form) { described_class.new(widget, double("controller")) }
+  subject(:form) { described_class.new(tree_pager, double("controller")) }
 
-  let(:widget) do
-    instance_double(
-      Y2ConfigurationManagement::Widgets::Text, id: "text1", value: "foobar", :value= => nil,
-      :parent= => nil
-    )
+  let(:tree_pager) do
+    instance_double(Y2ConfigurationManagement::Widgets::TreePager, value: { "text1" => "foobar" })
   end
   let(:new_val) { { "text1" => "example" } }
 
@@ -39,24 +36,15 @@ describe Y2ConfigurationManagement::Widgets::Form do
     before { form.value = new_val }
 
     it "sets values for underlying widgets" do
-      expect(widget).to receive(:value=).with("example")
+      expect(tree_pager).to receive(:refresh).with(new_val)
       form.init
     end
   end
 
   describe "#refresh" do
     it "sets values for underlying widgets" do
-      expect(widget).to receive(:value=).with("example")
+      expect(tree_pager).to receive(:refresh).with(new_val)
       form.refresh(new_val)
-    end
-
-    it "sets the widget's value" do
-      expect { form.refresh(new_val) }.to change { form.value }.to(new_val)
-    end
-
-    it "resets the widget's result" do
-      form.store
-      expect { form.refresh(new_val) }.to change { form.result }.from(Hash).to(nil)
     end
   end
 

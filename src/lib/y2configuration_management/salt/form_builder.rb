@@ -138,8 +138,67 @@ module Y2ConfigurationManagement
       # @param controller   [FormController] Controller to inject into the form
       # @return [Y2ConfigurationManagement::Widgets::Form]
       def build_form(form_element, locator, controller)
-        widgets = form_element.elements.map { |e| build_element(e, locator) }
-        Y2ConfigurationManagement::Widgets::Form.new(widgets, controller)
+        tree_pager = build_tree_pager(form_element, locator)
+        Y2ConfigurationManagement::Widgets::Form.new(tree_pager, controller)
+      end
+
+      # Builds a tree pager for a form
+      #
+      # The root element (Form#root) is excluded from the tree. However, when building
+      # a pager for any other container, that container should be taken into account.
+      # Additionally, the root element cannot contain simple input elements (usually it
+      # contains just one container).
+      #
+      # See #build_root_tree_items and #build_container_tree_items for the details.
+      #
+      # @param form_element [FormElement] Form element
+      # @param locator      [FormElementLocator] Form element locator
+      def build_tree_pager(form_element, locator)
+        tree_items =
+          if form_element.parent.nil?
+            build_root_tree_items(form_element)
+          else
+            build_container_tree_item(form_element, locator)
+          end
+
+        Widgets::TreePager.new(Array(tree_items))
+      end
+
+      # Builds tree pager items for the root element
+      #
+      # @param form_element [FormElement] Root form element
+      # @return [Array<Widgets::PagerTreeItem>]
+      def build_root_tree_items(form_element)
+        form_element.elements.map { |e| build_tree_item(e, e.locator) }
+      end
+
+      # Builds tree pager item for a container
+      #
+      # @param form_element [FormElement] Form element
+      # @param locator      [FormElementLocator] Form element locator
+      # @return [Widgets::PagerTreeItem]
+      def build_container_tree_item(form_element, locator)
+        build_tree_item(form_element, locator).tap { |t| t.main = true }
+      end
+
+      # Builds a tree item for a given form element
+      #
+      # @param form_element [FormElement] Form element
+      # @param locator      [FormElementLocator] Form element locator
+      # @return [Widgets::PagerTreeItem]
+      def build_tree_item(form_element, locator)
+        if form_element.respond_to?(:elements)
+          inputs, groups = form_element.elements.partition { |e| e.is_a?(FormInput) }
+        else
+          inputs = [form_element]
+          groups = []
+        end
+
+        widgets = inputs.map { |e| build_element(e, locator) }
+        children = groups.map { |e| build_tree_item(e, locator.join(e.id.to_sym)) }
+
+        page = Widgets::Page.new(locator.last.to_s, form_element.name, widgets)
+        Widgets::PagerTreeItem.new(page, children: children)
       end
     end
   end

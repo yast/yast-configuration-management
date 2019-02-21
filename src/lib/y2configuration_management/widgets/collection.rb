@@ -101,6 +101,13 @@ module Y2ConfigurationManagement
         true
       end
 
+      # Returns the relative locator
+      #
+      # @return [FormElementLocator]
+      def relative_locator
+        parent.relative_locator
+      end
+
       # Events handler
       #
       # @todo Partially implemented only
