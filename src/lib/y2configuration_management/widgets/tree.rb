@@ -27,7 +27,7 @@ module Y2ConfigurationManagement
     class Tree < ::CWM::Tree
       # @return [Array<PagerTreeItem>] Included tree items
       attr_reader :items
-      # @param pager [TreePager] Associated tree pager
+      # @return [TreePager] Associated tree pager
       attr_reader :pager
 
       # Constructor

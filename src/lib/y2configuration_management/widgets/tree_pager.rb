@@ -33,7 +33,7 @@ module Y2ConfigurationManagement
 
       # Constructor
       #
-      # @param [Array<PagerTreeItem>] Items to include in the tree
+      # @param items [Array<PagerTreeItem>] Items to include in the tree
       def initialize(items)
         textdomain "configuration_management"
         super(Tree.new(items, self))

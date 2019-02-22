@@ -37,7 +37,7 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param page [Page] Associated page
-      # @param icon 
+      # @param icon
       def initialize(page, icon: nil, open: true, children: [])
         super
         items.each { |i| i.parent = self }

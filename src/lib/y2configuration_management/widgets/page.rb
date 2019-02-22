@@ -33,10 +33,13 @@ module Y2ConfigurationManagement
       attr_reader :id
       # @return [Array<CWM::AbstractWidget>] Widgets to include in the page
       attr_reader :children
-      # @return [Hash] Value
+      # @return [Hash,Array] Page value
       attr_accessor :value
       # @return [PagerTreeItem] Tree item associated with the page
       attr_accessor :tree_item
+      # @!attribute [w] value
+      #   Values for widgets included in the page
+      attr_writer :value
 
       # Constructor
       #
@@ -54,7 +57,7 @@ module Y2ConfigurationManagement
 
       # Add widgets to the page
       #
-      # @param [Array<::CWM::AbstractWidget>] Widgets to add to the page
+      # @param widgets [Array<::CWM::AbstractWidget>] Widgets to add to the page
       def add_children(*widgets)
         @children ||= []
         widgets.each { |w| w.parent = self }
@@ -106,14 +109,6 @@ module Y2ConfigurationManagement
       def visible?
         pager.current_page && pager.current_page.id == id
       end
-
-      # Sets widget values
-      #
-      # @note This method does not update the underlying widgets. Changes are propagated
-      #   through the #init method.
-      #
-      # @param new_value [Hash,Array] Value for the widget
-      attr_writer :value
 
       # Returns widget's content
       #
