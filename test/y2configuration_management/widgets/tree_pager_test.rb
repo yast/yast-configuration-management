@@ -49,7 +49,7 @@ describe Y2ConfigurationManagement::Widgets::TreePager do
   }.freeze
 
   EXAMPLE_VALUE_WITH_MAIN = {
-    "name" => "OBS",
+    "name"      => "OBS",
     "platforms" => [{ "$value" => "Linux" }]
   }.freeze
 
@@ -87,8 +87,10 @@ describe Y2ConfigurationManagement::Widgets::TreePager do
     context "when a main item is found" do
       let(:item) do
         instance_double(
-          Y2ConfigurationManagement::Widgets::PagerTreeItem, main: true,
-          value: EXAMPLE_VALUE["data"]).as_null_object
+          Y2ConfigurationManagement::Widgets::PagerTreeItem,
+          main:  true,
+          value: EXAMPLE_VALUE["data"]
+        ).as_null_object
       end
 
       it "exports its values as the base of the hash" do

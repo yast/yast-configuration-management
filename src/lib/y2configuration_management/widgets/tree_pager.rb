@@ -95,7 +95,7 @@ module Y2ConfigurationManagement
       def contents
         MinSize(
           50, # FIXME: estimate needed sizes
-          50, 
+          50,
           HBox(
             pages.size > 1 ? HWeight(30, tree) : Empty(),
             HWeight(70, replace_point),

@@ -113,10 +113,7 @@ module Y2ConfigurationManagement
       #   through the #init method.
       #
       # @param new_value [Hash,Array] Value for the widget
-      def value=(new_value)
-        @value = new_value
-      end
-
+      attr_writer :value
 
       # Returns widget's content
       #

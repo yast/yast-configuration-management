@@ -33,7 +33,7 @@ describe Y2ConfigurationManagement::Widgets::Page do
   let(:widget1) do
     instance_double(
       Y2ConfigurationManagement::Widgets::Text, id: "name", value: "Jane"
-    ).as_null_object 
+    ).as_null_object
   end
 
   let(:widget2) do

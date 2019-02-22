@@ -58,7 +58,7 @@ describe Y2ConfigurationManagement::Widgets::SingleValueForm do
 
     context "when using a widget with a complex value" do
       let(:widget) { double("key_value_widget", value: { "foo" => "bar" }).as_null_object }
-      
+
       it "returns the widget's value" do
         expect(form.result).to eq("foo" => "bar")
       end
