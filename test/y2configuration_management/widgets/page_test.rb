@@ -32,13 +32,15 @@ describe Y2ConfigurationManagement::Widgets::Page do
   let(:widgets) { [widget1, widget2] }
   let(:widget1) do
     instance_double(
-      Y2ConfigurationManagement::Widgets::Text, id: "name", value: "Jane"
+      Y2ConfigurationManagement::Widgets::Text, id: "name", value: "Jane",
+      min_height: 1
     ).as_null_object
   end
 
   let(:widget2) do
     instance_double(
-      Y2ConfigurationManagement::Widgets::Text, id: "surname", value: "Doe"
+      Y2ConfigurationManagement::Widgets::Text, id: "surname", value: "Doe",
+      min_height: 2
     ).as_null_object
   end
 
@@ -68,6 +70,12 @@ describe Y2ConfigurationManagement::Widgets::Page do
         page.store
         expect(page.value).to be_nil
       end
+    end
+  end
+
+  describe "#min_height" do
+    it "returns sum of the min_height of the underlying widgets" do
+      expect(page.min_height).to eq(3)
     end
   end
 end

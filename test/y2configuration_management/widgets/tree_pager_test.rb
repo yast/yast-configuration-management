@@ -128,4 +128,27 @@ describe Y2ConfigurationManagement::Widgets::TreePager do
       tree_pager.store
     end
   end
+
+  describe "#min_height" do
+    let(:page1) { double("text", min_height: 3) }
+    let(:page2) { double("collection", min_height: 2) }
+    let(:text_mode) { false }
+
+    before do
+      allow(tree_pager).to receive(:pages).and_return([page1, page2])
+      allow(Yast::UI).to receive(:TextMode).and_return(text_mode)
+    end
+
+    context "when running in textmode" do
+      let(:text_mode) { true }
+
+      it "returns 0" do
+        expect(tree_pager.min_height).to eq(0)
+      end
+    end
+
+    it "returns the max min_height of the underlying widgets" do
+      expect(tree_pager.min_height).to eq(3)
+    end
+  end
 end

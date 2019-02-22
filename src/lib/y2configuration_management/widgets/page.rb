@@ -122,6 +122,11 @@ module Y2ConfigurationManagement
         end
       end
 
+      # @return [Integer]
+      def min_height
+        children.map(&:min_height).sum
+      end
+
     protected
 
       # Propagates the values to the underlying widgets

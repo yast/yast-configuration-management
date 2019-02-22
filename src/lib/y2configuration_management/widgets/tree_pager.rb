@@ -23,6 +23,8 @@ require "cwm"
 require "cwm/tree_pager"
 require "y2configuration_management/widgets/tree"
 
+Yast.import "UI"
+
 module Y2ConfigurationManagement
   module Widgets
     # This class implements a tree pager which allows to browse through the different parts of a
@@ -99,14 +101,20 @@ module Y2ConfigurationManagement
       # @see CWM::AbstractWidget
       def contents
         MinSize(
-          50, # FIXME: estimate needed sizes
-          50,
+          70, # FIXME: estimate needed sizes
+          min_height,
           HBox(
             pages.size > 1 ? HWeight(30, tree) : Empty(),
-            HWeight(70, replace_point),
+            HWeight(70, VBox(VSpacing(1), replace_point)),
             VStretch()
           )
         )
+      end
+
+      # @return [Integer]
+      def min_height
+        return 0 if Yast::UI.TextMode
+        pages.map(&:min_height).max
       end
 
     private

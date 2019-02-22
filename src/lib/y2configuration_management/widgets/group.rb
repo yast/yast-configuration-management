@@ -94,6 +94,13 @@ module Y2ConfigurationManagement
         widgets.each { |w| w.parent = self }
         @children.concat(widgets)
       end
+
+      # Minimal height
+      #
+      # @return [Integer]
+      def min_height
+        children.reduce(0) { |a, e| a + e.min_height }
+      end
     end
   end
 end

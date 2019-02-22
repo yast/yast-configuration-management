@@ -47,6 +47,20 @@ module Y2ConfigurationManagement
       def buttons
         [ok_button, cancel_button]
       end
+
+      # Defines the dialog's layout
+      #
+      # @return [Yast::Term]
+      def layout
+        VBox(
+          Id(:WizardDialog),
+          HSpacing(50),
+          Left(Heading(Id(:title), title)),
+          MinSize(min_width, min_height, ReplacePoint(Id(:contents), Empty())),
+          VStretch(),
+          ButtonBox(*buttons)
+        )
+      end
     end
   end
 end

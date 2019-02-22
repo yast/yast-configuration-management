@@ -65,16 +65,22 @@ module Y2ConfigurationManagement
         self.value = []
       end
 
+      # Reserve some lines for buttons
+      BUTTONS_HEIGHT = 1
+
       # Widget contents
       #
       # @return [Term]
       def contents
         VBox(
-          Table(
-            Id("table:#{locator}"),
-            Opt(:notify, :immediate),
-            Header(*headers),
-            []
+          MinHeight(
+            min_height - BUTTONS_HEIGHT,
+            Table(
+              Id("table:#{locator}"),
+              Opt(:notify, :immediate),
+              Header(*headers),
+              []
+            )
           ),
           HBox(
             HStretch(),
@@ -130,6 +136,13 @@ module Y2ConfigurationManagement
         return true if valid_items_qty?
         Yast::Report.Error(items_qty_error_message)
         false
+      end
+
+      # Minimal height
+      #
+      # @return [Integer]
+      def min_height
+        18
       end
 
     private
