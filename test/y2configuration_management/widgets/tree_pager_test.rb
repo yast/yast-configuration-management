@@ -113,4 +113,19 @@ describe Y2ConfigurationManagement::Widgets::TreePager do
       expect(tree_pager.widgets).to eq([widget1, widget2])
     end
   end
+
+  describe "#store" do
+    let(:page1) { double("page") }
+    let(:page2) { double("page") }
+
+    before do
+      allow(tree_pager).to receive(:pages).and_return([page1, page2])
+    end
+
+    it "stores pages values" do
+      expect(page1).to receive(:store)
+      expect(page2).to receive(:store)
+      tree_pager.store
+    end
+  end
 end

@@ -28,7 +28,9 @@ describe Y2ConfigurationManagement::Widgets::Form do
   subject(:form) { described_class.new(tree_pager, double("controller")) }
 
   let(:tree_pager) do
-    instance_double(Y2ConfigurationManagement::Widgets::TreePager, value: { "text1" => "foobar" })
+    instance_double(
+      Y2ConfigurationManagement::Widgets::TreePager, value: { "text1" => "foobar" }, store: nil
+    )
   end
   let(:new_val) { { "text1" => "example" } }
 

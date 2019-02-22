@@ -39,6 +39,11 @@ module Y2ConfigurationManagement
         super(Tree.new(items, self))
       end
 
+      # Stores the widget's values
+      def store
+        pages.each(&:store)
+      end
+
       # Switches current page
       #
       # @see CWM::TreePager

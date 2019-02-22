@@ -61,11 +61,8 @@ module Y2ConfigurationManagement
 
       # Widgets values
       #
-      # @note As a side effect, this method calls #store (FIXME)
-      #
       # @return [Hash]
       def value
-        page.store # needed for updating the visibility
         my_values = page.value
         items.reduce(my_values) do |a, e|
           a.merge(e.page_id => e.value)

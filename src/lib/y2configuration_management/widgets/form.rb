@@ -94,6 +94,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget
       def store
+        tree_pager.store
         @result = current_values
       end
 
