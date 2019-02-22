@@ -31,4 +31,10 @@ describe Y2ConfigurationManagement::Widgets::FormPopup do
 
   let(:subject) { described_class.new("popup", EmptyWidget.new) }
   include_examples "CWM::Dialog"
+
+  describe "#layout" do
+    it "returns a Yast::Term" do
+      expect(subject.send(:layout)).to be_a(Yast::Term)
+    end
+  end
 end
