@@ -20,6 +20,7 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/form_condition"
 require "y2configuration_management/salt/form_element_locator"
+require "y2configuration_management/salt/form_data"
 
 describe Y2ConfigurationManagement::Salt::FormCondition do
   def locator_new(*args)
@@ -66,7 +67,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
       it "compares the string representations" do
         expect(data).to receive(:get)
           .with(locator_new([:myform, :mywidget]))
-          .and_return(42)
+          .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
         expect(condition.evaluate(data, context: ctxt)).to eq(true)
       end
 
@@ -76,7 +77,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
         it "uses joins the context locator and the condition one" do
           expect(data).to receive(:get)
             .with(locator_new([:root, :foo, :mywidget]))
-            .and_return(42)
+            .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
           expect(condition.evaluate(data, context: ctxt)).to eq(true)
         end
       end
@@ -92,7 +93,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
 
       it "compares the string representations" do
         expect(data).to receive(:get).with(locator_new([:myform, :mywidget]))
-          .and_return(42)
+          .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
         expect(condition.evaluate(data, context: ctxt)).to eq(false)
       end
 
@@ -102,7 +103,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
         it "uses joins the context locator and the condition one" do
           expect(data).to receive(:get)
             .with(locator_new([:root, :foo, :mywidget]))
-            .and_return(42)
+            .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
           expect(condition.evaluate(data, context: ctxt)).to eq(false)
         end
       end
