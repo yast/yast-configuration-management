@@ -52,7 +52,6 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller, formula.form).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
-    #root_form.value = controller.get(form.root.locator).value
     root_form.value = { "person" => { "computers" => [] } }
     root_form.init
     state.open_form(form.root.locator, root_form)
