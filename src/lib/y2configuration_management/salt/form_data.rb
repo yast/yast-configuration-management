@@ -65,7 +65,7 @@ module Y2ConfigurationManagement
       # @param value   [Object] Value to add
       def add_item(locator, value)
         collection = find_by_locator(@data, locator)
-        collection.push(value)
+        collection.push(value.value)
       end
 
       # @param locator [FormElementLocator] Locator of the collection

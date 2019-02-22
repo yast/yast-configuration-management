@@ -88,7 +88,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
     let(:locator) { locator_from_string("root#person#computers") }
 
     it "adds the element to the collection" do
-      form_data.add_item(locator, "brand" => "ACME")
+      form_data.add_item(locator, described_class.new("brand" => "ACME"))
       new_disk = form_data.get(locator.join(2))
       expect(new_disk.value).to eq("brand" => "ACME")
     end
@@ -97,7 +97,10 @@ describe Y2ConfigurationManagement::Salt::FormData do
       let(:locator) { locator_from_string("root#person#projects") }
 
       it "adds the element to the collection" do
-        form_data.add_item(locator, "$key" => "openSUSE", "url" => "https://opensuse.org")
+        form_data.add_item(
+          locator,
+          described_class.new("$key" => "openSUSE", "url" => "https://opensuse.org")
+        )
         expect(form_data.get(locator).value).to include(
           "$key" => "openSUSE", "url" => "https://opensuse.org"
         )
