@@ -190,17 +190,24 @@ module Y2ConfigurationManagement
       # @return [Widgets::PagerTreeItem]
       def build_tree_item(form_element, locator)
         if form_element.respond_to?(:elements)
-          inputs, groups = form_element.elements.partition { |e| e.is_a?(FormInput) }
+          same_page, other_page = form_element.elements.partition { |e| shared_page?(e) }
         else
-          inputs = [form_element]
-          groups = []
+          same_page = [form_element]
+          other_page = []
         end
 
-        widgets = inputs.map { |e| build_element(e, locator) }
-        children = groups.map { |e| build_tree_item(e, locator.join(e.id.to_sym)) }
+        widgets = same_page.map { |e| build_element(e, locator) }
+        children = other_page.map { |e| build_tree_item(e, locator.join(e.id.to_sym)) }
 
         page = Widgets::Page.new(locator.last.to_s, form_element.name, widgets)
         Widgets::PagerTreeItem.new(page, children: children)
+      end
+
+      # Determines whether a form element should be placed in a different page or share one
+      #
+      # @return [Boolean]
+      def shared_page?(form_element)
+        form_element.is_a?(FormInput) || form_element.type == :namespace
       end
     end
   end

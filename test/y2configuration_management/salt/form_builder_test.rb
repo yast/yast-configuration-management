@@ -101,5 +101,11 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
         expect(computers.children.values.map(&:id)).to eq(["page:disks"])
       end
     end
+
+    it "does not place form element which type is 'namespace' separated pages" do
+      form_widget = builder.build(locator_from_string("root#person"))
+      person = form_widget.tree_pager.items.first
+      expect(person.page.children.map(&:id)).to include("newsletter")
+    end
   end
 end
