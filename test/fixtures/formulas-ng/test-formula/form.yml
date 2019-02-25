@@ -21,12 +21,14 @@ person:
   homepage:
     "$type": url
     "$default": "http://myhomepage.com"
-  wants_newsletter:
-    "$type": boolean
-    "$default": true
-  newsletter_color:
-    $type: color
-    $default: "#73ba25"
+  newsletter:
+    $type: namespace
+    wanted:
+      "$type": boolean
+      "$default": true
+    color:
+      $type: color
+      $default: "#73ba25"
   siblings:
     $type: number
     $name: "Number of siblings"

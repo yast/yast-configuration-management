@@ -44,6 +44,7 @@ describe Y2ConfigurationManagement::Salt::FormController do
   end
   let(:result) { nil }
   let(:state) { Y2ConfigurationManagement::Salt::FormControllerState.new(data) }
+  let(:root_form) { builder.build(form.root.locator) }
 
   before do
     allow(Y2ConfigurationManagement::Salt::FormControllerState).to receive(:new)
@@ -51,7 +52,9 @@ describe Y2ConfigurationManagement::Salt::FormController do
     allow(Y2ConfigurationManagement::Salt::FormBuilder).to receive(:new)
       .with(controller, formula.form).and_return(builder)
     allow(Y2ConfigurationManagement::Widgets::FormPopup).to receive(:new).and_return(popup)
-    state.open_form(form.root.locator, builder.build(form.root.locator))
+    root_form.value = { "person" => { "computers" => [] } }
+    root_form.init
+    state.open_form(form.root.locator, root_form)
   end
 
   shared_examples "form_controller" do

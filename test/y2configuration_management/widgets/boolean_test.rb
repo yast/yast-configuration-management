@@ -35,7 +35,7 @@ describe Y2ConfigurationManagement::Widgets::Boolean do
     )
   end
   let(:spec) { form_spec.find_element_by(locator: locator) }
-  let(:locator) { locator_from_string("root#person#wants_newsletter") }
+  let(:locator) { locator_from_string("root#person#newsletter#wanted") }
 
   describe ".new" do
     it "instantiates a new widget according to the spec" do

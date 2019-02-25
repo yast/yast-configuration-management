@@ -45,7 +45,8 @@ module Y2ConfigurationManagement
       #
       # @return [Yast::Term]
       def contents
-        c = VBox(*children)
+        aligned_children = children.map { |w| Left(w) }
+        c = VBox(*aligned_children)
         if @has_frame
           Frame(label, c)
         else
@@ -93,6 +94,13 @@ module Y2ConfigurationManagement
         @children ||= []
         widgets.each { |w| w.parent = self }
         @children.concat(widgets)
+      end
+
+      # Minimal height
+      #
+      # @return [Integer]
+      def min_height
+        children.reduce(0) { |a, e| a + e.min_height }
       end
     end
   end

@@ -71,7 +71,7 @@ module Y2ConfigurationManagement
       # @param context [FormElement] for resolving relative expressions
       def evaluate(data, context:)
         left_locator = @locator.relative? ? context.locator.join(@locator) : @locator
-        left = data.get(left_locator).to_s
+        left = data.get(left_locator).value.to_s
         right = @value.to_s
         left == right
       end

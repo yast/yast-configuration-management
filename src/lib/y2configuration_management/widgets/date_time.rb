@@ -77,7 +77,7 @@ module Y2ConfigurationManagement
       end
 
       def value=(val)
-        t = val.strip.to_s.empty? ? ::Time.new : ::Time.parse(val)
+        t = val.to_s.strip.empty? ? ::Time.new : ::Time.parse(val)
         date_value = t.strftime("%Y-%m-%d")
         time_value = t.strftime("%H:%M:%S")
         date.value = date_value

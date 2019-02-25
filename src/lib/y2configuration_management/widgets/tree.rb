@@ -1,4 +1,3 @@
-#!/usr/bin/env rspec
 # encoding: utf-8
 
 # Copyright (c) [2019] SUSE LLC
@@ -20,21 +19,34 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require_relative "../../spec_helper"
-require "cwm/rspec"
-require "y2configuration_management/widgets/form_popup"
+require "cwm"
 
-describe Y2ConfigurationManagement::Widgets::FormPopup do
-  class EmptyWidget < CWM::AbstractWidget
-    self.widget_type = :empty
-  end
+module Y2ConfigurationManagement
+  module Widgets
+    # Tree widget to display the form sections
+    class Tree < ::CWM::Tree
+      # @return [Array<PagerTreeItem>] Included tree items
+      attr_reader :items
+      # @return [TreePager] Associated tree pager
+      attr_reader :pager
 
-  let(:subject) { described_class.new("popup", EmptyWidget.new) }
-  include_examples "CWM::Dialog"
+      # Constructor
+      #
+      # @param items [Array<PagerTreeItem>] List of tree items
+      # @param pager [TreePager] Tree pager where the tree belongs to
+      def initialize(items, pager)
+        textdomain "configuration_management"
+        @pager = pager
+        @items = items
+        items.each { |i| i.tree = self }
+      end
 
-  describe "#layout" do
-    it "returns a Yast::Term" do
-      expect(subject.send(:layout)).to be_a(Yast::Term)
+      # Widget's label
+      #
+      # @see CWM::AbstractWidget
+      def label
+        _("Sections")
+      end
     end
   end
 end

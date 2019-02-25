@@ -48,6 +48,13 @@ module Y2ConfigurationManagement
         return parent.relative_locator.join(id.to_sym) if respond_to?(:parent) && parent
         Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
+
+      # Minimal height
+      #
+      # @return [Integer]
+      def min_height
+        2
+      end
     end
   end
 end

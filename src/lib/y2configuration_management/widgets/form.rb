@@ -33,8 +33,8 @@ module Y2ConfigurationManagement
     # * and storing the final result (see #store and #result).
     # It is able
     class Form < ::CWM::CustomWidget
-      # @return [Array<CWM::AbstractWidget>] Widgets included in the form
-      attr_reader :children
+      # @return [PagerTree] Widgets included in the form
+      attr_reader :tree_pager
       # @return [Hash] Form values from included widgets when this one is removed from the UI
       attr_reader :result
       # @return [String] Form title
@@ -46,12 +46,9 @@ module Y2ConfigurationManagement
       #   form.value = { "ranges" => [ { "start" => "10.0.0.10", "end" => "10.0.0.20" } ] }
       attr_accessor :value
 
-      attr_reader :scalar
-
       # Constructor
       #
-      # Usually, a form stores a set of keys and values. However, it is possible to define a
-      # "scalar" form, which holds a single value only.
+      # A form stores a set of keys and values.
       #
       # @example Regular form
       #   form.value = { "name" => "John Doe" }
@@ -63,14 +60,12 @@ module Y2ConfigurationManagement
       #   form.store
       #   form.result #=> "John Doe"
       #
-      # @param children   [Array<CWM::AbstractWidget>] Widgets included in the form
+      # @param tree_pager [PagerTree] Widgets included in the form
       # @param controller [Salt::FormController] Form controller
-      # @param scalar     [Boolean] Determines whether the form stores are scalar value
       # @param title      [String] Form title
-      def initialize(children, controller, scalar: false, title: "")
-        @value = scalar ? nil : {}
-        @scalar = scalar
-        add_children(*children)
+      def initialize(tree_pager, controller, title: "")
+        @value = {}
+        @tree_pager = tree_pager
         @controller = controller
         @title = title
         self.handle_all_events = true
@@ -82,14 +77,14 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget#init
       def init
-        set_widgets_content
+        set_children_contents
       end
 
       # Widget's content
       #
       # @see CWM::AbstractWidget
       def contents
-        VBox(*children)
+        VBox(tree_pager)
       end
 
       # Stores the widget's value
@@ -99,6 +94,7 @@ module Y2ConfigurationManagement
       #
       # @see CWM::AbstractWidget
       def store
+        tree_pager.store
         @result = current_values
       end
 
@@ -107,9 +103,7 @@ module Y2ConfigurationManagement
       # @return [Hash] values including the ones from the underlying widgets; values are
       #   `nil` when the form has been removed from the UI.
       def current_values
-        return children_values unless scalar?
-        first_value = children_values.values.first
-        first_value.is_a?(Hash) ? first_value : { "$value" => first_value }
+        tree_pager.value
       end
 
       # Refreshes the widget's content
@@ -127,61 +121,26 @@ module Y2ConfigurationManagement
       end
 
       def update_visibility(data)
-        children.each do |widget|
+        widgets.each do |widget|
           widget.update_visibility(data) if widget.respond_to? :update_visibility
         end
-      end
-
-      # Add children widgets
-      #
-      # @param widgets [Array<CWM::AbstractWidget>] Widgets to add to the form
-      def add_children(*widgets)
-        @children ||= []
-        widgets.each { |w| w.parent = self }
-        @children.concat(widgets)
       end
 
       def relative_locator
         Y2ConfigurationManagement::Salt::FormElementLocator.new([])
       end
 
-      def scalar?
-        @scalar
+      # Return all widgets
+      #
+      # @return [Array<::CWM::AbstractWidget>]
+      def widgets
+        tree_pager.widgets
       end
 
     private
 
-      # Returns children values
-      #
-      # @return [Hash] Hash containing the children ids and their values
-      def children_values
-        children.reduce({}) { |a, e| a.merge(e.id => e.value) }
-      end
-
-      def set_widgets_content
-        if scalar?
-          set_child_content
-        else
-          set_children_contents
-        end
-      end
-
-      def set_child_content
-        children.first.value = value.key?("$key") ? value : value["$value"]
-      end
-
       def set_children_contents
-        set_children_contents_precond!
-        children.each do |widget|
-          widget.value = value[widget.id] if value[widget.id]
-        end
-      end
-
-      def set_children_contents_precond!
-        child_ids = children.map(&:id).sort
-        value_keys = value.keys.sort
-        return if value_keys.all? { |k| child_ids.include?(k) }
-        raise "Form expects ids #{child_ids}, got #{value_keys}"
+        tree_pager.refresh(value)
       end
     end
   end

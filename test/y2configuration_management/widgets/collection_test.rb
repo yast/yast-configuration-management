@@ -36,7 +36,6 @@ describe Y2ConfigurationManagement::Widgets::Collection do
       FIXTURES_PATH.join("formulas-ng", "test-formula", "form.yml")
     )
   end
-  let(:form) { Y2ConfigurationManagement::Widgets::Form.new([], controller) }
   let(:spec) { form_spec.find_element_by(locator: locator) }
   let(:locator) { locator_from_string("root#person#computers") }
   let(:controller) { instance_double(Y2ConfigurationManagement::Salt::FormController) }
@@ -55,8 +54,12 @@ describe Y2ConfigurationManagement::Widgets::Collection do
   end
 
   describe "#handle" do
+    let(:page) do
+      Y2ConfigurationManagement::Widgets::Page.new("computers", "Computers", [collection])
+    end
+
     before do
-      form.add_children(collection)
+      Y2ConfigurationManagement::Widgets::PagerTreeItem.new(page)
     end
 
     context "when it is an 'add' event" do
@@ -240,5 +243,15 @@ describe Y2ConfigurationManagement::Widgets::Collection do
     end
 
     include_examples "collection"
+  end
+
+  describe "#relative_locator" do
+    let(:page) { double("page", relative_locator: locator_from_string("root#person#computers")) }
+
+    before { collection.parent = page }
+
+    it "returns the pages' locator" do
+      expect(collection.relative_locator).to eq(page.relative_locator)
+    end
   end
 end

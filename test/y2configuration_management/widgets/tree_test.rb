@@ -21,20 +21,19 @@
 # find current contact information at www.suse.com.
 
 require_relative "../../spec_helper"
+require "y2configuration_management/widgets/tree"
 require "cwm/rspec"
-require "y2configuration_management/widgets/form_popup"
 
-describe Y2ConfigurationManagement::Widgets::FormPopup do
-  class EmptyWidget < CWM::AbstractWidget
-    self.widget_type = :empty
-  end
+describe Y2ConfigurationManagement::Widgets::Tree do
+  subject(:tree) { described_class.new([item1], pager) }
+  let(:item1) { double("pager_tree_item1").as_null_object }
+  let(:pager) { double("pager") }
 
-  let(:subject) { described_class.new("popup", EmptyWidget.new) }
-  include_examples "CWM::Dialog"
+  include_examples "CWM::CustomWidget"
 
-  describe "#layout" do
-    it "returns a Yast::Term" do
-      expect(subject.send(:layout)).to be_a(Yast::Term)
+  describe "#pager" do
+    it "returns the associated pager" do
+      expect(tree.pager).to eq(pager)
     end
   end
 end

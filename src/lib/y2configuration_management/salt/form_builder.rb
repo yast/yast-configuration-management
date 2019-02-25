@@ -56,13 +56,12 @@ module Y2ConfigurationManagement
       def build(locator)
         form_element = form.find_element_by(locator: locator.unbounded)
         form_element = form_element.prototype if form_element.is_a?(Collection)
-        scalar = !form_element.respond_to?(:elements)
         root_locator = form_element.is_a?(Container) ? locator : locator.parent
-        elements = scalar ? [form_element] : form_element.elements
-        widgets = Array(elements).map { |e| build_element(e, root_locator) }
-        Y2ConfigurationManagement::Widgets::Form.new(
-          widgets, controller, scalar: scalar
-        )
+        if form_element.respond_to?(:elements)
+          build_form(form_element, root_locator, controller)
+        else
+          build_single_value_form(form_element, root_locator)
+        end
       end
 
     private
@@ -124,6 +123,91 @@ module Y2ConfigurationManagement
       # @return [Y2ConfigurationManagement::Widgets::Collection]
       def build_collection(collection_spec, locator)
         Y2ConfigurationManagement::Widgets::Collection.new(collection_spec, controller, locator)
+      end
+
+      # @param form_element [FormElement] Form element to include in the form
+      # @param locator      [FormElementLocator] Form element locator
+      # @return [Y2ConfigurationManagement::Widgets::Form]
+      def build_single_value_form(form_element, locator)
+        widget = build_element(form_element, locator)
+        Y2ConfigurationManagement::Widgets::SingleValueForm.new(widget, title: form_element.name)
+      end
+
+      # @param form_element [FormElement] Root form element for the form
+      # @param locator      [FormElementLocator] Form element locator
+      # @param controller   [FormController] Controller to inject into the form
+      # @return [Y2ConfigurationManagement::Widgets::Form]
+      def build_form(form_element, locator, controller)
+        tree_pager = build_tree_pager(form_element, locator)
+        Y2ConfigurationManagement::Widgets::Form.new(
+          tree_pager, controller, title: form_element.name
+        )
+      end
+
+      # Builds a tree pager for a form
+      #
+      # The root element (Form#root) is excluded from the tree. However, when building
+      # a pager for any other container, that container should be taken into account.
+      # Additionally, the root element cannot contain simple input elements (usually it
+      # contains just one container).
+      #
+      # See #build_root_tree_items and #build_container_tree_items for the details.
+      #
+      # @param form_element [FormElement] Form element
+      # @param locator      [FormElementLocator] Form element locator
+      def build_tree_pager(form_element, locator)
+        tree_items =
+          if form_element.parent.nil?
+            build_root_tree_items(form_element)
+          else
+            build_container_tree_item(form_element, locator)
+          end
+
+        Widgets::TreePager.new(Array(tree_items))
+      end
+
+      # Builds tree pager items for the root element
+      #
+      # @param form_element [FormElement] Root form element
+      # @return [Array<Widgets::PagerTreeItem>]
+      def build_root_tree_items(form_element)
+        form_element.elements.map { |e| build_tree_item(e, e.locator) }
+      end
+
+      # Builds tree pager item for a container
+      #
+      # @param form_element [FormElement] Form element
+      # @param locator      [FormElementLocator] Form element locator
+      # @return [Widgets::PagerTreeItem]
+      def build_container_tree_item(form_element, locator)
+        build_tree_item(form_element, locator).tap { |t| t.main = true }
+      end
+
+      # Builds a tree item for a given form element
+      #
+      # @param form_element [FormElement] Form element
+      # @param locator      [FormElementLocator] Form element locator
+      # @return [Widgets::PagerTreeItem]
+      def build_tree_item(form_element, locator)
+        if form_element.respond_to?(:elements)
+          same_page, other_page = form_element.elements.partition { |e| shared_page?(e) }
+        else
+          same_page = [form_element]
+          other_page = []
+        end
+
+        widgets = same_page.map { |e| build_element(e, locator) }
+        children = other_page.map { |e| build_tree_item(e, locator.join(e.id.to_sym)) }
+
+        page = Widgets::Page.new(locator.last.to_s, form_element.name, widgets)
+        Widgets::PagerTreeItem.new(page, children: children)
+      end
+
+      # Determines whether a form element should be placed in a different page or share one
+      #
+      # @return [Boolean]
+      def shared_page?(form_element)
+        form_element.is_a?(FormInput) || form_element.type == :namespace
       end
     end
   end
