@@ -66,7 +66,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
 
       it "compares the string representations" do
         expect(data).to receive(:get)
-          .with(locator_new([:myform, :mywidget]))
+          .with(locator_new([:root, :myform, :mywidget]))
           .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
         expect(condition.evaluate(data, context: ctxt)).to eq(true)
       end
@@ -92,7 +92,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
       let(:data) { double("form data") }
 
       it "compares the string representations" do
-        expect(data).to receive(:get).with(locator_new([:myform, :mywidget]))
+        expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
           .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
         expect(condition.evaluate(data, context: ctxt)).to eq(false)
       end
