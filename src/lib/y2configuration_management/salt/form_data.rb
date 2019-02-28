@@ -38,7 +38,7 @@ module Y2ConfigurationManagement
       #
       # @param initial [Hash] Initial data in hash form
       def initialize(initial)
-        @data = initial || {}
+        @data = initial.nil? ? {} : initial
       end
 
       # Returns the value of a given element
@@ -47,7 +47,7 @@ module Y2ConfigurationManagement
       # @return [FormData,nil] Form data or nil if no data was found for the given locator
       def get(locator)
         value = find_by_locator(@data, locator)
-        value ? FormData.new(value) : nil
+        value.nil? ? nil : FormData.new(value)
       end
 
       # Updates an element's value
