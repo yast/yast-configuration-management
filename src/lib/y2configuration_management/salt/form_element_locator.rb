@@ -81,6 +81,15 @@ module Y2ConfigurationManagement
           new(nil)
         end
 
+        # Returns the root locator
+        #
+        # Convenience method to return the root locator
+        #
+        # @return [FormElementLocator]
+        def root
+          new([:root])
+        end
+
       private
 
         # @return [String] Locator segments separator

@@ -74,7 +74,7 @@ module Y2ConfigurationManagement
           if @locator.relative?
             context.locator.join(@locator)
           else
-            FormElementLocator.new([:root]).join(@locator)
+            FormElementLocator.root.join(@locator)
           end
         left_data = data.get(left_locator)
         return false if left_data.nil?
