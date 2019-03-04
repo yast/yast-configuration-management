@@ -45,6 +45,7 @@ describe Y2ConfigurationManagement::Salt::FormData do
       before do
         form_data.update(locator_from_string("root#person#newsletter"), "wanted" => false)
       end
+
       it "returns the value" do
         wanted_newsletter = form_data.get(locator_from_string("root#person#newsletter#wanted"))
         expect(wanted_newsletter.value).to eq(false)

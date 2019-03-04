@@ -50,7 +50,7 @@ module Y2ConfigurationManagement
       def get(locator)
         value = find_by_locator(@data, locator)
         if value.nil?
-          log.warn "Could not find a value for #{locator}" if value.nil?
+          log.warn "Could not find a value for #{locator}"
           return nil
         end
         FormData.new(value)
