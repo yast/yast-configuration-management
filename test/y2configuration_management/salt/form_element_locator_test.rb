@@ -61,6 +61,14 @@ describe Y2ConfigurationManagement::Salt::FormElementLocator do
     end
   end
 
+  describe ".root" do
+    it "returns the root locator" do
+      root_locator = described_class.root
+      expect(root_locator.parts).to eq([:root])
+      expect(root_locator.upto).to be_zero
+    end
+  end
+
   describe "#to_s" do
     it "returns the string representation of the element locator" do
       expect(locator.to_s).to eq("root#hosts[1]#interfaces[3]")

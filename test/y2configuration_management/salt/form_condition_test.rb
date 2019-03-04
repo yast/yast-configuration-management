@@ -66,7 +66,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
 
       it "compares the string representations" do
         expect(data).to receive(:get)
-          .with(locator_new([:myform, :mywidget]))
+          .with(locator_new([:root, :myform, :mywidget]))
           .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
         expect(condition.evaluate(data, context: ctxt)).to eq(true)
       end
@@ -81,6 +81,13 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
           expect(condition.evaluate(data, context: ctxt)).to eq(true)
         end
       end
+
+      context "when the locator points to a missing element" do
+        it "returns false" do
+          expect(data).to receive(:get).and_return(nil)
+          expect(condition.evaluate(data, context: ctxt)).to eq(false)
+        end
+      end
     end
   end
 
@@ -92,7 +99,7 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
       let(:data) { double("form data") }
 
       it "compares the string representations" do
-        expect(data).to receive(:get).with(locator_new([:myform, :mywidget]))
+        expect(data).to receive(:get).with(locator_new([:root, :myform, :mywidget]))
           .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
         expect(condition.evaluate(data, context: ctxt)).to eq(false)
       end
@@ -105,6 +112,13 @@ describe Y2ConfigurationManagement::Salt::FormCondition do
             .with(locator_new([:root, :foo, :mywidget]))
             .and_return(Y2ConfigurationManagement::Salt::FormData.new(42))
           expect(condition.evaluate(data, context: ctxt)).to eq(false)
+        end
+      end
+
+      context "when the locator points to a missing element" do
+        it "returns true" do
+          expect(data).to receive(:get).and_return(nil)
+          expect(condition.evaluate(data, context: ctxt)).to eq(true)
         end
       end
     end
