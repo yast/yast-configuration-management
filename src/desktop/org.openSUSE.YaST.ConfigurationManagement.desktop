@@ -15,4 +15,6 @@ X-SuSE-YaST-Keywords=salt,privisioning,configuration_management
 Icon=yast-configuration-management
 Exec=/usr/bin/xdg-su -c "/sbin/yast2 configuration_management"
 
-Name=YaST2 Configuration Management
+Name=YaST Configuration Management
+GenericName=Configuration Management
+Comment= Manage System Configuration
