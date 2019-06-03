@@ -12,22 +12,23 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-configuration-management
-Version:        4.1.6
+Version:        4.2.0
 Release:        0
+Url:            https://github.com/yast/yast-migration
+Summary:        YaST2 - YaST Configuration Management
+License:        GPL-2.0-only
+Group:          System/YaST
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
-
-Url:            http://github.com/yast/yast-migration
 
 # CWM DateField and TimeField widgets
 BuildRequires:  yast2 >= 4.1.53
-BuildRequires:  yast2-devtools
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2-installation
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(yast-rake)
@@ -38,35 +39,29 @@ Requires:       yast2-installation
 
 BuildArch:      noarch
 
-Summary:        YaST2 - YaST Configuration Management
-License:        GPL-2.0-only
-Group:          System/YaST
-
 %description
 This package contains the YaST2 component for Configuration Management Provisioning.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %check
-rake test:unit
+%yast_check
 
 %build
 
 %install
-rake install DESTDIR="%{buildroot}"
+%yast_install
+%yast_metainfo
 
 %files
-%defattr(-,root,root)
-%{yast_clientdir}/*.rb
-%{yast_libdir}/y2configuration_management
-%{yast_desktopdir}/*.desktop
-%{yast_schemadir}/autoyast/rnc/*.rnc
+%{yast_clientdir}
+%{yast_libdir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_schemadir}
 %{yast_icondir}
-
-%dir %{yast_docdir}
+%doc %{yast_docdir}
 %license COPYING
-%doc %{yast_docdir}/README.md
-%doc %{yast_docdir}/CONTRIBUTING.md
 
 %changelog
