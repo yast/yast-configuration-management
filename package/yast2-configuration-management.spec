@@ -28,7 +28,7 @@ Source0:        %{name}-%{version}.tar.bz2
 
 # CWM DateField and TimeField widgets
 BuildRequires:  yast2 >= 4.1.53
-BuildRequires:  yast2-devtools
+BuildRequires:  yast2-devtools >= 4.2.2
 BuildRequires:  yast2-installation
 BuildRequires:  rubygem(rspec)
 BuildRequires:  rubygem(yast-rake)
