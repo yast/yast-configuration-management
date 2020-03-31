@@ -88,6 +88,11 @@ describe Y2ConfigurationManagement::Clients::Main do
       end
     end
 
+    it "configures the provisioner" do
+      expect(configurator).to receive(:prepare).with(require_formulas: true)
+      main.run
+    end
+
     it "ensures that needed packages are installed" do
       expect(Yast::PackageSystem).to receive(:CheckAndInstallPackages).with(["salt"])
         .and_return(true)

@@ -35,7 +35,7 @@ describe Y2ConfigurationManagement::ConfigurationManagementFinish do
       let(:config) { double("config", enable_services: false) }
 
       it "runs the configurator" do
-        expect(configurator).to receive(:prepare)
+        expect(configurator).to receive(:prepare).with(require_formulas: false)
         client.write
       end
 
