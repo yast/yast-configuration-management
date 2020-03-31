@@ -45,11 +45,14 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @macro seeSequence
-      # @param config [Yast::ConfigurationManagement::Configurations::Salt]
-      def initialize(config, reverse: false)
+      # @param config  [Yast::ConfigurationManagement::Configurations::Salt]
+      # @param reverse [Boolean] Runs the sequence in reverse order
+      # @param require_formulas
+      def initialize(config, reverse: false, require_formulas: false)
         textdomain "configuration_management"
         @config = config
         @reverse = reverse
+        @require_formulas = require_formulas
         read_formulas
       end
 
@@ -60,10 +63,7 @@ module Y2ConfigurationManagement
 
       # It runs the {FormulaSelection} dialog
       def choose_formulas
-        if Array.new(formulas).empty?
-          Yast::Report.Error(_("There are no formulas available. Please check the log files."))
-          return :abort
-        end
+        return handle_no_formulas if Array.new(formulas).empty?
 
         if config.enabled_states.empty?
           enable_formulas_by_user
@@ -100,16 +100,17 @@ module Y2ConfigurationManagement
 
     private
 
-      attr_reader :reverse
+      attr_reader :reverse, :require_formulas
 
       # @macro seeSequence
       def sequence_hash
         {
           START                => reverse ? "configure_formulas" : "choose_formulas",
           "choose_formulas"    => {
-            abort: :abort,
-            next:  "configure_formulas",
-            back:  :back
+            abort:  :abort,
+            next:   "configure_formulas",
+            back:   :back,
+            finish: :finish
           },
           "configure_formulas" => {
             cancel: "choose_formulas",
@@ -152,6 +153,18 @@ module Y2ConfigurationManagement
         formulas
           .select { |f| config.enabled_states.include?(f.id) }
           .each { |f| f.enabled = true }
+      end
+
+      # Handles the case where there are no formulas
+      #
+      # FIXME: reading formulas should be done outside this sequence so we can
+      # decide outside how to deal with this case.
+      #
+      # @return [Symbol] Symbol that the sequence should return
+      def handle_no_formulas
+        return :finish unless require_formulas
+        Yast::Report.Error(_("There are no formulas available. Please check the log files."))
+        :abort
       end
     end
   end

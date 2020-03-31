@@ -26,11 +26,14 @@ module Y2ConfigurationManagement
       PUBLIC_KEY_PATH = "/etc/salt/pki/minion/minion.pub".freeze
 
       # @see Base#prepare
-      mode(:masterless) do |reverse: false|
+      mode(:masterless) do |reverse: false, require_formulas: false|
         fetch_config(config.states_url, config.work_dir) if config.states_url
         fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
         update_configuration
-        Y2ConfigurationManagement::Salt::FormulaSequence.new(config, reverse: reverse).run
+        sequence = Y2ConfigurationManagement::Salt::FormulaSequence.new(
+          config, reverse: reverse, require_formulas: require_formulas
+        )
+        sequence.run
       end
 
       # @see Base#prepare

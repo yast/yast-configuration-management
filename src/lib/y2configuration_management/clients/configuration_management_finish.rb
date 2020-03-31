@@ -24,8 +24,8 @@ module Y2ConfigurationManagement
     #                                otherwise it returns false.
     def write
       return false if config.nil?
-      log.info("Provisioning Configuration Management")
-      configurator.prepare
+      log.info("Provisioning Configuration Management with config #{config.inspect}")
+      configurator.prepare(require_formulas: false)
       # saving settings to target system
       Y2ConfigurationManagement::Clients::Provision.new.run
 

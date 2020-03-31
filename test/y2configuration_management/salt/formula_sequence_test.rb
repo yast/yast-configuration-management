@@ -41,7 +41,7 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
   end
   let(:tmpdir) { Pathname(Dir.mktmpdir) }
   let(:reverse) { false }
-  subject(:sequence) { described_class.new(config, reverse: reverse) }
+  subject(:sequence) { described_class.new(config, reverse: reverse, require_formulas: true) }
 
   before do
     allow(config).to receive(:work_dir).and_return(tmpdir)
@@ -130,12 +130,24 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
 
       it "reports an error" do
         expect(Yast::Report).to receive(:Error).with(/There are no formulas available/)
-
         sequence.choose_formulas
       end
 
       it "returns :abort" do
         expect(sequence.choose_formulas).to eql(:abort)
+      end
+
+      context "but formulas are not required" do
+        subject(:sequence) { described_class.new(config, require_formulas: false) }
+
+        it "does not report any error" do
+          expect(Yast::Report).to_not receive(:Error)
+          sequence.choose_formulas
+        end
+
+        it "returns :finish" do
+          expect(sequence.choose_formulas).to eql(:finish)
+        end
       end
     end
   end
