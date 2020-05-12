@@ -7,8 +7,18 @@ Yast.import "Installation"
 Yast.import "Directory"
 
 module Y2ConfigurationManagement
+  # This module provides the classes to process the configuration
+  #
+  # These classes are responsible for processing and storing the configuration
+  # to be used by the provisioners (Salt or Puppet). They keep information about
+  # the operation mode, the server hostname, the number of attempts, timeouts,
+  # etc.
+  #
+  # The common settings and behaviour are implemented in the {Base} class.
+  # {Salt} and {Puppet} classes extend it in order to provide the specific
+  # bits for each provisioner.
   module Configurations
-    # This class inteprets the module configuration
+    # This class implements the current behaviour for configuration classes
     class Base
       # Default value for auth_attempts
       DEFAULT_AUTH_ATTEMPTS = 3

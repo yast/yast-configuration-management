@@ -33,7 +33,7 @@ module Y2ConfigurationManagement
   module Salt
     # This class is reponsible of running the sequence for selecting the Salt
     # {Formula}s to be applied, configuring all the {Formula}s through its
-    # {Form}s and write the {Pillar}s data associated to each of the selected
+    # {Form}s and writing the {Pillar}s data associated to each of the selected
     # {Formula}s into the system.
     class FormulaSequence < UI::Sequence
       # @return [Array<Formula>] available on the system

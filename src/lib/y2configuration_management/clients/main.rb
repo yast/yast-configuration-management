@@ -30,7 +30,8 @@ module Y2ConfigurationManagement
   module Clients
     # Basic client to run the configuration management tools
     #
-    # It reads the configuration from an XML file.
+    # It reads the configuration from an XML file if present (and given as first argument).
+    # Otherwise, it uses the default values (based on Salt).
     #
     # @example Configuration example
     #   <configuration_management>

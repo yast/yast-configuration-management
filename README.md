@@ -84,18 +84,18 @@ the required workflow. In the example below, only the relevant parts are shown:
   xmlns:config="http://www.suse.com/1.0/configns">
 
   <configuration_management>
-      <type>salt</type>
-      <!-- Default Salt Formulas root directories -->
-      <formulas_roots config:type="list">
-        <formulas_root>/usr/share/susemanager/formulas/metadata</formulas_root>
-        <formulas_root>/srv/formula_metadata</formulas_root>
-      </formulas_roots>
-      <!-- Default Salt Formulas state directories -->
-      <states_roots config:type="list">
-        <states_root>/usr/share/susemanager/formulas/states</states_root>
-      </states_roots>
-      <!-- Default Salt Formulas pillar data directory  -->
-      <pillar_root>/srv/susemanager/formula_data</pillar_root>
+    <type>salt</type>
+    <!-- Default Salt Formulas root directories -->
+    <formulas_roots config:type="list">
+      <formulas_root>/usr/share/susemanager/formulas/metadata</formulas_root>
+      <formulas_root>/srv/formula_metadata</formulas_root>
+    </formulas_roots>
+    <!-- Default Salt Formulas state directories -->
+    <states_roots config:type="list">
+      <states_root>/usr/share/susemanager/formulas/states</states_root>
+    </states_roots>
+    <!-- Default Salt Formulas pillar data directory  -->
+    <pillar_root>/srv/susemanager/formula_data</pillar_root>
   </configuration_management>
 
   <!-- more stuff -->
@@ -120,16 +120,13 @@ the required workflow. In the example below, only the relevant parts are shown:
 
 ## Salt Formulas Forms Support
 
-**WARNING: Under development.**
+[Salt Formulas
+Forms](https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-best-practices/single-html/book.suma.best.practices/book.suma.best.practices.html#best.practice.salt.formulas.and.forms)
+are supported. If you find out that some feature is not missing, please, open a
+[bug report](https://bugzilla.opensuse.org/).
 
-The support for Salt Formulas Forms is still under development. Currently, the module is able to
-render the corresponding UI to get user's input, store the information and run Salt accordingly.
-However, some stuff is still missing:
-
-* Some basic widgets are not implemented yet (passwords, numbers, etc.).
-* Support for nested collections, although simple collections are already working.
-* Better integration with Firstboot (supporting stuff like going back or running Salt at the end).
-* Good documentation.
+The supported types are: `text`, `password`, `number`, `url`, `email`, `date`, `time`, `datetime`,
+`boolean`, `color`, `select`, `group`, `edit-group`, and `namespace`.
 
 ## Options Reference
 

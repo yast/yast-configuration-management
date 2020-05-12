@@ -9,17 +9,30 @@ Yast.import "PackagesProposal"
 module Y2ConfigurationManagement
   # AutoClient implementation
   #
-  # The real work is delegated to Configurators.
+  # This module takes care of importing and configuring the configuration management module so the
+  # {ConfigurationManagementFinish} can provision the system at the end of the installation.
   #
-  # @see Y2ConfigurationManagement::Configurators
+  # It takes care of:
+  #
+  # * Importing the configuration (see {Configurations::Base.import}).
+  # * Initializing the configurator (see {Configurators::Base.for}).
+  # * Adding the required packages to the list of packages to install.
+  #
+  # It might change in the future but at this point in time this client only uses the information
+  # specified in the AutoYaST profile. For instance, when using Salt, it does not consider the
+  # formulas installed via RPM packages in the target system.
+  #
+  # @see Configurations
+  # @see Configurators
   class AutoClient < ::Installation::AutoClient
     include Yast::I18n
 
     # Import AutoYaST configuration
     #
-    # Additional configurator-specific options can be specified. They will be passed
-    # to the configurator's constructor.
+    # Additional configurator-specific options can be specified. They will be passed to the
+    # configurator's constructor.
     #
+    # @param profile [Hash] Options from an AutoYaST profile
     # @option profile [String] "type"            Configurator to use ("salt", "puppet", etc.)
     # @option profile [String] "master"          Master server name
     # @option profile [String] "auth_attempts"   Number of authentication attempts
@@ -49,8 +62,8 @@ module Y2ConfigurationManagement
 
     # Determines whether the profile data has been modified
     #
-    # This method always returns `false` because no information from this
-    # module is included in the cloned profile.
+    # This method always returns `false` because no information from this module is included in the
+    # cloned profile.
     #
     # @return [true]
     def modified?
@@ -59,8 +72,8 @@ module Y2ConfigurationManagement
 
     # Sets the profile as modified
     #
-    # This method does not perform any modification because no information
-    # from this module is included in the cloned profile.
+    # This method does not perform any modification because no information from this module is
+    # included in the cloned profile.
     #
     # @return [true]
     def modified
