@@ -53,6 +53,34 @@ module Y2ConfigurationManagement
       # @return [Pillar] Formula pillar
       attr_accessor :pillar
 
+      class << self
+        # Return all the installed formulas
+        #
+        # @note The result is cached. To force refreshing the cache, set the `reload`
+        #   parameter to `true`.
+        #
+        # @param paths  [Array<String>|String] File system paths to search for formulas
+        # @param reload [Boolean] Refresh formulas cache
+        # @return [Array<Formula>]
+        def all(*paths, reload: false)
+          return @formulas if @formulas && !reload
+          metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
+          @formulas =
+            Dir.glob(metadata_paths.map { |p| p + "/*" })
+              .map { |p| Pathname.new(p) }
+              .select(&:directory?)
+              .map { |p| Formula.new(p) }
+              .select(&:form)
+        end
+
+        # Return formula default directories
+        #
+        # @return [String]
+        def formula_directories
+          [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
+        end
+      end
+
       # Constructor
       #
       # @param path [Pathname]
@@ -86,32 +114,6 @@ module Y2ConfigurationManagement
       # @return [String]
       def description
         metadata ? metadata.description : ""
-      end
-
-      # Return all the installed formulas
-      #
-      # @note The result is cached. To force refreshing the cache, set the `reload`
-      #   parameter to `true`.
-      #
-      # @param paths  [Array<String>|String] File system paths to search for formulas
-      # @param reload [Boolean] Refresh formulas cache
-      # @return [Array<Formula>]
-      def self.all(*paths, reload: false)
-        return @formulas if @formulas && !reload
-        metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
-        @formulas =
-          Dir.glob(metadata_paths.map { |p| p + "/*" })
-             .map { |p| Pathname.new(p) }
-             .select(&:directory?)
-             .map { |p| Formula.new(p) }
-             .select(&:form)
-      end
-
-      # Return formula default directories
-      #
-      # @return [String]
-      def self.formula_directories
-        [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
       end
 
       # Convenience method for writing the associated {Pillar}
