@@ -33,15 +33,6 @@ module Y2ConfigurationManagement
     class Formula
       include Yast::Logger
 
-      # Default path to formulas repository. SuMa *-formula.rpm put them there
-      BASE_DIR = "/usr/share/susemanager/formulas".freeze
-      # Custom formulas metadada directory
-      # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.filedir
-      CUSTOM_METADATA_DIR = "/srv/formula_metadata".freeze
-      # Saved data directory
-      # @see https://www.suse.com/documentation/suse-manager-3/singlehtml/book_suma_best_practices_31/book_suma_best_practices_31.html#best.practice.salt.formulas.req
-      DATA_DIR = "/srv/susemanager/formula_data".freeze
-
       # @return [Pathname] Formula path
       attr_reader :path
 
@@ -65,14 +56,7 @@ module Y2ConfigurationManagement
         # @return [Array<Formula>]
         def all(*paths, reload: false)
           return @formulas if @formulas && !reload
-          @formulas = FormulasReader.new(paths).formulas
-        end
-
-        # Return formula default directories
-        #
-        # @return [String]
-        def formula_directories
-          [BASE_DIR + "/metadata", CUSTOM_METADATA_DIR]
+          @formulas = FormulasReader.new(*paths).formulas
         end
       end
 

@@ -31,30 +31,6 @@ describe Y2ConfigurationManagement::Salt::Formula do
       formulas = described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true)
       expect(formulas.size).to eql(2)
     end
-
-    context "when no path is given" do
-      let(:formulas) { described_class.all }
-
-      before do
-        allow(described_class)
-          .to receive(:formula_directories)
-          .and_return([FIXTURES_PATH.join("formulas-ng").to_s])
-      end
-
-      it "returns all the formulas from the default directories" do
-        expect(formulas.size).to eql(2)
-      end
-    end
-  end
-
-  describe ".formula_directories" do
-    let(:default_directories) do
-      [described_class::BASE_DIR + "/metadata", described_class::CUSTOM_METADATA_DIR]
-    end
-
-    it "returns an array with the default formula directories" do
-      expect(described_class.formula_directories).to eql(default_directories)
-    end
   end
 
   describe "#description" do

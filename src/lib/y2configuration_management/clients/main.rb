@@ -47,14 +47,19 @@ module Y2ConfigurationManagement
     class Main < Yast::Client
       include Yast::Logger
 
+      # @see https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-best-practices/single-html/book.suma.best.practices/book.suma.best.practices.html#best.practice.salt.formulas.what
+      FORMULAS_BASE = "/usr/share/susemanager/formulas".freeze
+
+      # FIXME: define default values in the {Y2ConfigurationManagement::Configurations} module.
       DEFAULT_SETTINGS = {
         "type"           => "salt",
-        "formulas_roots" => Y2ConfigurationManagement::Salt::Formula.formula_directories,
-        "states_roots"   => [
-          Y2ConfigurationManagement::Salt::Formula::BASE_DIR + "/states",
-          "/srv/salt/"
+        "formulas_roots" => [
+          File.join(FORMULAS_BASE, "metadata"), "/srv/formula_metadata"
         ],
-        "pillar_root"    => Y2ConfigurationManagement::Salt::Formula::DATA_DIR + "/pillar"
+        "states_roots"   => [
+          File.join(FORMULAS_BASE, "states"), "/srv/salt"
+        ],
+        "pillar_root"    => "/srv/susemanager/formula_data"
       }.freeze
 
       # Runs the client
