@@ -22,30 +22,22 @@ require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula"
 
 describe Y2ConfigurationManagement::Salt::Formula do
-  let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true) }
+  let(:formulas) do
+    described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true)
+  end
 
   describe ".all" do
-    it "returns all the formulas from the given path" do
+    it "returns all formulas from the given directory" do
+      formulas = described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true)
       expect(formulas.size).to eql(2)
-    end
-
-    context "when a formula does not contain a metadata file" do
-      it "is returned anyway" do
-        expect(formulas.map(&:id)).to include("no-metadata")
-      end
-    end
-
-    context "when a formula does not contain a form" do
-      it "is skipped" do
-        expect(formulas.map(&:id)).to_not include("no-one")
-      end
     end
 
     context "when no path is given" do
       let(:formulas) { described_class.all }
 
       before do
-        allow(described_class).to receive(:formula_directories)
+        allow(described_class)
+          .to receive(:formula_directories)
           .and_return([FIXTURES_PATH.join("formulas-ng").to_s])
       end
 

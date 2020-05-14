@@ -23,6 +23,7 @@ require "fileutils"
 require "y2configuration_management/salt/form"
 require "y2configuration_management/salt/metadata"
 require "y2configuration_management/salt/pillar"
+require "y2configuration_management/salt/formulas_reader"
 
 module Y2ConfigurationManagement
   module Salt
@@ -64,13 +65,7 @@ module Y2ConfigurationManagement
         # @return [Array<Formula>]
         def all(*paths, reload: false)
           return @formulas if @formulas && !reload
-          metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
-          @formulas =
-            Dir.glob(metadata_paths.map { |p| p + "/*" })
-              .map { |p| Pathname.new(p) }
-              .select(&:directory?)
-              .map { |p| Formula.new(p) }
-              .select(&:form)
+          @formulas = FormulasReader.new(paths).formulas
         end
 
         # Return formula default directories
