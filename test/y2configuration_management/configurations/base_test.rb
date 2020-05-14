@@ -13,11 +13,11 @@ describe Y2ConfigurationManagement::Configurations::Base do
 
   let(:profile) do
     {
-      "type"          => "salt",
-      "master"        => master,
-      "auth_attempts" => 5,
-      "auth_time_out" => 10,
-      "keys_url"      => "http://internal-server.com/keys.tgz"
+      type:          "salt",
+      master:        master,
+      auth_attempts: 5,
+      auth_time_out: 10,
+      keys_url:      "http://internal-server.com/keys.tgz"
     }
   end
 

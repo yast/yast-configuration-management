@@ -17,7 +17,7 @@ module Y2ConfigurationManagement
 
       # Custom initialization code
       #
-      # @param options [Hash] Constructor options
+      # @param options [Hash<Symbol,Object>] Constructor options
       # @option options [String] :states_url URL of the states tarball
       # @option options [String] :pillar_url URL of the pillar data tarball
       # @option options [String,Pathname] :pillar_root Path to the pillar data directory
