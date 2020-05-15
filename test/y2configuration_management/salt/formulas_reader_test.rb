@@ -22,7 +22,9 @@ require "y2configuration_management/salt/formulas_reader"
 
 describe Y2ConfigurationManagement::Salt::FormulasReader do
   subject(:reader) do
-    described_class.new(FIXTURES_PATH.join("formulas-ng").to_s)
+    described_class.new(
+      FIXTURES_PATH.join("formulas-ng"), FIXTURES_PATH.join("pillar")
+    )
   end
 
   describe "#formulas" do

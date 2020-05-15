@@ -18,10 +18,11 @@
 # find current contact information at www.suse.com.
 
 require "y2configuration_management/salt/formula"
+require "pathname"
 
 module Y2ConfigurationManagement
   module Salt
-    # Reads formulas from a set of given directories
+    # Reads formulas from a given location
     #
     # @example Reading SUMA formulas
     #   reader = FormulasReader.new("/usr/share/susemanager/formulas/metadata")
@@ -31,24 +32,45 @@ module Y2ConfigurationManagement
     #   reader = FormulasReader.new(["/usr/share/susemanager/formulas/metadata", "/srv/formulas"])
     #   reader.formulas #=> [#<Formula:...>, #<Formula:...>]
     class FormulasReader
-      # @return [Array<String>] Paths to read formulas from
-      attr_reader :paths
+      attr_reader :metadata_root
+      attr_reader :pillar_root
 
       # Constructor
       #
-      # @param paths  [Array<String>|String] File system paths to search for formulas
-      def initialize(*paths)
-        @paths = paths
+      # @param metadata_root [Pathname] Path to the metadata directory
+      # @param pillar_root [Pathname] Path to pillar data directory
+      def initialize(metadata_root, pillar_root)
+        @metadata_root = Pathname(metadata_root)
+        @pillar_root = Pathname(pillar_root)
       end
 
+      # Returns the formulas in the {#metadata_root} directory
+      #
+      # It searches for the pillar data under {#pillar_root} directory.
+      #
       # @return [Array<Formula>]
       def formulas
-        metadata_paths = paths.flatten.compact.empty? ? formula_directories : paths.flatten.compact
-        Dir.glob(metadata_paths.map { |p| p + "/*" })
-          .map { |p| Pathname.new(p) }
-          .select(&:directory?)
-          .map { |p| Formula.new(p) }
-          .select(&:form)
+        directories = metadata_root.glob("*").select(&:directory?)
+        directories.each_with_object([]) do |dir, found_formulas|
+          formula = Formula.new(dir)
+          next unless formula.form
+          formula.pillar = pillar_for(formula)
+          found_formulas << formula
+        end
+      end
+
+    private
+
+      # Convenience method for reading the {Pillar} associated to the given
+      # formula
+      #
+      # @param formula [Formula]
+      # @return [Pillar]
+      def pillar_for(formula)
+        path = pillar_root.join("#{formula.id}.sls")
+        pillar = Y2ConfigurationManagement::Salt::Pillar.new(path: path)
+        pillar.load
+        pillar
       end
     end
   end

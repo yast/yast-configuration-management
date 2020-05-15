@@ -105,7 +105,7 @@ describe Y2ConfigurationManagement::Configurators::Salt do
 
       it "sets file_roots in the minion's configuration" do
         expect(minion_config).to receive(:set_file_roots)
-          .with([config.states_root(:target)] + config.formulas_roots(:target))
+          .with([config.states_root(:target)])
         configurator.prepare
       end
 
