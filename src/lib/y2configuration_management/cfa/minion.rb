@@ -35,15 +35,33 @@ module Y2ConfigurationManagement
       end
 
       # Set file roots for a given environment
+      #
+      # @param roots [Array<String>] Names of the directories to be used as `file_roots`
+      # @param env [String] Environment name (e.g., "base")
       def set_file_roots(roots, env = "base")
-        self.data ||= {}
-        data["file_roots"] ||= {}
-        data["file_roots"][env] = roots.map(&:to_s)
+        set_array(:file_roots, roots, env)
+      end
+
+      # Set pillar roots for a given environment
+      #
+      # @param roots [Array<String>] Names of the directories to be used as `pillar_roots`
+      # @param env [String] Environment name (e.g., "base")
+      def set_pillar_roots(roots, env = "base")
+        set_array(:pillar_roots, roots, env)
       end
 
       # Get file roots for a given environment
+      #
+      # @param env [String] Environment name (e.g., "base")
       def file_roots(env)
         data.fetch("file_roots", {}).fetch(env, [])
+      end
+
+      # Get pillar roots for a given environment
+      #
+      # @param env [String] Environment name (e.g., "base")
+      def pillar_roots(env)
+        data.fetch("pillar_roots", {}).fetch(env, [])
       end
 
       # Save the configuration file
@@ -70,6 +88,18 @@ module Y2ConfigurationManagement
         dirname = File.dirname(@file_path)
         return if Yast::FileUtils.Exists(dirname)
         Yast::SCR.Execute(Yast::Path.new(".target.mkdir"), dirname)
+      end
+
+      # Sets an array-like value for a given key
+      #
+      # @param key [String,Symbol] Key name
+      # @param items [Array<#to_s>] List of elements to include
+      # @param env [String] Environment name (e.g., "base")
+      def set_array(key, items, env = "base")
+        self.data ||= {}
+        key = key.to_s
+        data[key] ||= {}
+        data[key][env] = items.map(&:to_s)
       end
     end
   end
