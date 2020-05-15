@@ -93,11 +93,16 @@ the required workflow. In the example below, only the relevant parts are shown:
         <pillar_root>/srv/susemanager/formula_data</pillar_root>
       </listentry>
       <listentry>
+        <metadata_root>/usr/share/salt-formulas/metadata</metadata_root>
+        <states_root>/usr/share/salt-formulas/states</states_root>
+        <pillar_root>/srv/salt-formulas/pillar</pillar_root>
+      </listentry>
+      <listentry>
         <metadata_root>/srv/formula_metadata</metadata_root>
       </listentry>
     </formulas_sets>
     <!-- Default Salt Formulas pillar data directory  -->
-    <pillar_root>/srv/susemanager/formula_data</pillar_root>
+    <pillar_root>/srv/pillar</pillar_root>
   </configuration_management>
 
   <!-- more stuff -->

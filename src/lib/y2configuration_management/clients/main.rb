@@ -36,30 +36,45 @@ module Y2ConfigurationManagement
     # @example Configuration example
     #   <configuration_management>
     #     <type>salt</type>
-    #     <states_roots config:type="list">
-    #       <listitem>/srv/salt</listitem>
-    #     </states_roots>
-    #     <formulas_roots config:type="list">
-    #       <listitem>/srv/formulas</listitem>
-    #     </formulas_roots>
-    #     <pillar_root>/srv/pillar</pillar_root>
+    #     <formulas_sets config:type="list">
+    #       <listentry>
+    #         <metadata_root>/usr/share/susemanager/formulas/metadata</metadata_root>
+    #         <states_root>/usr/share/susemanager/formulas/states</states_root>
+    #         <pillar_root>/srv/susemanager/formula_data</pillar_root>
+    #       </listentry>
+    #       <listentry>
+    #         <metadata_root>/srv/formula_metadata</metadata_root>
+    #       </listentry>
+    #     </formulas_sets>
     #   </configuration_management>
     class Main < Yast::Client
       include Yast::Logger
 
       # @see https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-best-practices/single-html/book.suma.best.practices/book.suma.best.practices.html#best.practice.salt.formulas.what
-      FORMULAS_BASE = "/usr/share/susemanager/formulas".freeze
+      SUMA_FORMULAS_BASE = "/usr/share/susemanager/formulas".freeze
+      FORMULAS_BASE = "/usr/share/salt-formulas".freeze
 
       # FIXME: define default values in the {Y2ConfigurationManagement::Configurations} module.
       DEFAULT_SETTINGS = {
-        "type"           => "salt",
-        "formulas_roots" => [
-          File.join(FORMULAS_BASE, "metadata"), "/srv/formula_metadata"
+        "type"          => "salt",
+        "formulas_sets" => [
+          {
+            "metadata_root" => File.join(SUMA_FORMULAS_BASE, "metadata"),
+            "states_root"   => File.join(SUMA_FORMULAS_BASE, "states"),
+            "pillar_root"   => "/srv/susemanager/formula_data/pillar"
+          },
+          {
+            "metadata_root" => File.join(FORMULAS_BASE, "metadata"),
+            "states_root"   => File.join(FORMULAS_BASE, "states"),
+            "pillar_root"   => "/srv/salt-formulas/pillar"
+          },
+          {
+            "metadata_root" => "/srv/formula_metadata"
+          }
         ],
-        "states_roots"   => [
-          File.join(FORMULAS_BASE, "states"), "/srv/salt"
-        ],
-        "pillar_root"    => "/srv/susemanager/formula_data"
+        "states_roots"  => [
+          "/srv/salt"
+        ]
       }.freeze
 
       # Runs the client
