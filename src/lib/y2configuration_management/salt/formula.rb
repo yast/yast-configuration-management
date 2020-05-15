@@ -45,21 +45,6 @@ module Y2ConfigurationManagement
       # @return [Pillar] Formula pillar
       attr_accessor :pillar
 
-      class << self
-        # Return all the installed formulas
-        #
-        # @note The result is cached. To force refreshing the cache, set the `reload`
-        #   parameter to `true`.
-        #
-        # @param paths  [Array<String>|String] File system paths to search for formulas
-        # @param reload [Boolean] Refresh formulas cache
-        # @return [Array<Formula>]
-        def all(*paths, reload: false)
-          return @formulas if @formulas && !reload
-          @formulas = FormulasReader.new(*paths).formulas
-        end
-      end
-
       # Constructor
       #
       # @param path [Pathname]

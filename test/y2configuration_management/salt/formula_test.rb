@@ -20,35 +20,27 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula"
+require "y2configuration_management/salt/formulas_reader"
 
 describe Y2ConfigurationManagement::Salt::Formula do
-  let(:formulas) do
-    described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true)
-  end
-
-  describe ".all" do
-    it "returns all formulas from the given directory" do
-      formulas = described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true)
-      expect(formulas.size).to eql(2)
-    end
-  end
+  subject(:formula) { described_class.new(path) }
+  let(:path) { FIXTURES_PATH.join("formulas-ng", "test-formula") }
 
   describe "#description" do
     it "returns the formula description from the metadata" do
-      formula = formulas.find { |f| f.id == "test-formula" }
       expect(formula.description).to include("This is the description of the test formula")
     end
 
     context "when the formula does not have metadata" do
+      let(:path) { FIXTURES_PATH.join("formulas-ng", "no-metadata") }
+
       it "returns an empty string" do
-        formula = formulas.find { |f| f.id == "no-metadata" }
         expect(formula.description).to be_empty
       end
     end
   end
 
   describe "#write_pillar" do
-    let(:formula) { formulas.find { |f| f.id == "test-formula" } }
     let(:pillar_path) { FIXTURES_PATH.join("pillar").join("test-formula.sls") }
     let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 
