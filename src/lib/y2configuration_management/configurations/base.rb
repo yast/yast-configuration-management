@@ -49,18 +49,29 @@ module Y2ConfigurationManagement
         # It saves the configuration that can be retrieved later by calling to the
         # {.current} method.
         #
-        # @param options [Hash<String,Object>] Settings from a profile or a control file
-        def import(options)
-          self.current = from_hash(options)
+        # @param hash [Hash<String,Object>] Settings from a profile or a control file
+        def import(hash)
+          self.current = from_hash(hash)
         end
 
-        # Returns the settings for the given hash configuration
+        # Returns a configuration according to the given hash
         #
-        # @param options [Hash] Configuration management settings
+        # @param hash [Hash] Configuration management settings
         # @return [Base] Returns the configuration. It uses the `:type` key to determine its type.
-        def from_hash(options)
-          symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
-          class_for(symbolized_opts[:type]).new(symbolized_opts)
+        def from_hash(hash)
+          klass = class_for(hash["type"])
+          klass.new_from_hash(hash)
+        end
+
+        # Returns a configuration according to the given hash
+        #
+        # Dervide classes may redefined this method.
+        #
+        # @param hash [Hash] Configuration management setting
+        # @return [Base] Configuration instance
+        def new_from_hash(hash)
+          options = Hash[hash.map { |k, v| [k.to_sym, v] }]
+          new(options)
         end
 
         def class_for(type)
