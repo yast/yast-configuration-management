@@ -80,6 +80,9 @@ module Y2ConfigurationManagement
           config_file.set_file_roots(
             config.states_roots(:target) + config.formulas_roots(:target)
           )
+          config_file.set_pillar_roots(
+            config.pillar_roots(:target)
+          )
         end
         config_file.save
       end
