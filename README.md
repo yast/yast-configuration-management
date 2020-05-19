@@ -129,7 +129,7 @@ the required workflow. In the example below, only the relevant parts are shown:
 
 [Salt Formulas
 Forms](https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-best-practices/single-html/book.suma.best.practices/book.suma.best.practices.html#best.practice.salt.formulas.and.forms)
-are supported. If you find out that some feature is not missing, please, open a
+are supported. If you find out that some feature is missing, please, open a
 [bug report](https://bugzilla.opensuse.org/).
 
 The supported types are: `text`, `password`, `number`, `url`, `email`, `date`, `time`, `datetime`,

@@ -18,9 +18,9 @@ module Y2ConfigurationManagement
   # * Initializing the configurator (see {Configurators::Base.for}).
   # * Adding the required packages to the list of packages to install.
   #
-  # It might change in the future but at this point in time this client only uses the information
-  # specified in the AutoYaST profile. For instance, when using Salt, it does not consider the
-  # formulas installed via RPM packages in the target system.
+  # This client is used during the 1st stage only. At this point in time, it just uses the
+  # information specified in the profile, i.e., it does not uses formulas from the target system
+  # (usually installed via RPM packages).
   #
   # @see Configurations
   # @see Configurators
