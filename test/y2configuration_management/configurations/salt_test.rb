@@ -48,6 +48,25 @@ describe Y2ConfigurationManagement::Configurations::Salt do
         )
       )
     end
+
+    context "when the old 'formulas_roots' key is used" do
+      let(:hash) do
+        {
+          "master"         => master,
+          "formulas_roots" => [
+            "/srv/custom_formulas"
+          ]
+        }
+      end
+      it "returns a FormulaSet object for each 'formulas_roots' element" do
+        config = described_class.new_from_hash(hash)
+        expect(config.formulas_sets).to contain_exactly(
+          an_object_having_attributes(
+            metadata_root: Pathname.new(hash["formulas_roots"].first)
+          )
+        )
+      end
+    end
   end
 
   describe "#type" do
