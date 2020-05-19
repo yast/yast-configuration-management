@@ -89,15 +89,6 @@ describe Y2ConfigurationManagement::Configurations::Salt do
   end
 
   describe "#pillar_roots" do
-    it "returns states roots (custom, formulas and work_dir + 'salt')" do
-      expect(config.states_roots.map(&:to_s))
-        .to contain_exactly(
-          "/srv/custom_states", formulas_sets[0]["states_root"], /#{config.work_dir}/
-        )
-    end
-  end
-
-  describe "#pillar_roots" do
     it "returns pillar roots (formulas and work_dir)" do
       expect(config.pillar_roots.map(&:to_s))
         .to contain_exactly("/srv/susemanager/formulas_data", /#{config.work_dir}/)
