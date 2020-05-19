@@ -79,7 +79,7 @@ module Y2ConfigurationManagement
       def pillar_roots(scope = :local)
         paths = ([@custom_pillar_root] + formulas_sets.map(&:pillar_root)).compact
         paths = scoped_paths(paths, scope)
-        paths << pillar_root(scope) unless @custom_pillar_root
+        paths.unshift(pillar_root(scope)) unless @custom_pillar_root
         paths
       end
 
@@ -99,7 +99,7 @@ module Y2ConfigurationManagement
       # @return [Array<Pathname>] Path to Salt state roots
       def states_roots(scope = :local)
         paths = @custom_states_roots + formulas_sets.map(&:states_root).compact
-        scoped_paths(paths, scope) + [states_root(scope)]
+        [states_root(scope)] + scoped_paths(paths, scope)
       end
 
       # Return path to the Salt states directory

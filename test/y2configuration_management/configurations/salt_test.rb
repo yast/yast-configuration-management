@@ -76,9 +76,15 @@ describe Y2ConfigurationManagement::Configurations::Salt do
   end
 
   describe "#states_roots" do
+    let(:states_root) { "/var/lib/YaST2/cm-202005190829/salt" }
+
+    before do
+      allow(config).to receive(:states_root).with(:local).and_return(states_root)
+    end
+
     it "returns states roots (custom, formulas and work_dir + 'salt')" do
       expect(config.states_roots.map(&:to_s))
-        .to contain_exactly("/srv/custom_states", formulas_sets[0]["states_root"], /var/)
+        .to eq([states_root, "/srv/custom_states", formulas_sets[0]["states_root"]])
     end
   end
 
@@ -89,9 +95,15 @@ describe Y2ConfigurationManagement::Configurations::Salt do
   end
 
   describe "#pillar_roots" do
-    it "returns pillar roots (formulas and work_dir)" do
+    let(:pillar_root) { "/var/lib/YaST2/cm-202005190829/pillar" }
+
+    before do
+      allow(config).to receive(:pillar_root).with(:local).and_return(pillar_root)
+    end
+
+    it "returns pillar roots (work_dir and formulas)" do
       expect(config.pillar_roots.map(&:to_s))
-        .to contain_exactly("/srv/susemanager/formulas_data", /#{config.work_dir}/)
+        .to eq([pillar_root, "/srv/susemanager/formulas_data"])
     end
 
     context "when the pillar_root is set" do
@@ -105,7 +117,7 @@ describe Y2ConfigurationManagement::Configurations::Salt do
 
       it "returns the pillar_root instead of the one in the work_dir" do
         expect(config.pillar_roots.map(&:to_s))
-          .to contain_exactly("/srv/susemanager/formulas_data", "/srv/pillar")
+          .to eq(["/srv/pillar", "/srv/susemanager/formulas_data"])
       end
     end
   end
