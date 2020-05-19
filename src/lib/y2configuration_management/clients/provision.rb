@@ -5,12 +5,13 @@ require "y2configuration_management/configurations/base"
 
 module Y2ConfigurationManagement
   module Clients
-    # TODO: move this code to the finish client
-
-    # This client takes care of running the provisioning in order to configure the system.
-    # The real work is implemented by runners.
+    # This client takes care of provisioning the system, although the real work
+    # is implemented by its correspondant {Runners}.
+    #
+    # It is used by {ConfigurationManagementFinish}, {Main} and firstboot clients.
     #
     # @see Y2ConfigurationManagement::Runners
+    # TODO: use a regular class instead of a client.
     class Provision < Yast::Client
       # Run the client
       def run

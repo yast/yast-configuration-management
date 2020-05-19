@@ -21,13 +21,16 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula_configuration"
-require "y2configuration_management/salt/formula"
+require "y2configuration_management/salt/formulas_reader"
 
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Salt::FormulaConfiguration do
   let(:formulas_root) { FIXTURES_PATH.join("formulas-ng") }
-  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true) }
+  let(:pillar_root) { FIXTURES_PATH.join("pillar") }
+  let(:formulas) do
+    Y2ConfigurationManagement::Salt::FormulasReader.new(formulas_root, pillar_root).formulas
+  end
   let(:formula) { formulas[0] }
   let(:controller) do
     instance_double("Y2ConfigurationManagement::Salt::FormController", show_main_dialog: :cancel)

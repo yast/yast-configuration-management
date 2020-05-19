@@ -10,10 +10,10 @@ describe Y2ConfigurationManagement::AutoClient do
   let(:configurator) { double("configurator", packages: packages) }
   let(:packages) { { "install" => ["pkg1"] } }
   let(:profile) { { "type" => "salt", "master" => "myserver" } }
-  let(:config) { Y2ConfigurationManagement::Configurations::Base.for(profile) }
+  let(:config) { Y2ConfigurationManagement::Configurations::Base.from_hash(profile) }
 
   before do
-    allow(Y2ConfigurationManagement::Configurations::Base).to receive(:for).with(profile)
+    allow(Y2ConfigurationManagement::Configurations::Base).to receive(:from_hash).with(profile)
       .and_return(config)
   end
 

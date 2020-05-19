@@ -5,6 +5,10 @@ require "cheetah"
 Yast.import "Installation"
 
 module Y2ConfigurationManagement
+  # This classes in this module are responsible for running the provisioning tools (Salt or Puppet).
+  #
+  # As usual, the {Base} class defines the common bits, while {Salt} and {Puppet} implement the
+  # suport for Salt and Puppet provisioners.
   module Runners
     class UnknownRunner < StandardError; end
 

@@ -20,7 +20,7 @@
 require "ui/sequence"
 require "y2configuration_management/salt/formula_configuration"
 require "y2configuration_management/salt/formula_selection"
-require "y2configuration_management/salt/formula"
+require "y2configuration_management/salt/formulas_reader"
 require "y2configuration_management/cfa/salt_top"
 
 Yast.import "Report"
@@ -33,7 +33,7 @@ module Y2ConfigurationManagement
   module Salt
     # This class is reponsible of running the sequence for selecting the Salt
     # {Formula}s to be applied, configuring all the {Formula}s through its
-    # {Form}s and write the {Pillar}s data associated to each of the selected
+    # {Form}s and writing the {Pillar}s data associated to each of the selected
     # {Formula}s into the system.
     class FormulaSequence < UI::Sequence
       # @return [Array<Formula>] available on the system
@@ -127,20 +127,12 @@ module Y2ConfigurationManagement
       # It reads all the available {Formula}s in the system initializing also
       # the {Pillar} associated with each one
       def read_formulas
-        @formulas = Y2ConfigurationManagement::Salt::Formula.all(config.formulas_roots.map(&:to_s))
-        @formulas.each { |f| f.pillar = pillar_for(f) }
-      end
-
-      # Convenience method for reading the {Pillar} associated to the given
-      # formula
-      #
-      # @param formula [Formula]
-      # @return [Pillar]
-      def pillar_for(formula)
-        pillar_file = File.join(config.pillar_root, "#{formula.id}.sls")
-        pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
-        pillar.load
-        pillar
+        @formulas = config.formulas_sets.each_with_object([]) do |location, formulas|
+          reader = Y2ConfigurationManagement::Salt::FormulasReader.new(
+            location.metadata_root, location.pillar_root || config.pillar_root
+          )
+          formulas.concat(reader.formulas)
+        end
       end
 
       # Asks the user to select the enabled formulas/states

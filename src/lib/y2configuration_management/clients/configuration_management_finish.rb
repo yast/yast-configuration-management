@@ -9,7 +9,12 @@ Yast.import "Service"
 module Y2ConfigurationManagement
   # Client to write the provisioner's configuration
   #
-  # @see Y2ConfigurationManagement::Configurators
+  # This client requires that the configurator and the configurators are already
+  # available (see {AutoClient}).
+  #
+  # @see Configurators
+  # @see Configurations
+  # @see Provision
   class ConfigurationManagementFinish < ::Installation::FinishClient
     include Yast::I18n
 

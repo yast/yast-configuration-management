@@ -81,6 +81,22 @@ describe Y2ConfigurationManagement::CFA::Minion do
       end
     end
 
+    describe "#set_pillar_roots" do
+      it "sets the pillar-roots for the base environment" do
+        config.set_pillar_roots(["/srv/pillar"])
+        expect(config.pillar_roots("base")).to eq(["/srv/pillar"])
+      end
+
+      context "when an environment is specified" do
+        it "sets pillar_roots for the given environment" do
+          old = config.pillar_roots("base")
+          config.set_pillar_roots(["/srv/pillar"], "test")
+          expect(config.pillar_roots("base")).to eq(old)
+          expect(config.pillar_roots("test")).to eq(["/srv/pillar"])
+        end
+      end
+    end
+
     describe "#exist?" do
       context "when the file exists" do
         let(:path) { EXAMPLE_PATH }

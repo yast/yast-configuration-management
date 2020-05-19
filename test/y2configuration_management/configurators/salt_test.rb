@@ -82,6 +82,7 @@ describe Y2ConfigurationManagement::Configurators::Salt do
         allow(Y2ConfigurationManagement::CFA::Minion)
           .to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:set_file_roots)
+        allow(minion_config).to receive(:set_pillar_roots)
         allow(configurator).to receive(:fetch_config)
         allow(Yast::WFM).to receive(:CallFunction)
         allow(Y2ConfigurationManagement::Salt::FormulaSequence).to receive(:new)
@@ -104,7 +105,13 @@ describe Y2ConfigurationManagement::Configurators::Salt do
 
       it "sets file_roots in the minion's configuration" do
         expect(minion_config).to receive(:set_file_roots)
-          .with([config.states_root(:target), config.formulas_root(:target)])
+          .with([config.states_root(:target)])
+        configurator.prepare
+      end
+
+      it "sets pillar_roots in the minion's configuration" do
+        expect(minion_config).to receive(:set_pillar_roots)
+          .with(config.pillar_roots(:target))
         configurator.prepare
       end
     end

@@ -20,67 +20,27 @@
 
 require_relative "../../spec_helper"
 require "y2configuration_management/salt/formula"
+require "y2configuration_management/salt/formulas_reader"
 
 describe Y2ConfigurationManagement::Salt::Formula do
-  let(:formulas) { described_class.all(FIXTURES_PATH.join("formulas-ng").to_s, reload: true) }
-
-  describe ".all" do
-    it "returns all the formulas from the given path" do
-      expect(formulas.size).to eql(2)
-    end
-
-    context "when a formula does not contain a metadata file" do
-      it "is returned anyway" do
-        expect(formulas.map(&:id)).to include("no-metadata")
-      end
-    end
-
-    context "when a formula does not contain a form" do
-      it "is skipped" do
-        expect(formulas.map(&:id)).to_not include("no-one")
-      end
-    end
-
-    context "when no path is given" do
-      let(:formulas) { described_class.all }
-
-      before do
-        allow(described_class).to receive(:formula_directories)
-          .and_return([FIXTURES_PATH.join("formulas-ng").to_s])
-      end
-
-      it "returns all the formulas from the default directories" do
-        expect(formulas.size).to eql(2)
-      end
-    end
-  end
-
-  describe ".formula_directories" do
-    let(:default_directories) do
-      [described_class::BASE_DIR + "/metadata", described_class::CUSTOM_METADATA_DIR]
-    end
-
-    it "returns an array with the default formula directories" do
-      expect(described_class.formula_directories).to eql(default_directories)
-    end
-  end
+  subject(:formula) { described_class.new(path) }
+  let(:path) { FIXTURES_PATH.join("formulas-ng", "test-formula") }
 
   describe "#description" do
     it "returns the formula description from the metadata" do
-      formula = formulas.find { |f| f.id == "test-formula" }
       expect(formula.description).to include("This is the description of the test formula")
     end
 
     context "when the formula does not have metadata" do
+      let(:path) { FIXTURES_PATH.join("formulas-ng", "no-metadata") }
+
       it "returns an empty string" do
-        formula = formulas.find { |f| f.id == "no-metadata" }
         expect(formula.description).to be_empty
       end
     end
   end
 
   describe "#write_pillar" do
-    let(:formula) { formulas.find { |f| f.id == "test-formula" } }
     let(:pillar_path) { FIXTURES_PATH.join("pillar").join("test-formula.sls") }
     let(:pillar) { Y2ConfigurationManagement::Salt::Pillar.from_file(pillar_path) }
 

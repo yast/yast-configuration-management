@@ -7,8 +7,18 @@ Yast.import "Installation"
 Yast.import "Directory"
 
 module Y2ConfigurationManagement
+  # This module provides the classes to process the configuration
+  #
+  # These classes are responsible for processing and storing the configuration
+  # to be used by the provisioners (Salt or Puppet). They keep information about
+  # the operation mode, the server hostname, the number of attempts, timeouts,
+  # etc.
+  #
+  # The common settings and behaviour are implemented in the {Base} class.
+  # {Salt} and {Puppet} classes extend it in order to provide the specific
+  # bits for each provisioner.
   module Configurations
-    # This class inteprets the module configuration
+    # This class implements the current behaviour for configuration classes
     class Base
       # Default value for auth_attempts
       DEFAULT_AUTH_ATTEMPTS = 3
@@ -36,13 +46,32 @@ module Y2ConfigurationManagement
 
         # Import settings from an AutoYaST profile
         #
-        # @param profile [Hash] Configuration management settings from profile
-        def import(profile)
-          self.current = self.for(profile)
+        # It saves the configuration that can be retrieved later by calling to the
+        # {.current} method.
+        #
+        # @param hash [Hash<String,Object>] Settings from a profile or a control file
+        def import(hash)
+          self.current = from_hash(hash)
         end
 
-        def for(config)
-          class_for(config["type"]).new(config)
+        # Returns a configuration according to the given hash
+        #
+        # @param hash [Hash] Configuration management settings
+        # @return [Base] Returns the configuration. It uses the `:type` key to determine its type.
+        def from_hash(hash)
+          klass = class_for(hash["type"])
+          klass.new_from_hash(hash)
+        end
+
+        # Returns a configuration according to the given hash
+        #
+        # Dervide classes may redefined this method.
+        #
+        # @param hash [Hash] Configuration management setting
+        # @return [Base] Configuration instance
+        def new_from_hash(hash)
+          options = Hash[hash.map { |k, v| [k.to_sym, v] }]
+          new(options)
         end
 
         def class_for(type)
@@ -53,15 +82,26 @@ module Y2ConfigurationManagement
         end
       end
 
-      def initialize(options)
-        symbolized_opts = Hash[options.map { |k, v| [k.to_sym, v] }]
-        @master           = symbolized_opts[:master]
-        @mode             = @master ? :client : :masterless
-        @keys_url         = URI(symbolized_opts[:keys_url]) if symbolized_opts[:keys_url]
-        @auth_attempts    = symbolized_opts[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
-        @auth_time_out    = symbolized_opts[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
-        @enable_services  = symbolized_opts[:enable_services] || true
-        post_initialize(symbolized_opts)
+      # Constructor
+      #
+      # Derived classes override the {#post_initialize} method to handle additional options.
+      #
+      # @param options [Hash<Symbol,Object>] Options
+      # @option options [String,nil] :master Master server
+      # @option options [String] :keys_url Authentication keys URL
+      # @option options [Integer] :auth_attempts Authentication attempts
+      # @option options [Integer] :auth_time_out Authentication timeout for each attempt
+      # @option options [Boolean] :enable_services Whether to enable the provisioner service
+      #
+      # @raise URI::InvalidURIError
+      def initialize(options = {})
+        @master          = options[:master]
+        @mode            = @master ? :client : :masterless
+        @keys_url        = URI(options[:keys_url]) if options[:keys_url]
+        @auth_attempts   = options[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
+        @auth_time_out   = options[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
+        @enable_services = !!options[:enable_services]
+        post_initialize(options)
       end
 
       # Hook to run after initializing the instance

@@ -59,7 +59,7 @@ describe Y2ConfigurationManagement::Clients::Main do
       let(:file_exists?) { false }
 
       it "uses the default_settings" do
-        expect(configuration).to receive(:for)
+        expect(configuration).to receive(:from_hash)
           .with(described_class::DEFAULT_SETTINGS).and_call_original
 
         main.run
@@ -70,7 +70,7 @@ describe Y2ConfigurationManagement::Clients::Main do
       let(:filename) { nil }
 
       it "uses the default_settings" do
-        expect(configuration).to receive(:for)
+        expect(configuration).to receive(:from_hash)
           .with(described_class::DEFAULT_SETTINGS).and_call_original
 
         main.run
@@ -81,7 +81,7 @@ describe Y2ConfigurationManagement::Clients::Main do
       let(:config) { nil }
 
       it "uses the default_settings" do
-        expect(configuration).to receive(:for)
+        expect(configuration).to receive(:from_hash)
           .with(described_class::DEFAULT_SETTINGS).and_call_original
 
         main.run

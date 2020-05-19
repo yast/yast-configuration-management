@@ -49,8 +49,7 @@ describe Y2ConfigurationManagement::Runners::Salt do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "debug",
-          "--local", "--pillar-root=#{config.pillar_root(:target)}",
-          "state.highstate",
+          "--local", "state.highstate",
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)
