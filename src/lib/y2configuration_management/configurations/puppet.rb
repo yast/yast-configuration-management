@@ -13,7 +13,9 @@ module Y2ConfigurationManagement
       # Custom initialization code
       #
       # @param options [Hash<Symbol,Object>] Constructor options
-      # @option options [URI,String] modules_url URL to get the modules from
+      # @option options [URI,String,nil] :modules_url URL to get the modules from
+      #
+      # @raise URI::InvalidURIError
       def post_initialize(options)
         @type = "puppet"
         @modules_url = URI(options[:modules_url]) if options[:modules_url]

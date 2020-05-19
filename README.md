@@ -132,8 +132,9 @@ Forms](https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-b
 are supported. If you find out that some feature is missing, please, open a
 [bug report](https://bugzilla.opensuse.org/).
 
-The supported types are: `text`, `password`, `number`, `url`, `email`, `date`, `time`, `datetime`,
-`boolean`, `color`, `select`, `group`, `edit-group`, and `namespace`.
+The supported widget types are listed in the
+{Y2ConfigurationManagement::Salt::FormBuilder::INPUT_WIDGET_CLASS} constant. Additionally, groups
+(`group` and `namespace`) and collections (`edit-group`) are supported too.
 
 ## Options Reference
 

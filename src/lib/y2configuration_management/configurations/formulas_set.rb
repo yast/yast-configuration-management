@@ -39,7 +39,7 @@ module Y2ConfigurationManagement
       # @param states_root [Pathname,nil] Directory where the states are located
       # @param pillar_root [Pathname,nil] Directory where the pillar data is stored
       def initialize(metadata_root, states_root = nil, pillar_root = nil)
-        @metadata_root = Pathname.new(metadata_root) if metadata_root
+        @metadata_root = Pathname.new(metadata_root)
         @states_root = Pathname.new(states_root) if states_root
         @pillar_root = Pathname.new(pillar_root) if pillar_root
       end

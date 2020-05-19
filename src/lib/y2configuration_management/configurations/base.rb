@@ -87,18 +87,20 @@ module Y2ConfigurationManagement
       # Derived classes override the {#post_initialize} method to handle additional options.
       #
       # @param options [Hash<Symbol,Object>] Options
-      # @option options [String,nil] master Master server
+      # @option options [String,nil] :master Master server
       # @option options [String] :keys_url Authentication keys URL
       # @option options [Integer] :auth_attempts Authentication attempts
       # @option options [Integer] :auth_time_out Authentication timeout for each attempt
       # @option options [Boolean] :enable_services Whether to enable the provisioner service
+      #
+      # @raise URI::InvalidURIError
       def initialize(options = {})
         @master          = options[:master]
         @mode            = @master ? :client : :masterless
         @keys_url        = URI(options[:keys_url]) if options[:keys_url]
         @auth_attempts   = options[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
         @auth_time_out   = options[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
-        @enable_services = options[:enable_services] || true
+        @enable_services = !!options[:enable_services]
         post_initialize(options)
       end
 
