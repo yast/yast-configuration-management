@@ -14,6 +14,7 @@ module Y2ConfigurationManagement
       #
       # @param options [Hash<Symbol,Object>] Constructor options
       # @option options [URI,String,nil] :modules_url URL to get the modules from
+      #   Ignored when running in :client mode.
       #
       # @raise URI::InvalidURIError
       def post_initialize(options)
