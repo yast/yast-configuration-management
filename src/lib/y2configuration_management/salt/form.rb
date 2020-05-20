@@ -29,6 +29,8 @@ module Y2ConfigurationManagement
   module Salt
     # A [Form][1] for [Salt Formulas][2].
     #
+    # This class offers an API on top of the form specification.
+    #
     # [1]: https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html#best.practice.salt.formulas.pillar
     # [2]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
     class Form

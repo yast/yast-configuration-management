@@ -44,6 +44,7 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param controller [FormController] Controller to inject in widgets
+      # @param form       [Form] Form specification
       def initialize(controller, form)
         @controller = controller
         @form = form
