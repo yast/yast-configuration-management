@@ -153,7 +153,6 @@ module Y2ConfigurationManagement
         state.form_widget.store
         form_data.update(form.root.locator, state.form_widget.result)
         pillar.data = form_data.to_pillar_data(formula.form)
-        puts pillar.dump
         true
       end
 
