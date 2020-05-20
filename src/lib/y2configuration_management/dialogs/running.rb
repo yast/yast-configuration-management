@@ -15,7 +15,27 @@ module Y2ConfigurationManagement
       include ::UI::EventDispatcher
 
       # @return [Integer] Seconds remaining for timeout
-      attr_writer :remaining_time
+      attr_reader :remaining_time
+
+      # Constructor
+      #
+      # @param reporting_opts [Hash] Reporting reporting_opts
+      # @option reporting_opts [Boolean] :open_after_success Keep the dialog open after finishing
+      #   successfuly
+      # @option reporting_opts [Boolean] :open_after_error Keep the dialog open after finishing
+      #   with an error
+      # @option reporting_opts [Integer] :timeout_after_success Timeout after finishing successfuly.
+      #   It only makes sense when `:open_after_success` is set to true.
+      # @option reporting_opts [Integer] :timeout_after_error Timeout after finishing with an error
+      #   It only makes sense when `:open_after_error` is set to true.
+      def initialize(reporting_opts: {})
+        super()
+        @open_after_success = !!reporting_opts[:open_after_success]
+        @open_after_error = !!reporting_opts[:open_after_error]
+        @timeout_after_success = reporting_opts[:timeout_after_success]
+        @timeout_after_error = reporting_opts[:timeout_after_error]
+        @timer_running = false
+      end
 
       # Update progress
       #
@@ -31,6 +51,13 @@ module Y2ConfigurationManagement
         )
       end
 
+      # Determines if the timer has been stopped or not
+      #
+      # @return [Boolean] Whether the timer is running or not
+      def timer_running?
+        @timer_running
+      end
+
       # Determines seconds for timeout
       #
       # @return [Integer] Remaining seconds for timeout
@@ -38,23 +65,23 @@ module Y2ConfigurationManagement
         @remaining_time ||= 9
       end
 
-      # Determines if the timer has been stopped or not
-      #
-      # @return [Boolean] True if it was stopped; false otherwise.
-      def timer_stopped?
-        return @timer_stopped unless @timer_stopped.nil?
-        @timer_stopped = false
+      # Stop timer
+      def stop_timer
+        @timer_running = false
       end
 
-      # Stop timer
-      def stop_timer!
-        @timer_stopped = true
+      # Start timer
+      #
+      # @param seconds [Integer] Seconds to start the count down from
+      def start_timer(seconds)
+        @remaining_time = seconds
+        @timer_running = true
       end
 
       # Decrement timer
       #
       # @return [Integer] New value for timer
-      def decrement_timer!
+      def decrement_timer
         @remaining_time -= 1
       end
 
@@ -68,11 +95,35 @@ module Y2ConfigurationManagement
       # @see run_block
       def run(&block)
         create_dialog
-        run_block(&block)
-        enable_buttons
+        result = run_block(&block)
+        return :ok unless open_after?(result)
+        start_timer_if_needed(result)
+        refresh_and_enable_buttons
         event_loop
       ensure
         Yast::UI.CloseDialog
+      end
+
+      # Determines whether the dialog should be kept open
+      #
+      # @param result [Boolean] Whether the block ran successfully or not
+      # @return [Boolean] true if the dialog should be kept; false otherwise
+      def open_after?(result)
+        result ? @open_after_success : @open_after_error
+      end
+
+      # Starts the timer if needed
+      #
+      # The timer will be started if the corresponding `open_after_*` variable
+      # is set to true and a timeout (`timeout_after_*`) was specified.
+      #
+      # @param result [Boolean] Whether the block ran successfully or not
+      def start_timer_if_needed(result)
+        if result
+          @open_after_success && @timeout_after_success && start_timer(@timeout_after_success)
+        else
+          @open_after_error && @timeout_after_error && start_timer(@timeout_after_error)
+        end
       end
 
       # Handler for the Ok button
@@ -83,7 +134,7 @@ module Y2ConfigurationManagement
       # Handler for the Stop button
       def stop_handler
         Yast::UI.ChangeWidget(Id(:stop), :Enabled, false)
-        stop_timer!
+        stop_timer
       end
 
       # Handler for user's input timeout
@@ -99,7 +150,7 @@ module Y2ConfigurationManagement
 
       # Update timer
       def update_timer
-        decrement_timer!
+        decrement_timer
         Yast::UI.ChangeWidget(
           Id(:remaining_time),
           :Value,
@@ -138,16 +189,11 @@ module Y2ConfigurationManagement
               RichText(Id(:progress), Opt(:autoScrollDown), "")
             ),
             VSpacing(0.2),
-            HCenter(Label(Id(:remaining_time), _("Please, wait"))),
-            buttons_box
+            ReplacePoint(Id(:status), Label(Id(:please_wait), _("Please, wait"))),
+            ReplacePoint(Id(:buttons), buttons_box)
           ),
           HSpacing(1)
         )
-      end
-
-      def enable_buttons
-        Yast::UI.ChangeWidget(Id(:ok), :Enabled, true)
-        Yast::UI.ChangeWidget(Id(:stop), :Enabled, true)
       end
 
       # Read user's input
@@ -156,25 +202,42 @@ module Y2ConfigurationManagement
       #
       # @return [Symbol] User's input.
       def user_input
-        timer_stopped? ? Yast::UI.UserInput : Yast::UI.TimeoutUserInput(1000)
+        timer_running? ? Yast::UI.TimeoutUserInput(1000) : Yast::UI.UserInput
+      end
+
+      # Refreshes status and buttons
+      def refresh_and_enable_buttons
+        Yast::UI.ReplaceWidget(Id(:buttons), buttons_box)
+        Yast::UI.ChangeWidget(Id(:ok), :Enabled, true)
+        if timer_running?
+          Yast::UI.ChangeWidget(Id(:stop), :Enabled, true)
+          Yast::UI.ReplaceWidget(Id(:status), Label(Id(:remaining_time), remaining_time.to_s))
+          update_timer
+        else
+          Yast::UI.ReplaceWidget(Id(:status), Empty())
+        end
       end
 
       # Buttons box
       #
       # @return [Yast::Term] Buttons box
       def buttons_box
-        ButtonBox(
-          PushButton(
-            Id(:ok),
-            Opt(:default, :okButton, :disabled),
-            Yast::Label.OKButton
-          ),
-          PushButton(
+        buttons = []
+        buttons << PushButton(
+          Id(:ok),
+          Opt(:default, :okButton, :disabled),
+          Yast::Label.OKButton
+        )
+
+        if timer_running?
+          buttons << PushButton(
             Id(:stop),
             Opt(:cancelButton, :disabled),
             Yast::Label.StopButton
           )
-        )
+        end
+
+        ButtonBox(*buttons)
       end
 
       # Auxiliar class used to update the dialog. This class looks like an IO
