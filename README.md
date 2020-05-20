@@ -138,18 +138,19 @@ The supported widget types are listed in the
 
 ## Options Reference
 
-Name            | Type         | Mode       | Description
----             | ---          | ---        | ---
-type            | string       | all        | Configuration Management System (`salt` or `puppet`)
-master          | string       | client     | Master server (if not set, it will run as masterless
-auth_attempts   | integer      | client     | Number of attempts when connecting to the master server
-auth_time_out   | integer      | client     | Time (in seconds) between attempts to connect to the master
-enable_services | boolean      | client     | Enable the configuration management service at the end
-formulas_roots  | list(string) | all        | List of directories to search for Salt formulas
-states_roots    | list(string) | all        | List of directories to search for Salt states
-pillar_root     | string       | all        | Path to write the Salt Pillar content
-pillar_url      | string       | masterless | URL to get Pillar content from
-keys_url        | string       | masterless | URL to get authentication keys from
-states_url      | string       | masterless | URL to get the Salt states from
-modules_url     | list(string) | masterless | URL to get Puppet modules from
-enabled_states  | list(string) | masterless | List of states/formulas to apply
+Name            | Type         | Provisioner | Mode       | Description
+---             | ---          | ---         | ---        | ---
+type            | string       | -           | all        | Configuration Management System (`salt` or `puppet`)
+master          | string       | all         | client     | Master server (if not set, it will run as masterless
+auth_attempts   | integer      | all         | client     | Number of attempts when connecting to the master server
+auth_time_out   | integer      | all         | client     | Time (in seconds) between attempts to connect to the master
+enable_services | boolean      | all         | client     | Enable the configuration management service at the end
+formulas_roots  | list(string) | salt        | all        | List of directories to search for Salt formulas
+states_roots    | list(string) | salt        | all        | List of directories to search for Salt states
+pillar_root     | string       | salt        | all        | Path to write the Salt Pillar content
+pillar_url      | string       | salt        | masterless | URL to get Pillar content from
+keys_url        | string       | all         | masterless | URL to get authentication keys from
+states_url      | string       | salt        | masterless | URL to get the Salt states from
+modules_url     | list(string) | puppet      | masterless | URL to get Puppet modules from
+enabled_states  | list(string) | salt        | masterless | List of states/formulas to apply
+log_level       | string       | all         | all        | Log level when running the provisioner (default to 'info')

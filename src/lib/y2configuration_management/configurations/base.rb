@@ -39,6 +39,8 @@ module Y2ConfigurationManagement
       attr_reader :keys_url
       # @return [Boolean] CM Services will be enabled on the target system
       attr_reader :enable_services
+      # @return [Symbol] Log level
+      attr_reader :log_level
 
       class << self
         # @return [Base] Current configuration
@@ -101,6 +103,7 @@ module Y2ConfigurationManagement
         @auth_attempts   = auth_required? ? options.fetch(:auth_attempts, DEFAULT_AUTH_ATTEMPTS) : 1
         @auth_time_out   = auth_required? ? options.fetch(:auth_time_out, DEFAULT_AUTH_TIME_OUT) : 0
         @enable_services = !!options[:enable_services]
+        @log_level       = options[:log_level] ? options[:log_level].to_sym : :info
         post_initialize(options)
       end
 
