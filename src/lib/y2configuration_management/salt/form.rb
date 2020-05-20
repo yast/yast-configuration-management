@@ -288,7 +288,7 @@ module Y2ConfigurationManagement
       # @param parent [FormElement]
       def initialize(id, spec, parent:)
         super
-        @item_name = spec["item_name"] if spec["item_name"]
+        @item_name = spec["$itemName"] if spec["$itemName"]
         @min_items = spec["$minItems"] if spec["$minItems"]
         @max_items = spec["$maxItems"] if spec["$maxItems"]
         @prototype = prototype_for(id, spec)
