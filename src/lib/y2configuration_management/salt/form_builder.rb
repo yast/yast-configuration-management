@@ -205,9 +205,12 @@ module Y2ConfigurationManagement
 
       # Determines whether a form element should be placed in a different page or share one
       #
+      # Only {FormInput} instances are placed in the same page.
+      #
+      # @param form_element [FormElement] Form element to check
       # @return [Boolean]
       def shared_page?(form_element)
-        form_element.is_a?(FormInput) || form_element.type == :namespace
+        form_element.is_a?(FormInput)
       end
     end
   end

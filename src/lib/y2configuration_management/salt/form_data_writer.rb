@@ -58,12 +58,11 @@ module Y2ConfigurationManagement
       # @return [Object]
       def data_for_pillar(data, element)
         return data if element.nil?
-        case data
-        when Array
+        if data.is_a?(Array)
           collection_for_pillar(data, element)
-        when Hash
+        elsif data.is_a?(Hash)
           hash_for_pillar(data, element)
-        else
+        elsif element.is_a?(FormInput)
           scalar_for_pillar(data, element)
         end
       end
