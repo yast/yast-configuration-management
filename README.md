@@ -101,6 +101,9 @@ the required workflow. In the example below, only the relevant parts are shown:
         <metadata_root>/srv/formula_metadata</metadata_root>
       </listentry>
     </formulas_sets>
+    <states_roots config:type="list">
+      <listentry>/srv/salt</listentry>
+    </states_roots>
     <!-- Default Salt Formulas pillar data directory  -->
     <pillar_root>/srv/pillar</pillar_root>
   </configuration_management>

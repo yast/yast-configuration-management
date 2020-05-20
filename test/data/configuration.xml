@@ -2,21 +2,31 @@
 <productDefines xmlns="http://www.suse.com/1.0/yast2ns" 
   xmlns:config="http://www.suse.com/1.0/configns">
 
-    <textdomain>configuration_management</textdomain>
+  <textdomain>configuration_management</textdomain>
 
-    <configuration_management>
-        <type>salt</type>
-        <!-- Default Salt Formulas root directories -->
-        <formulas_roots config:type="list">
-          <formula_root>/usr/share/susemanager/formulas/metadata</formula_root>
-          <formula_root>/srv/formula_metadata</formula_root>
-        </formulas_roots>
-        <!-- Default Salt Formulas state directories -->
-        <states_roots config:type="list">
-          <state_root>/usr/share/susemanager/formulas/states</state_root>
-        </states_roots>
-        <!-- Default Salt Formulas pillar data directory  -->
+  <configuration_management>
+    <type>salt</type>
+    <!-- Default Salt Formulas directories -->
+    <formulas_sets config:type="list">
+      <listentry>
+        <metadata_root>/usr/share/susemanager/formulas/metadata</metadata_root>
+        <states_root>/usr/share/susemanager/formulas/states</states_root>
         <pillar_root>/srv/susemanager/formula_data</pillar_root>
-    </configuration_management>
+      </listentry>
+      <listentry>
+        <metadata_root>/usr/share/salt-formulas/metadata</metadata_root>
+        <states_root>/usr/share/salt-formulas/states</states_root>
+        <pillar_root>/srv/salt-formulas/pillar</pillar_root>
+      </listentry>
+      <listentry>
+        <metadata_root>/srv/formula_metadata</metadata_root>
+      </listentry>
+    </formulas_sets>
+    <states_roots config:type="list">
+      <listentry>/srv/salt</listentry>
+    </states_roots>
+    <!-- Default Salt Formulas pillar data directory  -->
+    <pillar_root>/srv/pillar</pillar_root>
+  </configuration_management>
 
 </productDefines>
