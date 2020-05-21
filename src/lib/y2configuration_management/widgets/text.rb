@@ -60,13 +60,6 @@ module Y2ConfigurationManagement
         initialize_salt_visibility_switcher(spec.visible_if)
       end
 
-      # @see CWM::AbstractWidget
-      def init
-        saved_value = value
-        replace(inner)
-        self.value = saved_value
-      end
-
       # @see CWM::ValueBasedWidget
       def value=(val)
         super(val.to_s)
