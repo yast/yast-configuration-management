@@ -86,7 +86,9 @@ module Y2ConfigurationManagement
       # @return [Hash]
       def value
         base = items.first.main ? items.first.value : {}
-        items.reject(&:main).reduce(base) { |a, e| a.merge(e.page_id => e.value) }
+        items.select(&:visible?).reject(&:main).reduce(base) do |a, e|
+          a.merge(e.page_id => e.value)
+        end
       end
 
       # Returns included widgets

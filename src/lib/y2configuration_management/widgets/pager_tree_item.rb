@@ -97,8 +97,8 @@ module Y2ConfigurationManagement
       #
       # @return [Hash]
       def value
-        my_values = page.value
-        items.reduce(my_values) do |a, e|
+        my_values = page.value || {}
+        items.select(&:visible?).reduce(my_values) do |a, e|
           a.merge(e.page_id => e.value)
         end
       end

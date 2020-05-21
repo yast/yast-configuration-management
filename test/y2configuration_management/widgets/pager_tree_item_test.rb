@@ -64,6 +64,16 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
     it "returns values from pages" do
       expect(item.value).to eq("name" => "YaST2", "labels" => nested_page.value)
     end
+
+    context "when a page is not visible" do
+      before do
+        allow(nested_item).to receive(:visible?).and_return(false)
+      end
+
+      it "does not include its values" do
+        expect(item.value).to eq("name" => "YaST2")
+      end
+    end
   end
 
   describe "#value=" do
