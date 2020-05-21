@@ -67,11 +67,14 @@ module Y2ConfigurationManagement
       # @param data [FormData]
       # @see #visible?
       def update_visibility(data)
-        if parent && !parent.visible?
-          @visible = false
-        elsif visible_if
-          @visible = visible_if.evaluate(data, context: self)
-        end
+        @visible =
+          if parent && !parent.visible?
+            false
+          elsif visible_if
+            visible_if.evaluate(data, context: self)
+          else
+            true
+          end
         items.each { |i| i.update_visibility(data) }
       end
 

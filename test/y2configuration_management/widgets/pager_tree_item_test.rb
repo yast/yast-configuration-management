@@ -102,7 +102,7 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
     context "when visibility condition evaluates to true" do
       let(:visible?) { true }
 
-      it "sets the items as visible" do
+      it "sets the item as visible" do
         item.update_visibility(data)
         expect(item).to be_visible
       end
@@ -116,7 +116,7 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
     context "when visibility condition evaluates to false" do
       let(:visible?) { false }
 
-      it "sets the items as not visible" do
+      it "sets the item as not visible" do
         item.update_visibility(data)
         expect(item).to_not be_visible
       end
@@ -124,6 +124,21 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
       it "sets the children as not visible" do
         item.update_visibility(data)
         expect(nested_item).to_not be_visible
+      end
+    end
+
+    context "when it has no condition and its parent is visible" do
+      let(:visible?) { false }
+
+      before do
+        allow(item).to receive(:visible?).and_return(false)
+        nested_item.update_visibility(data) # set as false because the parent is not visible
+      end
+
+      it "sets the item as visible" do
+        allow(item).to receive(:visible?).and_return(true)
+        nested_item.update_visibility(data)
+        expect(nested_item).to be_visible
       end
     end
   end
