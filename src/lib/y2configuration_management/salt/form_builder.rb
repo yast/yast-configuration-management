@@ -85,8 +85,8 @@ module Y2ConfigurationManagement
       def build_element(element, locator)
         element_locator = locator.join(element.id.to_sym)
         case element.type
-        when :group, :namespace, :"hidden-group"
-          build_group(element, element_locator)
+        # when :group, :namespace, :"hidden-group"
+        #   build_group(element, element_locator)
         when :"edit-group"
           build_collection(element, element_locator)
         when *INPUT_WIDGET_CLASS.keys
@@ -201,7 +201,9 @@ module Y2ConfigurationManagement
         children = other_page.map { |e| build_tree_item(e, locator.join(e.id.to_sym)) }
 
         page = Widgets::Page.new(locator.last.to_s, form_element.name, widgets)
-        Widgets::PagerTreeItem.new(page, children: children)
+        Widgets::PagerTreeItem.new(
+          page, children: children, locator: locator, visible_if: form_element.visible_if
+        )
       end
 
       # Determines whether a form element should be placed in a different page or share one

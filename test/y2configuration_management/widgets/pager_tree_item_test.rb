@@ -23,11 +23,15 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/pager_tree_item"
 require "y2configuration_management/widgets/page"
+require "y2configuration_management/salt/form_condition"
+require "y2configuration_management/salt/form_data"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
   subject(:item) do
-    described_class.new(page, children: [nested_item]).tap { |i| i.tree = tree }
+    described_class.new(
+      page, children: [nested_item], visible_if: form_condition
+    ).tap { |i| i.tree = tree }
   end
 
   let(:page) do
@@ -43,6 +47,10 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
     ).as_null_object
   end
   let(:tree) { double("tree") }
+
+  let(:form_condition) do
+    Y2ConfigurationManagement::Salt::FormCondition.parse(".item == true")
+  end
 
   include_examples "CWM::AbstractWidget"
 
@@ -79,6 +87,43 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
       it "returns its parent tree" do
         nested = item.items.first
         expect(nested.tree).to eq(tree)
+      end
+    end
+  end
+
+  describe "#update_visibility" do
+    let(:data) { Y2ConfigurationManagement::Salt::FormData.new({}) }
+
+    before do
+      allow(form_condition).to receive(:evaluate)
+        .with(data, context: item).and_return(visible?)
+    end
+
+    context "when visibility condition evaluates to true" do
+      let(:visible?) { true }
+
+      it "sets the items as visible" do
+        item.update_visibility(data)
+        expect(item).to be_visible
+      end
+
+      it "asks children to set their visibility" do
+        expect(nested_item).to receive(:update_visibility)
+        item.update_visibility(data)
+      end
+    end
+
+    context "when visibility condition evaluates to false" do
+      let(:visible?) { false }
+
+      it "sets the items as not visible" do
+        item.update_visibility(data)
+        expect(item).to_not be_visible
+      end
+
+      it "sets the children as not visible" do
+        item.update_visibility(data)
+        expect(nested_item).to_not be_visible
       end
     end
   end

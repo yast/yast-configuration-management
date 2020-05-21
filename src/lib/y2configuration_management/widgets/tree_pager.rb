@@ -117,6 +117,17 @@ module Y2ConfigurationManagement
         pages.map(&:min_height).max
       end
 
+      # Automatic invisibility handling
+      #
+      # It updates items visibility and refreshes the tree.
+      #
+      # @param data [FormData]
+      # @see PagerTreeItem#update_visibility
+      def update_visibility(data)
+        (items + pages).each { |i| i.update_visibility(data) }
+        tree.refresh
+      end
+
     private
 
       # @return [Tree] Tree widget

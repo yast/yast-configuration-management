@@ -33,16 +33,25 @@ module Y2ConfigurationManagement
       attr_writer :tree
       # @return [Boolean] Determines whether this is a main page
       attr_accessor :main
+      # @return [FormCondition,nil]
+      attr_reader :visible_if
+      # @return [FormLocator]
+      attr_reader :locator
 
       # Constructor
       #
       # @param page [Page] Associated page
       # @param icon
-      def initialize(page, icon: nil, open: true, children: [])
-        super
+      # rubocop:disable Metrics/ParameterLists
+      def initialize(page, icon: nil, open: true, children: [], locator: nil, visible_if: nil)
+        super(page, icon: icon, open: open, children: children)
+        @locator = locator
+        @visible_if = visible_if
+        @visible = true
         items.each { |i| i.parent = self }
         page.tree_item = self
       end
+      # rubocop:enable Metrics/ParameterLists
 
       # Returns the page id
       #
@@ -51,6 +60,28 @@ module Y2ConfigurationManagement
       # @return [String]
       def page_id
         page.id
+      end
+
+      # Updates item visibility
+      #
+      # @param data [FormData]
+      # @see #visible?
+      def update_visibility(data)
+        if parent && !parent.visible?
+          @visible = false
+        elsif visible_if
+          @visible = visible_if.evaluate(data, context: self)
+        end
+        items.each { |i| i.update_visibility(data) }
+      end
+
+      # Determines whether the item should be visible in the tree
+      #
+      # If the item is not {visible?}, it is not shown in the tree.
+      #
+      # @return [Boolean]
+      def visible?
+        @visible
       end
 
       def relative_locator
@@ -102,6 +133,18 @@ module Y2ConfigurationManagement
       # @return [TreePager]
       def pager
         tree.pager
+      end
+
+      # Returns the UI term for the item
+      #
+      # @return [Yast::Term]
+      def ui_term
+        args = [Yast::Term.new(:id, id)]
+        args << Yast::Term.new(:icon, icon) if icon
+        args << label
+        args << open
+        args << children.values.select(&:visible?).map(&:ui_term)
+        Yast::Term.new(:item, *args)
       end
     end
   end
