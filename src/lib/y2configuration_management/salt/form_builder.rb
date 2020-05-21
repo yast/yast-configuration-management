@@ -85,8 +85,6 @@ module Y2ConfigurationManagement
       def build_element(element, locator)
         element_locator = locator.join(element.id.to_sym)
         case element.type
-        # when :group, :namespace, :"hidden-group"
-        #   build_group(element, element_locator)
         when :"edit-group"
           build_collection(element, element_locator)
         when *INPUT_WIDGET_CLASS.keys
@@ -94,17 +92,6 @@ module Y2ConfigurationManagement
         else
           raise "Unknown $type: #{element.type}"
         end
-      end
-
-      # Builds a form group
-      #
-      # @param group [Y2ConfigurationManagement::Salt::Group] Group specification
-      # @return [Y2ConfigurationManagement::Widgets::Group]
-      def build_group(group, locator)
-        children = group.elements.map do |element_spec|
-          build_element(element_spec, locator)
-        end
-        Y2ConfigurationManagement::Widgets::Group.new(group, children, locator)
       end
 
       # Builds a simple input element
