@@ -58,14 +58,15 @@ module Y2ConfigurationManagement
       # @see PagerTreeItem#visible?
       def contents
         VBox(
-          ReplacePoint(Id("tree_items"), tree_content)
+          ReplacePoint(Id(:tree_items), tree_content)
         )
       end
 
       # Refreshes the tree content keeping the current item as selected
       def refresh
+        return unless Yast::UI.WidgetExists(Id(widget_id))
         current_item = Yast::UI.QueryWidget(Id(widget_id), :CurrentItem)
-        Yast::UI.ReplaceWidget(Id("tree_items"), tree_content)
+        Yast::UI.ReplaceWidget(Id(:tree_items), tree_content)
         Yast::UI.ChangeWidget(Id(widget_id), :CurrentItem, current_item)
       end
 

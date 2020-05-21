@@ -56,4 +56,28 @@ describe Y2ConfigurationManagement::Widgets::Tree do
       tree.contents
     end
   end
+
+  describe "#refresh" do
+    before do
+      allow(Yast::UI).to receive(:WidgetExists).and_return(widget_exists)
+    end
+
+    context "when the widget is not accessible" do
+      let(:widget_exists) { true }
+
+      it "refreshes the content" do
+        expect(Yast::UI).to receive(:ReplaceWidget)
+        tree.refresh
+      end
+    end
+
+    context "when the widget is not accessible" do
+      let(:widget_exists) { false }
+
+      it "does not refresh the content" do
+        expect(Yast::UI).to_not receive(:ReplaceWidget)
+        tree.refresh
+      end
+    end
+  end
 end
