@@ -41,7 +41,10 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param page [Page] Associated page
-      # @param icon
+      # @param icon [String] Icon filename
+      # @param open [Boolean] Whether the subtree is open
+      # @param locator [FormLocator] Form data locator
+      # @param visible_if [FormCondition] Visibility form condition
       # rubocop:disable Metrics/ParameterLists
       def initialize(page, icon: nil, open: true, children: [], locator: nil, visible_if: nil)
         super(page, icon: icon, open: open, children: children)

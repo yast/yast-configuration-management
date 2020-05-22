@@ -64,6 +64,8 @@ module Y2ConfigurationManagement
           hash_for_pillar(data, element)
         elsif element.is_a?(FormInput)
           scalar_for_pillar(data, element)
+        else
+          data
         end
       end
 
