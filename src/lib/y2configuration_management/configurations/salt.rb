@@ -79,16 +79,19 @@ module Y2ConfigurationManagement
       def pillar_roots(scope = :local)
         paths = ([@custom_pillar_root] + formulas_sets.map(&:pillar_root)).compact
         paths = scoped_paths(paths, scope)
-        paths.unshift(pillar_root(scope)) unless @custom_pillar_root
+        paths.unshift(default_pillar_root(scope)) unless @custom_pillar_root
         paths
       end
 
-      # Return path to the Salt pillars directory
+      # Return path to the default Salt pillars directory
+      #
+      # If it is not defined by the user, the default pillar directory lives
+      # under the {#work_dir}.
       #
       # @param scope [Symbol] Path relative to inst-sys (:local) or the
       #   target system (:target)
       # @return [Pathname] Path to Salt pillars
-      def pillar_root(scope = :local)
+      def default_pillar_root(scope = :local)
         work_dir(scope).join("pillar")
       end
 
@@ -99,15 +102,17 @@ module Y2ConfigurationManagement
       # @return [Array<Pathname>] Path to Salt state roots
       def states_roots(scope = :local)
         paths = @custom_states_roots + formulas_sets.map(&:states_root).compact
-        [states_root(scope)] + scoped_paths(paths, scope)
+        [default_states_root(scope)] + scoped_paths(paths, scope)
       end
 
-      # Return path to the Salt states directory
+      # Return path to the default Salt states directory
+      #
+      # The default Salt states directory lives under the {#work_dir}.
       #
       # @param scope [Symbol] Path relative to inst-sys (:local) or the
       #   target system (:target)
       # @return [Pathname] Path to Salt states
-      def states_root(scope = :local)
+      def default_states_root(scope = :local)
         work_dir(scope).join("salt")
       end
 

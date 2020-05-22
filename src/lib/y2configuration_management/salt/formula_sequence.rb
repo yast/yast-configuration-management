@@ -83,7 +83,7 @@ module Y2ConfigurationManagement
       def write_data
         return :next if formulas.select(&:enabled?).empty?
 
-        [config.pillar_root, config.states_root].each do |path|
+        [config.default_pillar_root, config.default_states_root].each do |path|
           ::FileUtils.mkdir_p(path) unless File.exist?(path)
           top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
           top.load
@@ -129,7 +129,7 @@ module Y2ConfigurationManagement
       def read_formulas
         @formulas = config.formulas_sets.each_with_object([]) do |location, formulas|
           reader = Y2ConfigurationManagement::Salt::FormulasReader.new(
-            location.metadata_root, location.pillar_root || config.pillar_root
+            location.metadata_root, location.pillar_root || config.default_pillar_root
           )
           formulas.concat(reader.formulas)
         end
