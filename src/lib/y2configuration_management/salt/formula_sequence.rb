@@ -26,6 +26,7 @@ require "y2configuration_management/cfa/salt_top"
 Yast.import "Report"
 Yast.import "Message"
 Yast.import "Popup"
+Yast.import "Installation"
 
 # @!macro [new] seeSequence
 #   @see https://www.rubydoc.info/github/yast/yast-yast2/UI/Sequence
@@ -128,9 +129,11 @@ module Y2ConfigurationManagement
       # the {Pillar} associated with each one
       def read_formulas
         @formulas = config.formulas_sets.each_with_object([]) do |location, formulas|
-          reader = Y2ConfigurationManagement::Salt::FormulasReader.new(
-            location.metadata_root, location.pillar_root || config.default_pillar_root
+          metadata_path = File.join(Yast::Installation.destdir, location.metadata_root)
+          pillar_path = File.join(
+            Yast::Installation.destdir, location.pillar_root || config.default_pillar_root
           )
+          reader = Y2ConfigurationManagement::Salt::FormulasReader.new(metadata_path, pillar_path)
           formulas.concat(reader.formulas)
         end
       end

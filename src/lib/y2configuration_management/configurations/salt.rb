@@ -24,8 +24,6 @@ module Y2ConfigurationManagement
       attr_reader :pillar_url
       # @return [Array<String>] States (including formulas) which will be applied
       attr_reader :enabled_states
-      # @return [Array<FormulasSet>] List of formulas locations
-      attr_reader :formulas_sets
 
       class << self
         # Returns a {Salt} object from a hash
@@ -68,7 +66,7 @@ module Y2ConfigurationManagement
         @custom_pillar_root = Pathname.new(options[:pillar_root]) if options[:pillar_root]
         @custom_states_roots = pathnames_from(options[:states_roots])
         @enabled_states = options.fetch(:enabled_states, [])
-        @formulas_sets = options.fetch(:formulas_sets, [])
+        @custom_formulas_sets = options.fetch(:formulas_sets, [])
       end
 
       # Return path to the Salt main pillars directory (the one containing the top.sls)
@@ -123,20 +121,24 @@ module Y2ConfigurationManagement
       # @return [Array<Pathname>] Path to Salt formulas roots
       def formulas_roots(scope = :local)
         paths = formulas_sets.map(&:metadata_root).compact
-        scoped_paths(paths, scope) + [default_formulas_root(scope)]
+        scoped_paths(paths, scope)
       end
 
-      # Return path to the default Salt formulas directory
+      # Return the list of formulas sets
       #
-      #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
-      # @return [Pathname] Path to Salt formulas
-      def default_formulas_root(scope = :local)
-        work_dir(scope).join("formulas")
+      # @return [Array<FormulasSet>] List of formulas sets
+      def formulas_sets
+        [default_formulas_set] + @custom_formulas_sets
       end
 
     private
+
+      # Return path to the default Salt formulas directory
+      #
+      # @return [Pathname] Path to Salt formulas
+      def default_formulas_set
+        @default_formula_set ||= FormulasSet.from_directory(work_dir(:target).join("formulas"))
+      end
 
       # Convenience method for obtaining the list of given paths relative to
       # inst-sys (scope: :local) or to the target system (scope: :target)

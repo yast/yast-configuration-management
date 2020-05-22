@@ -105,7 +105,12 @@ describe Y2ConfigurationManagement::Configurators::Salt do
 
       it "sets file_roots in the minion's configuration" do
         expect(minion_config).to receive(:set_file_roots)
-          .with([config.states_root(:target)])
+          .with(
+            [
+              config.work_dir(:target).join("salt"),
+              config.work_dir(:target).join("formulas", "states")
+            ]
+          )
         configurator.prepare
       end
 
