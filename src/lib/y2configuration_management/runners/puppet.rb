@@ -33,8 +33,8 @@ module Y2ConfigurationManagement
       def run_masterless_mode(stdout, stderr)
         with_retries(config.auth_attempts) do
           run_cmd(
-            "puppet", "apply", "--modulepath", config.work_dir(:target).join("modules").to_s,
-            config.work_dir(:target).join("manifests", "site.pp").to_s,
+            "puppet", "apply", "--modulepath", config.work_dir.join("modules").to_s,
+            config.work_dir.join("manifests", "site.pp").to_s,
             *log_level_opts(config.log_level), stdout: stdout, stderr: stderr
           )
         end

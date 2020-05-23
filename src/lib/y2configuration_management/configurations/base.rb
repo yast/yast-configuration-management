@@ -116,14 +116,13 @@ module Y2ConfigurationManagement
         nil
       end
 
-      # Return a path to a temporal directory to extract states/pillars
+      # Return a path to a temporal directory to extract modules/states/pillars
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the target system (:target)
       # @return [String] Path name to the temporal directory
-      def work_dir(scope = :local)
-        @work_dir ||= build_work_dir_name
-        prefix = (scope == :target) ? "/" : Yast::Installation.destdir
-        Pathname.new(prefix).join(@work_dir)
+      def work_dir
+        @work_dir ||= Pathname.new(Yast::Directory.vardir).join(
+          "cm-#{Time.now.strftime("%Y%m%d%H%M")}"
+        )
       end
 
       # Determines whether the authentication is needed
@@ -133,16 +132,6 @@ module Y2ConfigurationManagement
       # @return [Boolean]
       def auth_required?
         @mode == :client
-      end
-
-    private
-
-      # Build a path to be used as work_dir
-      #
-      # @return [Pathname] Relative work_dir path
-      def build_work_dir_name
-        path = Pathname.new(Yast::Directory.vardir).join("cm-#{Time.now.strftime("%Y%m%d%H%M")}")
-        path.relative_path_from(Pathname.new("/"))
       end
     end
   end

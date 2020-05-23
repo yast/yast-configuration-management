@@ -31,7 +31,7 @@ module Y2ConfigurationManagement
       #   :abort when configuration failed or was aborted.
       mode(:masterless) do |_opts|
         update_configuration
-        fetch_config(config.modules_url, config.work_dir) ? :finish : :abort
+        fetch_config(config.modules_url, target_path(config.work_dir)) ? :finish : :abort
       end
 
       # @return [Symbol] :finish when configuration was successful; :abort when configuration failed

@@ -53,8 +53,8 @@ describe Y2ConfigurationManagement::Runners::Puppet do
 
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "puppet", "apply", "--modulepath", config.work_dir(:target).join("modules").to_s,
-          config.work_dir(:target).join("manifests", "site.pp").to_s,
+          "puppet", "apply", "--modulepath", config.work_dir.join("modules").to_s,
+          config.work_dir.join("manifests", "site.pp").to_s,
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)

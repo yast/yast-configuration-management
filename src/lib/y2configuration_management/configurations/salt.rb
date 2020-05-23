@@ -9,10 +9,6 @@ module Y2ConfigurationManagement
     # It extends the {Base} class with some Salt specific options. See #post_initialize for further
     # information about those options.
     #
-    # The methods that are related to path names ({#states_root}, {#formulas_roots}, {#pillar_root},
-    # {#pillar_roots}, are aware of the scope where YaST is running, so it takes
-    # `Yast::Installation.destdir` into account.
-    #
     # @example Directories during installation
     #   config = Salt.new
     #   config.pillar_roots #=> [#<Pathname:/mnt/var/lib/YaST2/cm-202005120829/pillar>]
@@ -71,13 +67,10 @@ module Y2ConfigurationManagement
 
       # Return path to the Salt main pillars directory (the one containing the top.sls)
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
       # @return [Array<Pathname>] Path to Salt pillars
-      def pillar_roots(scope = :local)
+      def pillar_roots
         paths = ([@custom_pillar_root] + formulas_sets.map(&:pillar_root)).compact
-        paths = scoped_paths(paths, scope)
-        paths.unshift(default_pillar_root(scope)) unless @custom_pillar_root
+        paths.unshift(default_pillar_root) unless @custom_pillar_root
         paths
       end
 
@@ -86,42 +79,34 @@ module Y2ConfigurationManagement
       # If it is not defined by the user, the default pillar directory lives
       # under the {#work_dir}.
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
       # @return [Pathname] Path to Salt pillars
-      def default_pillar_root(scope = :local)
-        work_dir(scope).join("pillar")
+      def default_pillar_root
+        work_dir.join("pillar")
       end
 
       # Return paths to the states root
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
       # @return [Array<Pathname>] Path to Salt state roots
-      def states_roots(scope = :local)
+      def states_roots
         paths = @custom_states_roots + formulas_sets.map(&:states_root).compact
-        [default_states_root(scope)] + scoped_paths(paths, scope)
+        [default_states_root] + paths
       end
 
       # Return path to the default Salt states directory
       #
       # The default Salt states directory lives under the {#work_dir}.
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
       # @return [Pathname] Path to Salt states
-      def default_states_root(scope = :local)
-        work_dir(scope).join("salt")
+      def default_states_root
+        work_dir.join("salt")
       end
 
+      # TODO: is still used?
       # Return paths to all formulas directories
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
       # @return [Array<Pathname>] Path to Salt formulas roots
-      def formulas_roots(scope = :local)
-        paths = formulas_sets.map(&:metadata_root).compact
-        scoped_paths(paths, scope)
+      def formulas_roots
+        formulas_sets.map(&:metadata_root).compact
       end
 
       # Return the list of formulas sets
@@ -137,21 +122,7 @@ module Y2ConfigurationManagement
       #
       # @return [Pathname] Path to Salt formulas
       def default_formulas_set
-        @default_formula_set ||= FormulasSet.from_directory(work_dir(:target).join("formulas"))
-      end
-
-      # Convenience method for obtaining the list of given paths relative to
-      # inst-sys (scope: :local) or to the target system (scope: :target)
-      #
-      # @param paths [Array<Pathname>] list of path to be scoped
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the
-      #   target system (:target)
-      # @return [Array<Pathname>] list of the given paths prefixed by the
-      #   destination directory in case of :local scope
-      def scoped_paths(paths, scope = :local)
-        return paths if scope == :target
-        prefix = Pathname.new(Yast::Installation.destdir)
-        paths.map { |d| prefix.join(d) }
+        @default_formula_set ||= FormulasSet.from_directory(work_dir.join("formulas"))
       end
 
       # Convenience method for converting from a list of directory names to a

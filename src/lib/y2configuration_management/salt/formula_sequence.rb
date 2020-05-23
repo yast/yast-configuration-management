@@ -85,8 +85,9 @@ module Y2ConfigurationManagement
         return :next if formulas.select(&:enabled?).empty?
 
         [config.default_pillar_root, config.default_states_root].each do |path|
-          ::FileUtils.mkdir_p(path) unless File.exist?(path)
-          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+          dir = File.join(Yast::Installation.destdir, path)
+          ::FileUtils.mkdir_p(dir) unless File.exist?(dir)
+          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(dir, "top.sls"))
           top.load
           top.add_states(formulas.select(&:enabled?).map(&:id))
           top.save

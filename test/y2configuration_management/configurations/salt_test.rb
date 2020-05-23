@@ -108,7 +108,7 @@ describe Y2ConfigurationManagement::Configurations::Salt do
     let(:default_pillar_root) { "/var/lib/YaST2/cm-202005190829/pillar" }
 
     before do
-      allow(config).to receive(:default_pillar_root).with(:local).and_return(default_pillar_root)
+      allow(config).to receive(:default_pillar_root).and_return(default_pillar_root)
     end
 
     it "returns pillar roots (work_dir and formulas)" do
