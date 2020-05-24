@@ -20,20 +20,20 @@ module Y2ConfigurationManagement
       # Constructor
       #
       # @param reporting_opts [Hash] Reporting reporting_opts
-      # @option reporting_opts [Boolean] :open_after_success Keep the dialog open after finishing
-      #   successfuly
-      # @option reporting_opts [Boolean] :open_after_error Keep the dialog open after finishing
-      #   with an error
-      # @option reporting_opts [Integer] :timeout_after_success Timeout after finishing successfuly.
-      #   It only makes sense when `:open_after_success` is set to true.
-      # @option reporting_opts [Integer] :timeout_after_error Timeout after finishing with an error
-      #   It only makes sense when `:open_after_error` is set to true.
+      # @option reporting_opts [Boolean,nil] :open_after_success Keep the dialog open after
+      #   finishing successfuly
+      # @option reporting_opts [Boolean,nil] :open_after_error Keep the dialog open after
+      #   finishing with an error
+      # @option reporting_opts [Integer,nil] :timeout_after_success Timeout after finishing
+      #   successfuly. It only makes sense when `:open_after_success` is set to true.
+      # @option reporting_opts [Integer,nil] :timeout_after_error Timeout after finishing with
+      #   an error. It only makes sense when `:open_after_error` is set to true.
       def initialize(reporting_opts: {})
         super()
         @open_after_success = !!reporting_opts[:open_after_success]
         @open_after_error = !!reporting_opts[:open_after_error]
-        @timeout_after_success = reporting_opts[:timeout_after_success]
-        @timeout_after_error = reporting_opts[:timeout_after_error]
+        @timeout_after_success = reporting_opts[:timeout_after_success].to_i
+        @timeout_after_error = reporting_opts[:timeout_after_error].to_i
         @timer_running = false
       end
 
@@ -120,9 +120,11 @@ module Y2ConfigurationManagement
       # @param result [Boolean] Whether the block ran successfully or not
       def start_timer_if_needed(result)
         if result
-          @open_after_success && @timeout_after_success && start_timer(@timeout_after_success)
+          @open_after_success && !@timeout_after_success.zero? &&
+            start_timer(@timeout_after_success)
         else
-          @open_after_error && @timeout_after_error && start_timer(@timeout_after_error)
+          @open_after_error && !@timeout_after_error.zero? &&
+            start_timer(@timeout_after_error)
         end
       end
 
@@ -151,11 +153,7 @@ module Y2ConfigurationManagement
       # Update timer
       def update_timer
         decrement_timer
-        Yast::UI.ChangeWidget(
-          Id(:remaining_time),
-          :Value,
-          remaining_time.to_s
-        )
+        Yast::UI.ReplaceWidget(Id(:status), Label(Id(:remaining_time), remaining_time.to_s))
       end
 
     protected
@@ -189,7 +187,7 @@ module Y2ConfigurationManagement
               RichText(Id(:progress), Opt(:autoScrollDown), "")
             ),
             VSpacing(0.2),
-            ReplacePoint(Id(:status), Label(Id(:please_wait), _("Please, wait"))),
+            ReplacePoint(Id(:status), Label(Id(:please_wait), Yast::Label.PleaseWaitMsg)),
             ReplacePoint(Id(:buttons), buttons_box)
           ),
           HSpacing(1)
@@ -211,7 +209,6 @@ module Y2ConfigurationManagement
         Yast::UI.ChangeWidget(Id(:ok), :Enabled, true)
         if timer_running?
           Yast::UI.ChangeWidget(Id(:stop), :Enabled, true)
-          Yast::UI.ReplaceWidget(Id(:status), Label(Id(:remaining_time), remaining_time.to_s))
           update_timer
         else
           Yast::UI.ReplaceWidget(Id(:status), Empty())
