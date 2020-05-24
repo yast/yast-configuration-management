@@ -105,15 +105,15 @@ describe Y2ConfigurationManagement::Configurations::Salt do
   end
 
   describe "#pillar_roots" do
-    let(:default_pillar_root) { "/var/lib/YaST2/cm-202005190829/pillar" }
+    let(:work_dir) { Pathname.new("/var/lib/YaST2/cm-202005190829/pillar") }
 
     before do
-      allow(config).to receive(:default_pillar_root).and_return(default_pillar_root)
+      allow(config).to receive(:work_dir).and_return(work_dir)
     end
 
     it "returns pillar roots (work_dir and formulas)" do
-      expect(config.pillar_roots.map(&:to_s))
-        .to eq([default_pillar_root, "/srv/susemanager/formulas_data"])
+      expect(config.pillar_roots)
+        .to eq([work_dir.join("pillar"), Pathname.new("/srv/susemanager/formulas_data")])
     end
 
     context "when the pillar_root is set" do

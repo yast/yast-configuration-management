@@ -69,9 +69,7 @@ module Y2ConfigurationManagement
       #
       # @return [Array<Pathname>] Path to Salt pillars
       def pillar_roots
-        paths = ([@custom_pillar_root] + formulas_sets.map(&:pillar_root)).compact
-        paths.unshift(default_pillar_root) unless @custom_pillar_root
-        paths
+        [default_pillar_root] + formulas_sets.map(&:pillar_root).compact
       end
 
       # Return path to the default Salt pillars directory
@@ -81,7 +79,7 @@ module Y2ConfigurationManagement
       #
       # @return [Pathname] Path to Salt pillars
       def default_pillar_root
-        work_dir.join("pillar")
+        @default_pillar_root ||= @custom_pillar_root || work_dir.join("pillar")
       end
 
       # Return paths to the states root
