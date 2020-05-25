@@ -85,7 +85,7 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
         person = form_widget.tree_pager.items.first
         expect(person.id).to eq("page:person")
         expect(person.children.values.map(&:id))
-          .to eq(["page:address", "page:computers", "page:projects"])
+          .to eq(["page:newsletter", "page:address", "page:computers", "page:projects"])
       end
     end
 
@@ -102,10 +102,10 @@ describe Y2ConfigurationManagement::Salt::FormBuilder do
       end
     end
 
-    it "does not place form element which type is 'namespace' separated pages" do
+    it "places form elements which type is 'namespace' in separated pages" do
       form_widget = builder.build(locator_from_string("root#person"))
       person = form_widget.tree_pager.items.first
-      expect(person.page.children.map(&:id)).to include("newsletter")
+      expect(person.page.children.map(&:id)).to_not include("newsletter")
     end
   end
 end

@@ -8,11 +8,14 @@ describe Y2ConfigurationManagement::Runners::Puppet do
   subject(:runner) { Y2ConfigurationManagement::Runners::Puppet.new(config) }
 
   let(:mode) { :masterless }
+  let(:log_level) { :notice }
   let(:master) { "puppet.suse.de" }
   let(:tmpdir) { "/mnt/tmp/yast_cm" }
 
   let(:config) do
-    Y2ConfigurationManagement::Configurations::Puppet.new(master: master)
+    Y2ConfigurationManagement::Configurations::Puppet.new(
+      master: master, log_level: log_level
+    )
   end
 
   before do
@@ -28,7 +31,7 @@ describe Y2ConfigurationManagement::Runners::Puppet do
     context "when running in client mode" do
       it "runs puppet agent" do
         expect(Cheetah).to receive(:run)
-          .with("puppet", "agent", "--onetime", "--debug", "--no-daemonize",
+          .with("puppet", "agent", "--onetime", "--no-daemonize",
             "--waitforcert", config.auth_time_out.to_s, stdout: $stdout,
             stderr: $stderr, chroot: "/mnt")
         expect(runner.run).to eq(true)
@@ -50,11 +53,33 @@ describe Y2ConfigurationManagement::Runners::Puppet do
 
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "puppet", "apply", "--modulepath", config.work_dir(:target).join("modules").to_s,
-          config.work_dir(:target).join("manifests", "site.pp").to_s, "--debug",
+          "puppet", "apply", "--modulepath", config.work_dir.join("modules").to_s,
+          config.work_dir.join("manifests", "site.pp").to_s,
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)
+      end
+    end
+
+    context "when log level is set to 'info'" do
+      let(:log_level) { :info }
+
+      it "includes the '--verbose' option" do
+        expect(Cheetah).to receive(:run) do |*args|
+          expect(args).to include("--verbose")
+        end
+        runner.run
+      end
+    end
+
+    context "when log level is set to :debug" do
+      let(:log_level) { :debug }
+
+      it "includes the '--verbose' and '--debug' options" do
+        expect(Cheetah).to receive(:run) do |*args|
+          expect(args).to include("--verbose", "--debug")
+        end
+        runner.run
       end
     end
   end

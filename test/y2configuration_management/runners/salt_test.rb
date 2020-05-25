@@ -10,7 +10,9 @@ describe Y2ConfigurationManagement::Runners::Salt do
   let(:tmpdir) { "/mnt/tmp/yast_cm" }
 
   let(:config) do
-    Y2ConfigurationManagement::Configurations::Salt.new(master: master)
+    Y2ConfigurationManagement::Configurations::Salt.new(
+      master: master, log_level: :info
+    )
   end
 
   before do
@@ -26,7 +28,7 @@ describe Y2ConfigurationManagement::Runners::Salt do
     context "when running in client mode" do
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "salt-call", "--log-level", "debug", "state.highstate",
+          "salt-call", "--log-level", "info", "state.highstate",
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)
@@ -48,9 +50,7 @@ describe Y2ConfigurationManagement::Runners::Salt do
 
       it "runs salt-call" do
         expect(Cheetah).to receive(:run).with(
-          "salt-call", "--log-level", "debug",
-          "--local", "--pillar-root=#{config.pillar_root(:target)}",
-          "state.highstate",
+          "salt-call", "--log-level", "info", "--local", "state.highstate",
           stdout: $stdout, stderr: $stderr, chroot: "/mnt"
         )
         expect(runner.run).to eq(true)

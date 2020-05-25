@@ -26,7 +26,7 @@ describe Y2ConfigurationManagement::Configurators::Salt do
 
   before do
     allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
-    allow(FileUtils).to receive(:mkdir_p).with(config.work_dir)
+    allow(FileUtils).to receive(:mkdir_p).with(Pathname.new(File.join("/mnt", config.work_dir)))
   end
 
   describe "#packages" do
@@ -82,17 +82,18 @@ describe Y2ConfigurationManagement::Configurators::Salt do
         allow(Y2ConfigurationManagement::CFA::Minion)
           .to receive(:new).and_return(minion_config)
         allow(minion_config).to receive(:set_file_roots)
+        allow(minion_config).to receive(:set_pillar_roots)
         allow(configurator).to receive(:fetch_config)
         allow(Yast::WFM).to receive(:CallFunction)
-        allow(Y2ConfigurationManagement::Salt::FormulaSequence).to receive(:new)
-          .and_return(formula_sequence)
+        allow(Y2ConfigurationManagement::Salt::FormulaSequence)
+          .to receive(:new).and_return(formula_sequence)
       end
 
       it "retrieves the Salt states" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(states_url), config.work_dir(:local))
+          .with(URI(states_url), Pathname.new("/mnt#{config.work_dir}"))
         expect(configurator).to receive(:fetch_config)
-          .with(URI(pillar_url), config.work_dir(:local).join("pillar"))
+          .with(URI(pillar_url), Pathname.new("/mnt#{config.work_dir.join("pillar")}"))
         configurator.prepare
       end
 
@@ -104,7 +105,18 @@ describe Y2ConfigurationManagement::Configurators::Salt do
 
       it "sets file_roots in the minion's configuration" do
         expect(minion_config).to receive(:set_file_roots)
-          .with([config.states_root(:target), config.formulas_root(:target)])
+          .with(
+            [
+              config.work_dir.join("salt"),
+              config.work_dir.join("formulas", "states")
+            ]
+          )
+        configurator.prepare
+      end
+
+      it "sets pillar_roots in the minion's configuration" do
+        expect(minion_config).to receive(:set_pillar_roots)
+          .with(config.pillar_roots)
         configurator.prepare
       end
     end

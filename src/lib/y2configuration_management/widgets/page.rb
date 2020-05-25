@@ -103,6 +103,7 @@ module Y2ConfigurationManagement
         @value = current_values if visible?
       end
 
+      # TODO: rename to "selected?"
       # Determine whether this page is visible or not
       #
       # @return [Boolean] true if the page is visible; false otherwise.
@@ -125,6 +126,13 @@ module Y2ConfigurationManagement
       # @return [Integer]
       def min_height
         children.map(&:min_height).sum
+      end
+
+      # Update children visibility
+      #
+      # @param data [FormData] Form data
+      def update_visibility(data)
+        children.each { |e| e.update_visibility(data) }
       end
 
     protected

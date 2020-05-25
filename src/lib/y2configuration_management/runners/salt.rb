@@ -16,8 +16,10 @@ module Y2ConfigurationManagement
       # @see Y2ConfigurationManagement::Runners::Base#run_client_mode
       def run_client_mode(stdout, stderr)
         with_retries(config.auth_attempts, config.auth_time_out) do
-          run_cmd("salt-call", "--log-level", "debug", "state.highstate",
-            stdout: stdout, stderr: stderr)
+          run_cmd(
+            "salt-call", "--log-level", config.log_level.to_s, "state.highstate",
+            stdout: stdout, stderr: stderr
+          )
         end
       end
 
@@ -31,9 +33,10 @@ module Y2ConfigurationManagement
       # @see Y2ConfigurationManagement::Runners::Base#run_masterless_mode
       def run_masterless_mode(stdout, stderr)
         with_retries(config.auth_attempts, config.auth_time_out) do
-          run_cmd("salt-call", "--log-level", "debug", "--local",
-            "--pillar-root=#{config.pillar_root(:target)}", "state.highstate",
-            stdout: stdout, stderr: stderr)
+          run_cmd(
+            "salt-call", "--log-level", config.log_level.to_s, "--local", "state.highstate",
+            stdout: stdout, stderr: stderr
+          )
         end
       end
     end

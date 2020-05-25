@@ -84,9 +84,19 @@ module Y2ConfigurationManagement
         ReplacePoint(Id(widget_id), @inner)
       end
 
+      # Initialize the widget
       def init
-        replace(@inner)
-        self.value = @value
+        if @visible
+          replace(@inner)
+          self.value = @value
+        else
+          replace(EMPTY_WIDGET)
+        end
+      end
+
+      def replace(widget)
+        return unless Yast::UI.WidgetExists(Id(widget_id))
+        super(widget)
       end
     end
   end

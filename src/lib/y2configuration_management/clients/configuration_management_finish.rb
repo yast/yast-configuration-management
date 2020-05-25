@@ -5,11 +5,17 @@ require "y2configuration_management/configurations/base"
 require "y2configuration_management/clients/provision"
 
 Yast.import "Service"
+Yast.import "Wizard"
 
 module Y2ConfigurationManagement
   # Client to write the provisioner's configuration
   #
-  # @see Y2ConfigurationManagement::Configurators
+  # This client requires that the configurator and the configurators are already
+  # available (see {AutoClient}).
+  #
+  # @see Configurators
+  # @see Configurations
+  # @see Provision
   class ConfigurationManagementFinish < ::Installation::FinishClient
     include Yast::I18n
 
@@ -24,6 +30,7 @@ module Y2ConfigurationManagement
     #                                otherwise it returns false.
     def write
       return false if config.nil?
+      Yast::Wizard.CreateDialog
       log.info("Provisioning Configuration Management with config #{config.inspect}")
       configurator.prepare(require_formulas: false)
       # saving settings to target system
@@ -34,6 +41,7 @@ module Y2ConfigurationManagement
         configurator.services.each { |s| Service.Enable(s) }
       end
 
+      Yast::Wizard.CloseDialog
       true
     end
 
