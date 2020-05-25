@@ -33,6 +33,16 @@ module Y2ConfigurationManagement
       # @return [Pathname,nil]
       attr_reader :pillar_root
 
+      class << self
+        # Convenience method to create a set from a directory following the conventions
+        #
+        # @param path [Pathname] Directory for the formulas set
+        # @return [FormulasSet]
+        def from_directory(path)
+          new(path.join("metadata"), path.join("states"))
+        end
+      end
+
       # Constructor
       #
       # @param metadata_root [Pathname] Directory where formulas metadata is located

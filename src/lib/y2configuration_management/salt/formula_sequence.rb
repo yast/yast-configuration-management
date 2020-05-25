@@ -26,6 +26,7 @@ require "y2configuration_management/cfa/salt_top"
 Yast.import "Report"
 Yast.import "Message"
 Yast.import "Popup"
+Yast.import "Installation"
 
 # @!macro [new] seeSequence
 #   @see https://www.rubydoc.info/github/yast/yast-yast2/UI/Sequence
@@ -83,9 +84,10 @@ module Y2ConfigurationManagement
       def write_data
         return :next if formulas.select(&:enabled?).empty?
 
-        [config.pillar_root, config.states_root].each do |path|
-          ::FileUtils.mkdir_p(path) unless File.exist?(path)
-          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+        [config.default_pillar_root, config.default_states_root].each do |path|
+          dir = File.join(Yast::Installation.destdir, path)
+          ::FileUtils.mkdir_p(dir) unless File.exist?(dir)
+          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(dir, "top.sls"))
           top.load
           top.add_states(formulas.select(&:enabled?).map(&:id))
           top.save
@@ -128,9 +130,11 @@ module Y2ConfigurationManagement
       # the {Pillar} associated with each one
       def read_formulas
         @formulas = config.formulas_sets.each_with_object([]) do |location, formulas|
-          reader = Y2ConfigurationManagement::Salt::FormulasReader.new(
-            location.metadata_root, location.pillar_root || config.pillar_root
+          metadata_path = File.join(Yast::Installation.destdir, location.metadata_root)
+          pillar_path = File.join(
+            Yast::Installation.destdir, location.pillar_root || config.default_pillar_root
           )
+          reader = Y2ConfigurationManagement::Salt::FormulasReader.new(metadata_path, pillar_path)
           formulas.concat(reader.formulas)
         end
       end

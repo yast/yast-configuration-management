@@ -39,6 +39,8 @@ module Y2ConfigurationManagement
       attr_reader :keys_url
       # @return [Boolean] CM Services will be enabled on the target system
       attr_reader :enable_services
+      # @return [Symbol] Log level
+      attr_reader :log_level
 
       class << self
         # @return [Base] Current configuration
@@ -98,9 +100,10 @@ module Y2ConfigurationManagement
         @master          = options[:master]
         @mode            = @master ? :client : :masterless
         @keys_url        = URI(options[:keys_url]) if options[:keys_url]
-        @auth_attempts   = options[:auth_attempts] || DEFAULT_AUTH_ATTEMPTS
-        @auth_time_out   = options[:auth_time_out] || DEFAULT_AUTH_TIME_OUT
+        @auth_attempts   = auth_required? ? options.fetch(:auth_attempts, DEFAULT_AUTH_ATTEMPTS) : 1
+        @auth_time_out   = auth_required? ? options.fetch(:auth_time_out, DEFAULT_AUTH_TIME_OUT) : 0
         @enable_services = !!options[:enable_services]
+        @log_level       = options[:log_level] ? options[:log_level].to_sym : :info
         post_initialize(options)
       end
 
@@ -113,24 +116,22 @@ module Y2ConfigurationManagement
         nil
       end
 
-      # Return a path to a temporal directory to extract states/pillars
+      # Return a path to a temporal directory to extract modules/states/pillars
       #
-      # @param scope [Symbol] Path relative to inst-sys (:local) or the target system (:target)
       # @return [String] Path name to the temporal directory
-      def work_dir(scope = :local)
-        @work_dir ||= build_work_dir_name
-        prefix = (scope == :target) ? "/" : Yast::Installation.destdir
-        Pathname.new(prefix).join(@work_dir)
+      def work_dir
+        @work_dir ||= Pathname.new(Yast::Directory.vardir).join(
+          "cm-#{Time.now.strftime("%Y%m%d%H%M")}"
+        )
       end
 
-    private
-
-      # Build a path to be used as work_dir
+      # Determines whether the authentication is needed
       #
-      # @return [Pathname] Relative work_dir path
-      def build_work_dir_name
-        path = Pathname.new(Yast::Directory.vardir).join("cm-#{Time.now.strftime("%Y%m%d%H%M")}")
-        path.relative_path_from(Pathname.new("/"))
+      # By default, authentication is needed only in :client mode.
+      #
+      # @return [Boolean]
+      def auth_required?
+        @mode == :client
       end
     end
   end

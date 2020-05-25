@@ -23,6 +23,7 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/page"
 require "y2configuration_management/widgets/text"
+require "y2configuration_management/salt/form_data"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::Page do
@@ -76,6 +77,16 @@ describe Y2ConfigurationManagement::Widgets::Page do
   describe "#min_height" do
     it "returns sum of the min_height of the underlying widgets" do
       expect(page.min_height).to eq(3)
+    end
+  end
+
+  describe "#update_visibility" do
+    let(:data) { Y2ConfigurationManagement::Salt::FormData.new({}) }
+
+    it "updates children visibility" do
+      expect(widget1).to receive(:update_visibility).with(data)
+      expect(widget2).to receive(:update_visibility).with(data)
+      page.update_visibility(data)
     end
   end
 end
