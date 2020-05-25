@@ -27,26 +27,37 @@ require "tmpdir"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Salt::FormulaSequence do
-  let(:formulas_root) { FIXTURES_PATH.join("formulas-ng") }
-  let(:form) { formulas_root.join("form.yml") }
-  let(:formulas) { Y2ConfigurationManagement::Salt::Formula.all(formulas_root.to_s, reload: true) }
   let(:selector) { instance_double(Y2ConfigurationManagement::Salt::FormulaSelection, run: :next) }
   let(:formula_config_sequence) do
     instance_double(Y2ConfigurationManagement::Salt::FormulaConfiguration, run: :abort)
   end
   let(:config) do
-    Y2ConfigurationManagement::Configurations::Salt.new(
-      formulas_roots: [formulas_root]
+    Y2ConfigurationManagement::Configurations::Salt.new_from_hash(
+      "formulas_sets" => [
+        {
+          "metadata_root" => metadata_root.to_s,
+          "pillar_root"   => pillar_root.to_s
+        }
+      ]
     )
   end
   let(:tmpdir) { Pathname(Dir.mktmpdir) }
+  let(:work_dir) { tmpdir.join("work_dir") }
+  let(:formulas_root) { tmpdir.join("formulas") }
+  let(:pillar_root) { formulas_root.join("pillar") }
+  let(:metadata_root) { formulas_root.join("metadata") }
   let(:reverse) { false }
+
   subject(:sequence) { described_class.new(config, reverse: reverse, require_formulas: true) }
 
   before do
-    allow(config).to receive(:work_dir).and_return(tmpdir)
+    allow(config).to receive(:work_dir).and_return(work_dir)
     allow(Y2ConfigurationManagement::Salt::FormulaConfiguration)
-      .to receive(:new).with(formulas, reverse: reverse).and_return(formula_config_sequence)
+      .to receive(:new).with(Array, reverse: reverse).and_return(formula_config_sequence)
+
+    FileUtils.mkdir_p(formulas_root.join("metadata"))
+    FileUtils.cp_r(FIXTURES_PATH.join("formulas-ng").glob("*"), metadata_root)
+    FileUtils.mkdir_p(formulas_root.join("pillar"))
   end
 
   after do
@@ -96,7 +107,7 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     before do
       allow(Yast::Report).to receive(:Error)
       allow(Y2ConfigurationManagement::Salt::FormulaSelection)
-        .to receive(:new).with(formulas).and_return(selector)
+        .to receive(:new).with(Array).and_return(selector)
     end
 
     it "runs the formula selection dialog" do
@@ -126,7 +137,9 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
     end
 
     context "when there are not formulas available in the system" do
-      let(:formulas_root) { FIXTURES_PATH.join("missing") }
+      before do
+        FileUtils.rm_r(metadata_root)
+      end
 
       it "reports an error" do
         expect(Yast::Report).to receive(:Error).with(/There are no formulas available/)
@@ -163,34 +176,42 @@ describe Y2ConfigurationManagement::Salt::FormulaSequence do
 
       it "runs the formulas configuration sequence in reverse order" do
         allow(Y2ConfigurationManagement::Salt::FormulaConfiguration)
-          .to receive(:new).with(formulas, reverse: true).and_return(formula_config_sequence)
+          .to receive(:new).with(Array, reverse: true).and_return(formula_config_sequence)
         sequence.configure_formulas
       end
     end
   end
 
   describe "#write_data" do
-    before do
-      formulas.each { |f| allow(f).to receive(:enabled?).and_return(true) }
-    end
-
     context "when no formula was selected to be applied" do
-      let(:formulas) { [] }
-
       it "returns :next without notifying" do
         expect(Yast::Popup).to_not receive(:Feedback)
         expect(sequence.write_data).to eql(:next)
       end
     end
 
-    it "popups a feedback message" do
-      expect(Yast::Popup).to receive(:Feedback)
-      sequence.write_data
-    end
+    context "when a formula was selected to be applied" do
+      before do
+        sequence.formulas[0].enabled = true
+      end
 
-    it "returns :next" do
-      allow(Yast::Popup).to receive(:Feedback)
-      expect(sequence.write_data).to eql(:next)
+      it "writes the pillar data" do
+        sequence.write_data
+        files = pillar_root.glob("*")
+        expect(files.map(&:to_s)).to contain_exactly(
+          sequence.formulas[0].pillar.path.to_s
+        )
+      end
+
+      it "popups a feedback message" do
+        expect(Yast::Popup).to receive(:Feedback)
+        sequence.write_data
+      end
+
+      it "returns :next" do
+        allow(Yast::Popup).to receive(:Feedback)
+        expect(sequence.write_data).to eql(:next)
+      end
     end
   end
 end

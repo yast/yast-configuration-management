@@ -27,8 +27,10 @@ module Y2ConfigurationManagement
 
       # @see Base#prepare
       mode(:masterless) do |reverse: false, require_formulas: false|
-        fetch_config(config.states_url, config.work_dir) if config.states_url
-        fetch_config(config.pillar_url, config.pillar_root) if config.pillar_url
+        fetch_config(config.states_url, target_path(config.work_dir)) if config.states_url
+        if config.pillar_url
+          fetch_config(config.pillar_url, target_path(config.default_pillar_root))
+        end
         update_configuration
         sequence = Y2ConfigurationManagement::Salt::FormulaSequence.new(
           config, reverse: reverse, require_formulas: require_formulas
@@ -77,9 +79,8 @@ module Y2ConfigurationManagement
         if config.master.is_a?(::String)
           config_file.master = config.master
         else
-          config_file.set_file_roots(
-            config.states_roots(:target) + config.formulas_roots(:target)
-          )
+          config_file.set_file_roots(config.states_roots)
+          config_file.set_pillar_roots(config.pillar_roots)
         end
         config_file.save
       end
@@ -88,14 +89,14 @@ module Y2ConfigurationManagement
       #
       # @return [Pathname] Path to private key
       def private_key_path
-        Pathname(::File.join(Yast::Installation.destdir, PRIVATE_KEY_PATH))
+        target_path(PRIVATE_KEY_PATH)
       end
 
       # Return path to public key
       #
       # @return [Pathname] Path to public_key
       def public_key_path
-        Pathname(::File.join(Yast::Installation.destdir, PUBLIC_KEY_PATH))
+        target_path(PUBLIC_KEY_PATH)
       end
     end
   end

@@ -84,18 +84,28 @@ the required workflow. In the example below, only the relevant parts are shown:
   xmlns:config="http://www.suse.com/1.0/configns">
 
   <configuration_management>
-      <type>salt</type>
-      <!-- Default Salt Formulas root directories -->
-      <formulas_roots config:type="list">
-        <formulas_root>/usr/share/susemanager/formulas/metadata</formulas_root>
-        <formulas_root>/srv/formula_metadata</formulas_root>
-      </formulas_roots>
-      <!-- Default Salt Formulas state directories -->
-      <states_roots config:type="list">
+    <type>salt</type>
+    <!-- Default Salt Formulas directories -->
+    <formulas_sets config:type="list">
+      <listentry>
+        <metadata_root>/usr/share/susemanager/formulas/metadata</metadata_root>
         <states_root>/usr/share/susemanager/formulas/states</states_root>
-      </states_roots>
-      <!-- Default Salt Formulas pillar data directory  -->
-      <pillar_root>/srv/susemanager/formula_data</pillar_root>
+        <pillar_root>/srv/susemanager/formula_data</pillar_root>
+      </listentry>
+      <listentry>
+        <metadata_root>/usr/share/salt-formulas/metadata</metadata_root>
+        <states_root>/usr/share/salt-formulas/states</states_root>
+        <pillar_root>/srv/salt-formulas/pillar</pillar_root>
+      </listentry>
+      <listentry>
+        <metadata_root>/srv/formula_metadata</metadata_root>
+      </listentry>
+    </formulas_sets>
+    <states_roots config:type="list">
+      <listentry>/srv/salt</listentry>
+    </states_roots>
+    <!-- Default Salt Formulas pillar data directory  -->
+    <pillar_root>/srv/pillar</pillar_root>
   </configuration_management>
 
   <!-- more stuff -->
@@ -120,31 +130,30 @@ the required workflow. In the example below, only the relevant parts are shown:
 
 ## Salt Formulas Forms Support
 
-**WARNING: Under development.**
+[Salt Formulas
+Forms](https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-best-practices/single-html/book.suma.best.practices/book.suma.best.practices.html#best.practice.salt.formulas.and.forms)
+are supported. If you find out that some feature is missing, please, open a
+[bug report](https://bugzilla.opensuse.org/).
 
-The support for Salt Formulas Forms is still under development. Currently, the module is able to
-render the corresponding UI to get user's input, store the information and run Salt accordingly.
-However, some stuff is still missing:
-
-* Some basic widgets are not implemented yet (passwords, numbers, etc.).
-* Support for nested collections, although simple collections are already working.
-* Better integration with Firstboot (supporting stuff like going back or running Salt at the end).
-* Good documentation.
+The supported widget types are listed in the
+{Y2ConfigurationManagement::Salt::FormBuilder::INPUT_WIDGET_CLASS} constant. Additionally, groups
+(`group` and `namespace`) and collections (`edit-group`) are supported too.
 
 ## Options Reference
 
-Name            | Type         | Mode       | Description
----             | ---          | ---        | ---
-type            | string       | all        | Configuration Management System (`salt` or `puppet`)
-master          | string       | client     | Master server (if not set, it will run as masterless
-auth_attempts   | integer      | client     | Number of attempts when connecting to the master server
-auth_time_out   | integer      | client     | Time (in seconds) between attempts to connect to the master
-enable_services | boolean      | client     | Enable the configuration management service at the end
-formulas_roots  | list(string) | all        | List of directories to search for Salt formulas
-states_roots    | list(string) | all        | List of directories to search for Salt states
-pillar_root     | string       | all        | Path to write the Salt Pillar content
-pillar_url      | string       | masterless | URL to get Pillar content from
-keys_url        | string       | masterless | URL to get authentication keys from
-states_url      | string       | masterless | URL to get the Salt states from
-modules_url     | list(string) | masterless | URL to get Puppet modules from
-enabled_states  | list(string) | masterless | List of states/formulas to apply
+Name            | Type         | Provisioner | Mode       | Description
+---             | ---          | ---         | ---        | ---
+type            | string       | -           | all        | Configuration Management System (`salt` or `puppet`)
+master          | string       | all         | client     | Master server (if not set, it will run as masterless
+auth_attempts   | integer      | all         | client     | Number of attempts when connecting to the master server
+auth_time_out   | integer      | all         | client     | Time (in seconds) between attempts to connect to the master
+enable_services | boolean      | all         | client     | Enable the configuration management service at the end
+formulas_roots  | list(string) | salt        | all        | List of directories to search for Salt formulas
+states_roots    | list(string) | salt        | all        | List of directories to search for Salt states
+pillar_root     | string       | salt        | all        | Path to write the Salt Pillar content
+pillar_url      | string       | salt        | masterless | URL to get Pillar content from
+keys_url        | string       | all         | masterless | URL to get authentication keys from
+states_url      | string       | salt        | masterless | URL to get the Salt states from
+modules_url     | list(string) | puppet      | masterless | URL to get Puppet modules from
+enabled_states  | list(string) | salt        | masterless | List of states/formulas to apply
+log_level       | string       | all         | all        | Log level when running the provisioner (default to 'info')

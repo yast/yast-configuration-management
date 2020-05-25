@@ -7,7 +7,7 @@ require "y2configuration_management/configurations/base"
 describe Y2ConfigurationManagement::Clients::Provision do
   subject(:client) { described_class.new }
 
-  let(:dialog) { double("dialog") }
+  let(:dialog) { double("dialog", run: nil) }
   let(:config) { double("config") }
   let(:runner) { double("runner") }
 
@@ -25,6 +25,47 @@ describe Y2ConfigurationManagement::Clients::Provision do
       expect(dialog).to receive(:run).and_yield($stdout, $stderr)
       expect(runner).to receive(:run)
       client.run
+    end
+
+    context "during autoinstallation" do
+      let(:messages_settings) do
+        { "show" => true, "timeout" => 10 }
+      end
+
+      let(:errors_settings) do
+        { "show" => true, "timeout" => 30 }
+      end
+
+      before do
+        Yast::Report.Import("messages" => messages_settings, "errors" => errors_settings)
+      end
+
+      around do |example|
+        old_mode = Yast::Mode.mode
+        Yast::Mode.SetMode("autoinstallation")
+        example.run
+        Yast::Mode.SetMode(old_mode)
+      end
+
+      it "sets show/timeout settings from Yast::Report" do
+        expect(Y2ConfigurationManagement::Dialogs::Running).to receive(:new)
+          .with(
+            reporting_opts: {
+              open_after_success: true, open_after_error: true,
+              timeout_after_success: 10, timeout_after_error: 30
+            }
+          ).and_return(dialog)
+        client.run
+      end
+    end
+
+    context "during normal mode" do
+      it "shows all messages and errors" do
+        expect(Y2ConfigurationManagement::Dialogs::Running).to receive(:new)
+          .with(reporting_opts: { open_after_success: true, open_after_error: true })
+          .and_return(dialog)
+        client.run
+      end
     end
   end
 end

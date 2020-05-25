@@ -23,11 +23,15 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/pager_tree_item"
 require "y2configuration_management/widgets/page"
+require "y2configuration_management/salt/form_condition"
+require "y2configuration_management/salt/form_data"
 require "cwm/rspec"
 
 describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
   subject(:item) do
-    described_class.new(page, children: [nested_item]).tap { |i| i.tree = tree }
+    described_class.new(
+      page, children: [nested_item], visible_if: form_condition
+    ).tap { |i| i.tree = tree }
   end
 
   let(:page) do
@@ -44,6 +48,10 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
   end
   let(:tree) { double("tree") }
 
+  let(:form_condition) do
+    Y2ConfigurationManagement::Salt::FormCondition.parse(".item == true")
+  end
+
   include_examples "CWM::AbstractWidget"
 
   describe "#page_id" do
@@ -55,6 +63,16 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
   describe "#value" do
     it "returns values from pages" do
       expect(item.value).to eq("name" => "YaST2", "labels" => nested_page.value)
+    end
+
+    context "when a page is not visible" do
+      before do
+        allow(nested_item).to receive(:visible?).and_return(false)
+      end
+
+      it "does not include its values" do
+        expect(item.value).to eq("name" => "YaST2")
+      end
     end
   end
 
@@ -79,6 +97,58 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
       it "returns its parent tree" do
         nested = item.items.first
         expect(nested.tree).to eq(tree)
+      end
+    end
+  end
+
+  describe "#update_visibility" do
+    let(:data) { Y2ConfigurationManagement::Salt::FormData.new({}) }
+
+    before do
+      allow(form_condition).to receive(:evaluate)
+        .with(data, context: item).and_return(visible?)
+    end
+
+    context "when visibility condition evaluates to true" do
+      let(:visible?) { true }
+
+      it "sets the item as visible" do
+        item.update_visibility(data)
+        expect(item).to be_visible
+      end
+
+      it "asks children to set their visibility" do
+        expect(nested_item).to receive(:update_visibility)
+        item.update_visibility(data)
+      end
+    end
+
+    context "when visibility condition evaluates to false" do
+      let(:visible?) { false }
+
+      it "sets the item as not visible" do
+        item.update_visibility(data)
+        expect(item).to_not be_visible
+      end
+
+      it "sets the children as not visible" do
+        item.update_visibility(data)
+        expect(nested_item).to_not be_visible
+      end
+    end
+
+    context "when it has no condition and its parent is visible" do
+      let(:visible?) { false }
+
+      before do
+        allow(item).to receive(:visible?).and_return(false)
+        nested_item.update_visibility(data) # set as false because the parent is not visible
+      end
+
+      it "sets the item as visible" do
+        allow(item).to receive(:visible?).and_return(true)
+        nested_item.update_visibility(data)
+        expect(nested_item).to be_visible
       end
     end
   end

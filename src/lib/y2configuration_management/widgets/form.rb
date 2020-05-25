@@ -121,9 +121,7 @@ module Y2ConfigurationManagement
       end
 
       def update_visibility(data)
-        widgets.each do |widget|
-          widget.update_visibility(data) if widget.respond_to? :update_visibility
-        end
+        tree_pager.update_visibility(data)
       end
 
       def relative_locator

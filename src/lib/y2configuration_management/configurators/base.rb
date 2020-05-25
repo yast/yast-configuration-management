@@ -118,7 +118,7 @@ module Y2ConfigurationManagement
       #
       # @see .mode
       def prepare(opts = {})
-        ::FileUtils.mkdir_p(config.work_dir) if mode?(:masterless)
+        ::FileUtils.mkdir_p(target_path(config.work_dir)) if mode?(:masterless)
         send("prepare_#{config.mode}", opts)
       end
 
@@ -154,6 +154,13 @@ module Y2ConfigurationManagement
       def fetch_keys(url, private_key_path, public_key_path)
         return false if url.nil? # FIXME: should be move to the caller
         KeyFinder.new(keys_url: url).fetch_to(private_key_path, public_key_path)
+      end
+
+      # Returns the path in the target system
+      #
+      # @return [Pathname]
+      def target_path(path)
+        Pathname.new(::File.join(Yast::Installation.destdir, path))
       end
     end
   end

@@ -5,15 +5,15 @@ require "y2configuration_management/configurations/puppet"
 require "tmpdir"
 
 describe Y2ConfigurationManagement::Configurations::Puppet do
-  subject(:config) { Y2ConfigurationManagement::Configurations::Puppet.new(profile) }
+  subject(:config) { described_class.new_from_hash(hash) }
 
   let(:master) { "puppet.suse.de" }
   let(:modules_url) { "http://ftp.suse.de/modules.tgz" }
 
-  let(:profile) do
+  let(:hash) do
     {
-      master:      master,
-      modules_url: modules_url
+      "master"      => master,
+      "modules_url" => modules_url
     }
   end
 

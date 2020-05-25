@@ -23,6 +23,7 @@
 require_relative "../../spec_helper"
 require "y2configuration_management/widgets/tree_pager"
 require "y2configuration_management/widgets/pager_tree_item"
+require "y2configuration_management/salt/form_data"
 
 describe Y2ConfigurationManagement::Widgets::TreePager do
   subject(:tree_pager) do
@@ -149,6 +150,25 @@ describe Y2ConfigurationManagement::Widgets::TreePager do
 
     it "returns the max min_height of the underlying widgets" do
       expect(tree_pager.min_height).to eq(3)
+    end
+  end
+
+  describe "#update_visibility" do
+    let(:data) { Y2ConfigurationManagement::Salt::FormData.new({}) }
+    let(:tree) do
+      instance_double(
+        Y2ConfigurationManagement::Widgets::Tree, refresh: nil, items: [item]
+      )
+    end
+
+    before do
+      allow(Y2ConfigurationManagement::Widgets::Tree).to receive(:new).and_return(tree)
+    end
+
+    it "update items visibility and refreshes the tree" do
+      expect(item).to receive(:update_visibility)
+      expect(tree).to receive(:refresh)
+      tree_pager.update_visibility(data)
     end
   end
 end

@@ -13,11 +13,11 @@ describe Y2ConfigurationManagement::Configurations::Base do
 
   let(:profile) do
     {
-      "type"          => "salt",
-      "master"        => master,
-      "auth_attempts" => 5,
-      "auth_time_out" => 10,
-      "keys_url"      => "http://internal-server.com/keys.tgz"
+      type:          "salt",
+      master:        master,
+      auth_attempts: 5,
+      auth_time_out: 10,
+      keys_url:      "http://internal-server.com/keys.tgz"
     }
   end
 
@@ -39,30 +39,14 @@ describe Y2ConfigurationManagement::Configurations::Base do
 
   describe "#work_dir" do
     let(:now) { Time.new(2017, 5, 4, 15, 0) }
-    let(:expected) { "#{Yast::Directory.vardir}/cm-201705041500" }
 
     before do
       allow(Time).to receive(:now).and_return(now)
-      allow(Yast::Installation).to receive(:destdir).and_return("/mnt")
       allow(Yast::Directory).to receive(:vardir).and_return("/var/lib/YaST")
     end
 
-    context "when no scope is given" do
-      it "returns a path with a timestamp prefixed by the installation directory" do
-        expect(config.work_dir).to eq(Pathname("/mnt#{expected}"))
-      end
-    end
-
-    context "when :local scope is given" do
-      it "returns a path with a timestamp prefixed by the installation directory" do
-        expect(config.work_dir(:local)).to eq(Pathname("/mnt#{expected}"))
-      end
-    end
-
-    context "when no scope is given" do
-      it "returns a path with a timestamp not prefixed by the installation directory" do
-        expect(config.work_dir(:target)).to eq(Pathname(expected))
-      end
+    it "returns a path including a timestamp under YaST's var directory" do
+      expect(config.work_dir.to_s).to eq(File.join(Yast::Directory.vardir, "cm-201705041500"))
     end
   end
 end

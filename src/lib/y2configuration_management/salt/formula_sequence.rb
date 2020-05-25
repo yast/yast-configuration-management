@@ -20,12 +20,13 @@
 require "ui/sequence"
 require "y2configuration_management/salt/formula_configuration"
 require "y2configuration_management/salt/formula_selection"
-require "y2configuration_management/salt/formula"
+require "y2configuration_management/salt/formulas_reader"
 require "y2configuration_management/cfa/salt_top"
 
 Yast.import "Report"
 Yast.import "Message"
 Yast.import "Popup"
+Yast.import "Installation"
 
 # @!macro [new] seeSequence
 #   @see https://www.rubydoc.info/github/yast/yast-yast2/UI/Sequence
@@ -33,7 +34,7 @@ module Y2ConfigurationManagement
   module Salt
     # This class is reponsible of running the sequence for selecting the Salt
     # {Formula}s to be applied, configuring all the {Formula}s through its
-    # {Form}s and write the {Pillar}s data associated to each of the selected
+    # {Form}s and writing the {Pillar}s data associated to each of the selected
     # {Formula}s into the system.
     class FormulaSequence < UI::Sequence
       # @return [Array<Formula>] available on the system
@@ -83,9 +84,10 @@ module Y2ConfigurationManagement
       def write_data
         return :next if formulas.select(&:enabled?).empty?
 
-        [config.pillar_root, config.states_root].each do |path|
-          ::FileUtils.mkdir_p(path) unless File.exist?(path)
-          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(path, "top.sls"))
+        [config.default_pillar_root, config.default_states_root].each do |path|
+          dir = File.join(Yast::Installation.destdir, path)
+          ::FileUtils.mkdir_p(dir) unless File.exist?(dir)
+          top = Y2ConfigurationManagement::CFA::SaltTop.new(path: File.join(dir, "top.sls"))
           top.load
           top.add_states(formulas.select(&:enabled?).map(&:id))
           top.save
@@ -127,20 +129,14 @@ module Y2ConfigurationManagement
       # It reads all the available {Formula}s in the system initializing also
       # the {Pillar} associated with each one
       def read_formulas
-        @formulas = Y2ConfigurationManagement::Salt::Formula.all(config.formulas_roots.map(&:to_s))
-        @formulas.each { |f| f.pillar = pillar_for(f) }
-      end
-
-      # Convenience method for reading the {Pillar} associated to the given
-      # formula
-      #
-      # @param formula [Formula]
-      # @return [Pillar]
-      def pillar_for(formula)
-        pillar_file = File.join(config.pillar_root, "#{formula.id}.sls")
-        pillar = Y2ConfigurationManagement::Salt::Pillar.new(data: {}, path: pillar_file)
-        pillar.load
-        pillar
+        @formulas = config.formulas_sets.each_with_object([]) do |location, formulas|
+          metadata_path = File.join(Yast::Installation.destdir, location.metadata_root)
+          pillar_path = File.join(
+            Yast::Installation.destdir, location.pillar_root || config.default_pillar_root
+          )
+          reader = Y2ConfigurationManagement::Salt::FormulasReader.new(metadata_path, pillar_path)
+          formulas.concat(reader.formulas)
+        end
       end
 
       # Asks the user to select the enabled formulas/states

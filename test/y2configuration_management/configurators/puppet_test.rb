@@ -92,7 +92,7 @@ describe Y2ConfigurationManagement::Configurators::Puppet do
 
       it "retrieves the Puppet modules" do
         expect(configurator).to receive(:fetch_config)
-          .with(URI(modules_url), config.work_dir(:local))
+          .with(URI(modules_url), configurator.target_path(config.work_dir))
         configurator.prepare
       end
     end

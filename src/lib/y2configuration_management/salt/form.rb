@@ -29,6 +29,8 @@ module Y2ConfigurationManagement
   module Salt
     # A [Form][1] for [Salt Formulas][2].
     #
+    # This class offers an API on top of the form specification.
+    #
     # [1]: https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/best.practice.salt.formulas.and.forms.html#best.practice.salt.formulas.pillar
     # [2]: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
     class Form
@@ -286,7 +288,7 @@ module Y2ConfigurationManagement
       # @param parent [FormElement]
       def initialize(id, spec, parent:)
         super
-        @item_name = spec["item_name"] if spec["item_name"]
+        @item_name = spec["$itemName"] if spec["$itemName"]
         @min_items = spec["$minItems"] if spec["$minItems"]
         @max_items = spec["$maxItems"] if spec["$maxItems"]
         @prototype = prototype_for(id, spec)

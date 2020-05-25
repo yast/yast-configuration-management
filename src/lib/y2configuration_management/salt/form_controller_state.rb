@@ -24,7 +24,7 @@ module Y2ConfigurationManagement
     # Stores the UI state information
     #
     # This class holds information related to FormController. Basically, it behaves like a stack
-    # which contains informaion about the open widget forms and the current form data. Those items
+    # which contains information about the open widget forms and the current form data. Those items
     # could have been stored directly in the FormController instance, but they have been extracted
     # in order to keep the controller as simple as possible.
     class FormControllerState

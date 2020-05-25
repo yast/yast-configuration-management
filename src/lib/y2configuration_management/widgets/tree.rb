@@ -24,6 +24,8 @@ require "cwm"
 module Y2ConfigurationManagement
   module Widgets
     # Tree widget to display the form sections
+    #
+    # It only shows visible entries (@see {PagerTreeItem#visible?}).
     class Tree < ::CWM::Tree
       # @return [Array<PagerTreeItem>] Included tree items
       attr_reader :items
@@ -46,6 +48,36 @@ module Y2ConfigurationManagement
       # @see CWM::AbstractWidget
       def label
         _("Sections")
+      end
+
+      # Tree's content
+      #
+      # It only shows the visible elements
+      #
+      # @return [Yast::Term]
+      # @see PagerTreeItem#visible?
+      def contents
+        VBox(
+          ReplacePoint(Id(:tree_items), tree_content)
+        )
+      end
+
+      # Refreshes the tree content keeping the current item as selected
+      def refresh
+        return unless Yast::UI.WidgetExists(Id(widget_id))
+        current_item = Yast::UI.QueryWidget(Id(widget_id), :CurrentItem)
+        Yast::UI.ReplaceWidget(Id(:tree_items), tree_content)
+        Yast::UI.ChangeWidget(Id(widget_id), :CurrentItem, current_item)
+      end
+
+    private
+
+      # Returns the Tree term
+      #
+      # @return [Yast::Term]
+      def tree_content
+        item_terms = items.select(&:visible?).map(&:ui_term)
+        Tree(Id(widget_id), Opt(:notify), label, item_terms)
       end
     end
   end
