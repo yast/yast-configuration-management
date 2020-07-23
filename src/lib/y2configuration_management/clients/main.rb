@@ -22,6 +22,7 @@ require "y2configuration_management/clients/provision"
 require "y2configuration_management/configurators/salt"
 require "y2configuration_management/configurations/salt"
 require "y2configuration_management/salt/formula"
+require "yast2/popup"
 
 Yast.import "WFM"
 Yast.import "PackageSystem"
@@ -49,6 +50,7 @@ module Y2ConfigurationManagement
     #   </configuration_management>
     class Main < Yast::Client
       include Yast::Logger
+      include Yast::I18n
 
       # @see https://documentation.suse.com/external-tree/en-us/suma/3.2/susemanager-best-practices/single-html/book.suma.best.practices/book.suma.best.practices.html#best.practice.salt.formulas.what
       SUMA_FORMULAS_BASE = "/usr/share/susemanager/formulas".freeze
@@ -89,6 +91,10 @@ module Y2ConfigurationManagement
           return :abort
         end
         Y2ConfigurationManagement::Clients::Provision.new.run
+      rescue Yast::XMLDeserializationError => e
+        textdomain "configuration_management"
+        Yast2::Popup.show(_("Failed to parse configuration file."), headline: :error, details: e.message)
+        return :abort
       end
 
     private
