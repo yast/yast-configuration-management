@@ -93,7 +93,8 @@ module Y2ConfigurationManagement
         Y2ConfigurationManagement::Clients::Provision.new.run
       rescue Yast::XMLDeserializationError => e
         textdomain "configuration_management"
-        Yast2::Popup.show(_("Failed to parse configuration file."), headline: :error, details: e.message)
+        Yast2::Popup.show(_("Failed to parse configuration file."),
+          headline: :error, details: e.message)
         return :abort
       end
 
