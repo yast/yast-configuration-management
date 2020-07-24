@@ -88,6 +88,23 @@ describe Y2ConfigurationManagement::Clients::Main do
       end
     end
 
+    context "when configuration is not valid XML" do
+      before do
+        allow(Yast::XML).to receive(:XMLToYCPFile).and_raise(Yast::XMLDeserializationError)
+        allow(Yast2::Popup).to receive(:show)
+      end
+
+      it "shows error popup" do
+        expect(Yast2::Popup).to receive(:show)
+
+        main.run
+      end
+
+      it "returns :abort" do
+        expect(main.run).to eq :abort
+      end
+    end
+
     it "configures the provisioner" do
       expect(configurator).to receive(:prepare).with(require_formulas: true)
       main.run
