@@ -32,6 +32,11 @@ module Y2ConfigurationManagement
       return false if config.nil?
       Yast::Wizard.CreateDialog
       log.info("Provisioning Configuration Management with config #{config.inspect}")
+
+      # We need the raw cache to be clean in order to do "zypper ref --force".
+      # Otherwise, the operation will fail.
+      ::FileUtils.rm_r(ZYPP_RAW_CACHE) if Dir.exist?(ZYPP_RAW_CACHE)
+
       configurator.prepare(require_formulas: false)
       # saving settings to target system
       Y2ConfigurationManagement::Clients::Provision.new.run
@@ -54,6 +59,8 @@ module Y2ConfigurationManagement
     end
 
   private
+
+    ZYPP_RAW_CACHE = File.join(Yast::Installation.destdir, "var", "cache", "zypp", "raw")
 
     def configurator
       @configurator ||= Y2ConfigurationManagement::Configurators::Base.current
