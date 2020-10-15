@@ -34,7 +34,7 @@ module Y2ConfigurationManagement
       log.info("Provisioning Configuration Management with config #{config.inspect}")
 
       # We need the raw cache to be clean in order to do "zypper ref --force".
-      # Otherwise, the operation will fail.
+      # Otherwise, the operation will fail (bsc#1177522).
       ::FileUtils.rm_r(ZYPP_RAW_CACHE) if Dir.exist?(ZYPP_RAW_CACHE)
 
       configurator.prepare(require_formulas: false)
