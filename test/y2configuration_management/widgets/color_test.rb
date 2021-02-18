@@ -64,7 +64,13 @@ describe Y2ConfigurationManagement::Widgets::Color do
     context "when the current value is not a valid HEX color" do
       let(:value) { "#ahrdfH" }
 
+      it "reports an error" do
+        expect(Yast::Report).to receive(:Error)
+        color.validate
+      end
+
       it "returns false" do
+        allow(Yast::Report).to receive(:Error)
         expect(color.validate).to eql(false)
       end
     end

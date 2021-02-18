@@ -41,7 +41,22 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
   let(:key_widget) { dictionary.send(:key_widget) }
   let(:value_widget) { dictionary.send(:value_widget) }
   subject(:dictionary) { described_class.new(spec, locator) }
-  include_examples "CWM::CustomWidget"
+
+  context "with a valid value" do
+    before do
+      allow(key_widget).to receive(:value).and_return "YaST"
+    end
+
+    include_examples "CWM::CustomWidget"
+  end
+
+  context "with the initial value" do
+    before do
+      allow(Yast::Report).to receive(:Error)
+    end
+
+    include_examples "CWM::CustomWidget"
+  end
 
   describe "#contents" do
     it "contains a InputFIeld for the $key and $value" do
@@ -117,7 +132,13 @@ describe Y2ConfigurationManagement::Widgets::KeyValue do
     context "when the $key input is empty" do
       let(:key_widget_value) { "" }
 
+      it "reports an error" do
+        expect(Yast::Report).to receive(:Error)
+        subject.validate
+      end
+
       it "returns false" do
+        allow(Yast::Report).to receive(:Error)
         expect(subject.validate).to eql(false)
       end
     end

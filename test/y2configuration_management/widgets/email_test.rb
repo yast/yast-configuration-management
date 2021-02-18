@@ -59,6 +59,7 @@ describe Y2ConfigurationManagement::Widgets::Email do
       end
 
       it "returns false" do
+        allow(Yast::Report).to receive(:Error)
         expect(email.validate).to eql(false)
       end
     end

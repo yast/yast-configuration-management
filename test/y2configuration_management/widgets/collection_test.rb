@@ -29,7 +29,21 @@ describe Y2ConfigurationManagement::Widgets::Collection do
 
   subject(:collection) { described_class.new(spec, controller, locator) }
 
-  include_examples "CWM::CustomWidget"
+  context "with a correct value" do
+    before do
+      allow(subject).to receive(:value).and_return [double("item1"), double("item2")]
+    end
+
+    include_examples "CWM::CustomWidget"
+  end
+
+  context "with the default value" do
+    before do
+      allow(Yast::Report).to receive(:Error)
+    end
+
+    include_examples "CWM::CustomWidget"
+  end
 
   let(:form_spec) do
     Y2ConfigurationManagement::Salt::Form.from_file(
