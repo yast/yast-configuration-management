@@ -59,6 +59,7 @@ describe Y2ConfigurationManagement::Widgets::URL do
       end
 
       it "returns false" do
+        allow(Yast::Report).to receive(:Error)
         expect(url.validate).to eql(false)
       end
     end
