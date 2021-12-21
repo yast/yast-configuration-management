@@ -52,7 +52,7 @@ describe Y2ConfigurationManagement::Configurators::Base do
     end
 
     it "calls to 'prepare_MODE' method with passed options" do
-      expect(configurator).to receive(:send) { |arg, **rest| expect(arg).to eq "prepare_client" }
+      expect(configurator).to receive(:send) { |arg, **_| expect(arg).to eq "prepare_client" }
       configurator.prepare
     end
 
