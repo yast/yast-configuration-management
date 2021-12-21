@@ -46,11 +46,13 @@ describe Y2ConfigurationManagement::Configurators::Base do
     before do
       allow(config).to receive(:work_dir).and_return(work_dir)
       allow(FileUtils).to receive(:mkdir_p)
+      # both needed as ruby2 pass empty hash, but ruby3 pass nothing
       allow(configurator).to receive(:send).with("prepare_client", {})
+      allow(configurator).to receive(:send).with("prepare_client")
     end
 
     it "calls to 'prepare_MODE' method with passed options" do
-      expect(configurator).to receive(:send).with("prepare_client", {})
+      expect(configurator).to receive(:send) { |arg, **rest| expect(arg).to eq "prepare_client" }
       configurator.prepare
     end
 
@@ -58,7 +60,9 @@ describe Y2ConfigurationManagement::Configurators::Base do
       let(:master) { nil }
 
       before do
+        # both needed as ruby2 pass empty hash, but ruby3 pass nothing
         allow(configurator).to receive(:send).with("prepare_masterless", {})
+        allow(configurator).to receive(:send).with("prepare_masterless")
       end
 
       it "creates the work_dir" do

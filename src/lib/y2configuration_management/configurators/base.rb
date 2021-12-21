@@ -117,9 +117,10 @@ module Y2ConfigurationManagement
       #   failed or was aborted.
       #
       # @see .mode
-      def prepare(opts = {})
+      def prepare(**opts)
+        puts "prepare with #{opts.inspect}"
         ::FileUtils.mkdir_p(target_path(config.work_dir)) if mode?(:masterless)
-        send("prepare_#{config.mode}", opts)
+        send("prepare_#{config.mode}", **opts)
       end
 
       # Determines whether the configurator is operating in the given module
