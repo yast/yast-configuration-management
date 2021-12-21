@@ -29,14 +29,14 @@ module Y2ConfigurationManagement
 
       # @return [Symbol] :finish when configuration was successful; :back when the user
       #   :abort when configuration failed or was aborted.
-      mode(:masterless) do |_opts|
+      mode(:masterless) do |**_opts|
         update_configuration
         fetch_config(config.modules_url, target_path(config.work_dir)) ? :finish : :abort
       end
 
       # @return [Symbol] :finish when configuration was successful; :abort when configuration failed
       #   or was aborted.
-      mode(:client) do |_opts|
+      mode(:client) do |**_opts|
         update_configuration
         fetch_keys(config.keys_url, private_key_path, public_key_path) ? :finish : :abort
       end

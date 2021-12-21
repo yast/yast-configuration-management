@@ -39,7 +39,7 @@ module Y2ConfigurationManagement
       end
 
       # @see Base#prepare
-      mode(:client) do |_opts|
+      mode(:client) do |**_opts|
         fetch_keys(config.keys_url, private_key_path, public_key_path)
         update_configuration ? :finish : :abort
       end
