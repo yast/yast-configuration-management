@@ -17,7 +17,7 @@
 
 
 Name:           yast2-configuration-management
-Version:        4.4.1
+Version:        4.4.2
 Release:        0
 Url:            https://github.com/yast/yast-migration
 Summary:        YaST2 - YaST Configuration Management

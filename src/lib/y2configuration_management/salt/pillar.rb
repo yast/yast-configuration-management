@@ -57,7 +57,13 @@ module Y2ConfigurationManagement
       # @return [Boolean] whether the configuration was read
       def load
         return false unless path
-        @data = YAML.safe_load(File.read(path), [Date, Time])
+
+        @data = if RUBY_VERSION.start_with?("2.")
+          YAML.safe_load(File.read(path), [Date, Time])
+        else
+          YAML.safe_load(File.read(path), permitted_classes: [Date, Time])
+        end
+
         true
       rescue IOError, SystemCallError, RuntimeError => error
         log.error("Reading #{path} failed with exception: #{error.inspect}")
