@@ -30,10 +30,10 @@ describe Y2ConfigurationManagement::Runners::Puppet do
 
     context "when running in client mode" do
       it "runs puppet agent" do
+        opts = { stdout: $stdout, stderr: $stderr, chroot: "/mnt" }
         expect(Cheetah).to receive(:run)
           .with("puppet", "agent", "--onetime", "--no-daemonize",
-            "--waitforcert", config.auth_time_out.to_s, stdout: $stdout,
-            stderr: $stderr, chroot: "/mnt")
+            "--waitforcert", config.auth_time_out.to_s, opts)
         expect(runner.run).to eq(true)
       end
 
@@ -52,10 +52,11 @@ describe Y2ConfigurationManagement::Runners::Puppet do
       let(:master) { nil }
 
       it "runs salt-call" do
+        opts = { stdout: $stdout, stderr: $stderr, chroot: "/mnt" }
         expect(Cheetah).to receive(:run).with(
           "puppet", "apply", "--modulepath", config.work_dir.join("modules").to_s,
           config.work_dir.join("manifests", "site.pp").to_s,
-          stdout: $stdout, stderr: $stderr, chroot: "/mnt"
+          opts
         )
         expect(runner.run).to eq(true)
       end

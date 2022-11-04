@@ -27,9 +27,10 @@ describe Y2ConfigurationManagement::Runners::Salt do
 
     context "when running in client mode" do
       it "runs salt-call" do
+        opts = { stdout: $stdout, stderr: $stderr, chroot: "/mnt" }
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "info", "state.highstate",
-          stdout: $stdout, stderr: $stderr, chroot: "/mnt"
+          opts
         )
         expect(runner.run).to eq(true)
       end
@@ -49,9 +50,10 @@ describe Y2ConfigurationManagement::Runners::Salt do
       let(:master) { nil }
 
       it "runs salt-call" do
+        opts = { stdout: $stdout, stderr: $stderr, chroot: "/mnt" }
         expect(Cheetah).to receive(:run).with(
           "salt-call", "--log-level", "info", "--local", "state.highstate",
-          stdout: $stdout, stderr: $stderr, chroot: "/mnt"
+          opts
         )
         expect(runner.run).to eq(true)
       end

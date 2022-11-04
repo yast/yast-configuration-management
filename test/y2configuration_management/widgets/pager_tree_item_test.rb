@@ -82,7 +82,8 @@ describe Y2ConfigurationManagement::Widgets::PagerTreeItem do
     end
 
     it "propagates the values to the pages" do
-      expect(page).to receive(:value=).with("name" => "OBS")
+      page_value = { "name" => "OBS" }
+      expect(page).to receive(:value=).with(page_value)
       expect(nested_page).to receive(:value=).with(new_value["labels"])
       item.value = new_value
     end

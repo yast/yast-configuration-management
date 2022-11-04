@@ -17,6 +17,8 @@ describe Y2ConfigurationManagement::ConfigurationManagementFinish do
         .and_return(configurator)
       allow(Y2ConfigurationManagement::Clients::Provision).to receive(:new)
         .and_return(provision_client)
+      allow(Dir).to receive(:exist?).with("/var/cache/zypp/raw").and_return(true)
+      allow(FileUtils).to receive(:rm_r).with("/var/cache/zypp/raw")
     end
 
     context "when not configuration is set" do
