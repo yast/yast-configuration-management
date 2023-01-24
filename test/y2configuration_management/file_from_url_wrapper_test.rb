@@ -43,8 +43,7 @@ describe Y2ConfigurationManagement::FileFromUrlWrapper do
       expect(wrapper).to receive(:get_file_from_url).with(
         scheme: "usb", host: "",
         urlpath: "/some-file.txt",
-        urltok: { "scheme" => "usb", "path" => "", "query" => "", "fragment" => "",
-          "user" => "", "pass" => "", "port" => "", "host" => "some-file.txt" },
+        urltok: Hash,
         destdir: "/", localfile: "/tmp/local-file.txt"
       )
       wrapper.get_file(usb, target)
