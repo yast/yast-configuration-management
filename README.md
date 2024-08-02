@@ -2,8 +2,7 @@
 
 [![Workflow Status](https://github.com/yast/yast-configuration-management/workflows/CI/badge.svg?branch=master)](
 https://github.com/yast/yast-configuration-management/actions?query=branch%3Amaster)
-[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-configuration-management-master)](
-https://ci.opensuse.org/view/Yast/job/yast-yast-configuration-management-master/)
+[![OBS](https://github.com/yast/yast-configuration-management/actions/workflows/submit.yml/badge.svg)](https://github.com/yast/yast-configuration-management/actions/workflows/submit.yml)
 [![Coverage Status](https://coveralls.io/repos/github/yast/yast-configuration-management/badge.svg?branch=master)](
   https://coveralls.io/github/yast/yast-configuration-management?branch=master)
 [![Code Climate](https://codeclimate.com/github/yast/yast-configuration-management/badges/gpa.svg)](
